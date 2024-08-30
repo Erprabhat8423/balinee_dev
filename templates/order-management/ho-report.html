@@ -1,0 +1,245 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} {% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-12 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-5 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-7 p-md-0">
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-12 p-md-0 text-right">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <form id="hoReportForm">
+                {% csrf_token %}
+                <div class="row" id="tableBox">
+                    <div class="col-md-12 primaryContainerBG h-100 p-10 commonTableBg">
+                        <div class="row">
+                            <div class="col-md-6 text-left"><b>Last updated at : </b>{{last_row.created_at | date:'d/m/Y H:i'}}</div>
+                            <div class="col-md-6 text-right">
+                                
+                                <button type="button" id="" class="btn iconBox iconExportExcel"  onclick="exportExcel()"></button>
+                                <button type="button" id="editBtn" class="btn iconBox iconModify"  onclick="edit()"></button>
+                                <button class="btn btn-save float-right" id="updateBtn" type="button" style="display: none;" onclick="updateReport()">Save</button>
+                                <button class="btn btn-close float-right" id="cancelBtn" type="button" style="display: none;" onclick="cancel()" >Close</button>
+                            </div>
+                        </div>
+                        <div class="row" style="margin-top:10px;">
+                            <table id="addOrgTable" class="table table-bordered table-hover mt-0" style="width: 100%;">
+                                <thead>
+                                    <tr>
+                                        <th> EMPLOYEE NAME </th>
+                                        {% if product_milk_variant_list %}
+                                        {% for product_variant in product_milk_variant_list %}
+                                        <th style="color:#ffff;background-color: {{product_variant.product_color_code}}; text-align:center"> {{product_variant.variant_name}}  </th>
+                                        {% endfor %}
+                                        {% endif %}
+                                        {% if product_without_milk_variant_list %}
+                                        {% for product_variant in product_without_milk_variant_list %}
+                                        <th style="color:#ffff;background-color: {{product_variant.product_color_code}}; text-align:center"> {{product_variant.variant_name}}  </th>
+                                        {% endfor %}
+                                        {% endif %}
+                                        <th style="color:#ffff;background-color: #a4b787; text-align:center">AMOUNT</th>
+                                        
+                                    </tr>
+                                    
+                                </thead>
+                                <tbody>
+                                    
+                                    {% for user in users %}
+                                    <tr>
+                                        <td>{{user.first_name}} {{user.middle_name}} {{user.last_name}}</td>
+                                        
+                                        {% for product_variant in product_milk_variant_list %}
+                                        <td style="color:#ffff;background-color: {{product_variant.product_color_code}}; text-align:center"> 
+                                            <input type="hidden" value="{{product_variant.sp_employee}}">
+                                            <input type="text" value="{% get_ho_report_quantity user.id product_variant.id %}" name="quantity_{{user.id}}_{{product_variant.id}}" class="inputField numeric quantity_field product_quantity_{{product_variant.id}} quantity_{{user.id}}" onkeyup="calculateEmployeeAmount('{{user.id}}')" readonly>  
+                                        </td>
+                                        {% endfor %}
+                                        
+                                        {% for product_variant in product_without_milk_variant_list %}
+                                        <td style="color:#ffff;background-color: {{product_variant.product_color_code}}; text-align:center"> 
+                                            <input type="hidden" value="{{product_variant.sp_employee}}">
+                                            <input type="text"  value="{% get_ho_report_quantity user.id product_variant.id %}" name="quantity_{{user.id}}_{{product_variant.id}}" class="inputField numeric quantity_field product_quantity_{{product_variant.id}} quantity_{{user.id}}" onkeyup="calculateEmployeeAmount('{{user.id}}')" readonly>  
+                                        </td>
+                                        {% endfor %}
+                                        
+                                        <td style="color:#ffff;background-color: #a4b787; text-align:center">
+                                            <input type="text" class="inputField" id="employee_total_{{user.id}}" readonly>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                    <tr><td style="border:none"></td></tr>
+                                    <tr>
+                                        <th>TOTAL NO. OF POUCHES / UNITS</th>
+                                        
+                                        {% for product_variant in product_milk_variant_list %}
+                                        <td style="color:#ffff;background-color: #892cdc; text-align:center"> 
+                                            <input type="text"  name="quantity_{{product_variant.id}}" class="inputField numeric" readonly>  
+                                        </td>
+                                        {% endfor %}
+                                        
+                                        {% for product_variant in product_without_milk_variant_list %}
+                                        <td style="color:#ffff;background-color: #892cdc; text-align:center"> 
+                                            <input type="text"   name="quantity_{{product_variant.id}}" class="inputField numeric" readonly>  
+                                        </td>
+                                        {% endfor %}
+                                        
+                                        <td style="color:#ffff;background-color: #892cdc; text-align:center">
+                                            <input type="text" class="inputField" id="total_quantity_amount" readonly>
+                                        </td>
+                                        
+                                    </tr>
+                                    <tr>
+                                        <th>FOC POUCHES</th>
+                                        
+                                        {% for product_variant in product_milk_variant_list %}
+                                        <td style="color:#ffff;background-color: #892cdc; text-align:center"> 
+                                            <input type="text"  value="{% get_ho_report_foc product_variant.id %}" name="foc_quantity_{{product_variant.id}}" class="inputField numeric foc_quantity" onkeyup="calculateFocQuantity();">  
+                                        </td>
+                                        {% endfor %}
+                                        
+                                        {% for product_variant in product_without_milk_variant_list %}
+                                        <td style="color:#ffff;background-color: #892cdc; text-align:center"> 
+                                            <input type="text"   value="{% get_ho_report_foc product_variant.id %}" name="foc_quantity_{{product_variant.id}}" class="inputField numeric foc_quantity" onkeyup="calculateFocQuantity();">  
+                                        </td>
+                                        {% endfor %}
+                                        
+                                        <td style="color:#ffff;background-color: #892cdc; text-align:center">
+                                            <input type="text" class="inputField" id="foc_total_quantity"  readonly>
+                                        </td>
+                                        
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+</div>
+
+
+{% endblock content %}
+{% block script %}
+<script>
+    $(document).ready(function(){
+        calculateProductVariantQty();
+        calculateTotalQuantityAmount();
+        calculateFocQuantity();
+    });
+    
+    $(document).ready(function(){
+        {% for current_user in users %}
+        calculateEmployeeAmount("{{current_user.id}}")
+        {% endfor %}
+    });
+    
+    function calculateProductVariantQty(){
+        {% for product_variant in product_variants %}
+        $(".product_quantity_{{product_variant.id}}").each(function(){
+            total = 0;
+            if($(this).val() > 0){
+                total = total + parseInt($(this).val());
+            }
+            $("[name='quantity_{{product_variant.id}}']").val(total);
+        });
+        {% endfor %}
+    }
+
+    
+    function calculateEmployeeAmount(employee_id){
+        total = 0;
+        $('.quantity_'+employee_id).each(function(){
+            if($(this).val() > 0){
+                if($(this).prev().val() > 0){
+                    total = total + parseFloat(parseInt($(this).val()) * parseFloat($(this).prev().val()));
+                }
+            }
+        });
+        $('#employee_total_'+employee_id).val(total.toFixed(2));
+        calculateProductVariantQty();
+        calculateTotalQuantityAmount();
+    }
+
+    function calculateTotalQuantityAmount(){
+        total = 0;
+        {% for current_user in users %}
+        if($('#employee_total_{{current_user.id}}').val() > 0){
+            total = total + parseFloat($('#employee_total_{{current_user.id}}').val());
+        }
+        {% endfor %}
+        $('#total_quantity_amount').val(total.toFixed(2));
+    }
+    
+    function calculateFocQuantity(){
+        total = 0;
+        $('.foc_quantity').each(function(){
+            if($(this).val() > 0){
+                total = total + parseInt($(this).val());
+            }
+        });
+        $('#foc_total_quantity').val(total);
+    }
+    
+    
+    function exportExcel(){
+        window.location.href = "{% url 'src:export-ho-report' %}";
+    }
+    function edit(){
+        $('#editBtn').hide();
+        $('#updateBtn').show();
+        $('#cancelBtn').show();
+        $('.quantity_field').removeAttr('readonly')
+        
+    }
+    function cancel(){
+        $('#updateBtn').hide();
+        $('#cancelBtn').hide();
+        $('#editBtn').show();
+        $('.quantity_field').attr('readonly','readonly')
+    }
+    function updateReport(){
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:update-ho-report' %}",
+            method: 'POST',
+            data: $('#hoReportForm').serialize(),
+            success: function (data) {
+                hideLoader();
+                if(data.flag){
+                    openToaster("success", data.message);
+                    $('#updateBtn').hide();
+                    $('#cancelBtn').hide();
+                    $('#editBtn').show();
+                    $('.quantity_field').attr('readonly','readonly')
+                }else{
+                    openToaster("danger", data.message);
+                }
+            },
+            error: function (err) {
+                hideLoader();
+                console.log(err)
+            }
+        }).always(function() {
+            hideLoader();
+        });
+    }
+</script>
+{% endblock %}

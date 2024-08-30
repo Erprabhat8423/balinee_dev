@@ -1,0 +1,307 @@
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/tablesorter.theme.blue.min.css' %}">
+<style>
+    #ui-datepicker-div{
+        z-index: 999 !important;
+    }
+    .sunday{
+        background-color:#fd8823;
+        border-radius: 1.5px;
+        vertical-align: middle;
+        padding: 0.3em 0.6em 0.3em;
+        margin-top: 2%;
+        text-align: center;
+    }
+    .holiday{
+        background-color:#c7fd2370;
+        border-radius: 1.5px;
+        vertical-align: middle;
+        padding: 0.3em 0.6em 0.3em;
+        margin-top: 2%;
+        text-align: center;
+    }
+    .present{
+        background-color:#7EC857;
+        border-radius: 1.5px;
+        vertical-align: middle;
+        padding: 0.3em 0.6em 0.3em;
+        margin-top: 2%;
+        text-align: center;
+    }
+    .absent{
+        background-color:#FF4859; 
+        border-radius: 1.5px; 
+        vertical-align: middle; 
+        padding: 0.3em 0.6em 0.3em; 
+        margin-top: 2%; 
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+
+<div class="row px-0" id="containerHeight px-0" style="width:100%;">
+    <div class="col-md-12 px-md-0 h-100">
+        <div class="primaryContainer h-100 px-0" id="mainbox">
+            {% csrf_token %}            
+            <div class="row py-2">
+                <div class="col-md-12 px-0">
+                    <h1 class="h4 font-weight-bold d-flex justify-content-center">Registration Stats</h1>
+                    <table id="" class="detail-table table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th class="table_student_name" id="">
+                                    Annotation
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th class="table_student_name" id="table_father_name">
+                                    Number of Students
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablebody">
+
+                            <tr id="reg_list" class="odd selected" onclick="getRegistrationZone('0','Registered Students');">
+                                <td class="table_student_name">
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">Registered Students</span> 
+                                    </div>
+                                </td>
+                                <td id="total_registered" class="table_father_name">{{total_registered}}</td>
+                            </tr>
+                            <tr onclick="getRegistrationZone('1','Unregistered Students');">
+                                <td class="table_student_name" >
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">Unregistered Students</span> 
+                                    </div>
+                                </td>
+                                <td id="total_unregistered" class="table_father_name">{{total_unregistered}}</td>
+                            </tr>
+
+                            <tr class="odd selected" onclick="getRegistrationZone('2','Today Registration');">
+                                <td class="table_student_name" >
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">Today's Registration</span> 
+                                    </div>
+                                </td>
+                                <td id="today_registered" class="table_father_name">{{today_registered}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="row py-2 px-0">
+                <div class="col-md-12 px-0">
+                    <h1 class="h4 font-weight-bold d-flex justify-content-center">Attendance Stats</h1>
+                    <table id="attendanceZoneTable" class="detail-table table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th class="table_student_name" id="table_student_name">
+                                    Attendance Zone
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th class="table_student_name" id="table_father_name">
+                                    Number of Students
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th class="table_college" id="table_college">
+                                    Percentage
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablebody">
+                            <tr class="odd selected" onclick="getAttendanceZone('3' , 'First time');">
+                                <td class="table_student_name">
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">First time (0%)</span> 
+                                    </div>
+                                </td>
+                                <td class="table_father_name">
+                                    {{first_time}}
+                                </td>
+                                <td class="table_college">
+                                    {{first_time_percent}}%
+                                </td>
+                            </tr>
+                            <tr onclick="getAttendanceZone('4' , 'Very Poor');">
+                                <td class="table_student_name">
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">Very Poor (1-30%)</span> 
+                                    </div>
+                                </td>
+                                <td class="table_father_name">
+                                    {{very_poor}}
+                                </td>
+                                <td class="table_college">
+                                    {{very_poor_percent}}%
+                                </td>
+                            </tr>
+                            <tr onclick="getAttendanceZone('5' ,'Poor');">
+                                <td class="table_student_name">
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">Poor (31-50%)</span> 
+                                    </div>
+                                </td>
+                                <td class="table_father_name">
+                                    {{poor}}
+                                </td>
+                                <td class="table_college">
+                                    {{poor_percent}}%
+                                </td>
+                            </tr>
+
+                            <tr class="odd" onclick="getAttendanceZone('6' , 'Moderate');">
+                                <td class="table_student_name">
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">Moderate (51-80%)</span> 
+                                    </div>
+                                </td>
+                                <td class="table_father_name">
+                                    {{moderate}}
+                                </td>
+                                <td class="table_college">
+                                    {{moderate_percent}}%
+                                </td>
+                            </tr>
+
+
+                            <tr class="odd selected" onclick="getAttendanceZone('7','Good');" >
+                                <td class="table_student_name">
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">Good (80-90%)</span> 
+                                    </div>
+                                </td>
+                                <td class="table_father_name">
+                                    {{good}}
+                                </td>
+                                <td class="table_college">
+                                    {{good_percent}}%
+                                </td>
+                            </tr>
+
+                            <tr onclick="getAttendanceZone('8','Excellent');">
+                                <td class="table_student_name">
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">Excellent (90%+)</span> 
+                                        <!-- <div class="col-sm-2 col-2 px-0"> 
+                                        </div> -->
+                                    </div>
+                                </td>
+                                <td class="table_father_name">
+                                    {{excellent}}
+                                </td>
+                                <td class="table_college">
+                                    {{excellent_percent}}%
+                                </td>
+                            </tr>
+                            <tr class="odd selected" onclick="getAttendanceZone('9', 'Never Attended');">
+                                <td class="table_student_name">
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">Registered yet not attended</span> 
+                                    </div>
+                                </td>
+                                <td class="table_father_name">
+                                    {{zero_attendance}}
+                                </td>
+                                <td class="table_college">
+                                    {{zero_percent}}%
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block script %}
+
+<script>
+    $(document).ready(function () {
+    $("#reg_list").click()
+    })
+    function getCourseOption(value){
+        if(value != ""){
+            url = "{% url 'src:get-college-course-options' '1' %}";
+            url = url.replace('1',value);
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    $('#filter_course').html(data.options);
+                },
+                error: function (err) {
+                    alert(err.message);
+                }
+            });
+            
+        }else{
+            $('#filter_course').html(`<option value="">View By Course</option>`);
+        }
+    }   
+    
+    $(document).ready(function () {
+        $("[name='from_date']").datepicker({  
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-2:+0",
+            maxDate: 0,
+            dateFormat: 'dd/mm/yy' 
+        });
+    });
+    
+    // function exportsInExcel(){
+        // var college_id = $('#filter_college_id').val();
+        // var course = $('#filter_course').val();
+        // var sem_year = $('#filter_sem').val();
+        // var filter_date = $('#filter_date').val();
+        // var url = "{% url 'src:export-attendance-summary-report-to-xlsx' 'college_id' 'course' 'sem_year' 'filter_date' %}";
+        // if(college_id != ''){
+        //     url = url.replace('college_id',college_id);
+        // }else{
+        //     url = url.replace('college_id','0');
+        // }
+        
+        // if(course =='course'){
+        //     url = url.replace('course','0');
+        // }else{
+        //     url = url.replace('course',course);
+        // }
+        // if(sem_year != ''){
+        //     url = url.replace('sem_year',sem_year);
+        // }else{
+        //     url = url.replace('sem_year','0');
+        // }
+        // filter_date = filter_date.replace('/','-');
+
+        // url = url.replace('filter_date',filter_date);
+        // window.location.href = url;  
+        
+    // }
+    
+    
+</script>
+{% endblock %}

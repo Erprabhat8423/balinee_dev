@@ -1,0 +1,1088 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+{% load static %}
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/contact-manage-list.css' %}">
+<link rel="stylesheet" href="{% static 'css/global.css' %}">
+
+<style>
+ 
+</style>
+{% endblock %}
+
+
+<div class="row px-3" id="containerHeight">
+    <div class="col-md-8 col-12 pl-0 pr-3 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-sm-4 col-12 px-0 mob-mt-8  mob-mb-8 ">
+                    <h1 class="page-main-heading">{{page_title}} &nbsp;&nbsp;
+                        <i class="fa fa-star add_to_fav ml-2 {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')">
+                        </i>
+                    </h1>
+                </div>
+                <div class="col-sm-8 col-12 px-0 advance-serch-contact">
+                    <div class="row" id="secondRow" style="justify-content: flex-end;">
+                        <div class="col-sm-4 col-5 px-0  search-box">
+                            <input class="search searchTable  w-100" placeholder="Search" type="search" data-column="all">
+                            <!-- <div  class="dropDown-popup dropdown toggle-search-dropdown " id="dropDownPopup">
+                                <img src="{% static 'img/svg/search-new-icon.svg' %}" alt="" > 
+                                
+                            </div>  -->
+                            <div class="dropdown-advance-serch  " id="dropdownAdvanceSerch" style="display: none;" >
+                                <div class="top-arrow"></div>
+                                <div class="col-sm-12 col-12 px-0">
+                                    <h6 class="accent-color font-wt-b mb-0 font-12">Advance Search</h6>
+                                    <div class="mb-2">
+                                        <span class=" mt-1 d-block font-11 font-wt-b" >By Organization </span>
+                                        <input class="inputField mt-1 font-11 "type="text" placeholder="All Organisation">
+                                    </div>
+                                    <div>
+                                        <span class="font-11 font-wt-b d-block" >By Contact</span>
+                                        <div class="row my-1">
+                                            <div class="btn-by-contact activebtn-by-contact">All</div>
+                                            <div class="btn-by-contact"  style="cursor: pointer;">Active</div>
+                                            <div class=" btn-by-contact"  style="cursor: pointer;">inactive</div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <span class="font-11 font-wt-b d-block mb-1" >By Tags</span>
+                                        <select class="inputField selectField" multiple  style="width: 100%;">
+                                            <option value="" selected> Saleasman</option>
+                                            <option value="kk" >Saleas Head</option>
+                                            <option value="">HR</option>
+                                            <option value=""> TSE</option>
+                                            <option value="">Ass Manager</option>
+                                        </select>
+                                    </div>
+                                    <div class="pt-2 pb-0 border-top row" style="justify-content: flex-end;">
+                                        
+                                        <div class="btn-2danger toggle-search-dropdown" style="cursor: pointer;">Clear Filters</div>
+                                        <div class="btn-2apply toggle-search-dropdown"  style="cursor: pointer;">Apply</div>
+                                        
+                                        
+                                        
+                                        
+                                    </div>
+                                </div>
+                            </div> 
+                        </div>
+                        
+                        
+                        
+                        <button type="button" class="btn ml-2  iconBox iconAddContact"  onclick="addContactCard()"><img src="{% static 'img/svg/add-roles.svg' %}" alt="" style="margin-left: 6px; width: 13px;" >
+                        </button>
+                        <div class=" pl-1 pr-0">
+                            <div class="row address-list-icon  ">
+                                <div class="col-sm-6 px-0 address-box address-box-active" onclick="changeView(this, 'card-view')" style="cursor:pointer" ><i class="far fa-address-card"></i></div>
+                                <div class="col-sm-6 px-0 list-box border-left address-box" onclick="changeView(this,'list-box-view')" style="cursor:pointer"><i class="fas fa-list"></i></div>
+                            </div>
+                        </div>
+                        <div class="dropdown fixed-column " style="display: none;
+                        /* display: inline-block; */
+                        " id="lockColumn">
+                            <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                            aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="table_user_name" id="lock_table_user_name" data-id="1" onclick="toggleFreeze(this.id,'table_user_name',1)" />
+                                <label class="mb-0" for="lock_table_user_name">Name</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="table_contact_number"
+                                id="lock_table_contact_number" data-id="2" 
+                                onclick="toggleFreeze(this.id,'table_contact_number',2)" />
+                                <label class="mb-0" for="lock_table_contact_number">Contact no.</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="table_email_id" id="lock_table_email_id" data-id="3"
+                                onclick="toggleFreeze(this.id,'table_email_id',3)" />
+                                <label class="mb-0" for="lock_table_email_id">Email id</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="table_organisation" id="lock_table_organisation" data-id="4"
+                                onclick="toggleFreeze(this.id,'table_organisation',4)" />
+                                <label class="mb-0" for="lock_table_organisation">Organisation</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="table_tags" id="lock_table_tags" data-id="5"
+                                onclick="toggleFreeze(this.id,'table_tags',5)" />
+                                <label class="mb-0" for="lock_table_tags">Tags</label>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="dropdown show-hide " style="display: none;
+                    /* display: inline-block; */
+                    " id="hideColumn">
+                        <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        </button>
+                        <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                        aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colCheck" name="table_user_name" id="table_user_name" data-id="1" onclick="showHideColumns(this.id,2)"
+                            />
+                            <label class="mb-0" for="table_user_name"> Name</label>
+                        </a>
+                        
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colCheck" name="table_contact_number" id="table_contact_number" data-id="2" onclick="showHideColumns(this.id, 2)" />
+                            <label class="mb-0" for="table_contact_number">Contact No.</label>
+                        </a>
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colCheck" name="table_email_id" id="table_email_id" data-id="4" onclick="showHideColumns(this.id, 4)" />
+                            <label class="mb-0" for="table_email_id">Email id</label>
+                        </a>
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colCheck" name="table_organisation" id="table_organisation" data-id="4" onclick="showHideColumns(this.id, 4)" />
+                            <label class="mb-0" for="table_organisation">Organisation</label>
+                        </a>
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colCheck" name="table_tags" id="table_tags" data-id="4" onclick="showHideColumns(this.id, 4)" />
+                            <label class="mb-0" for="table_tags">Tags</label>
+                        </a>
+                    </div>
+                </div>
+                    <!-- <div class="dropdown " style="display: inline-block;">
+                        <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    </button>
+                    
+                    <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                    aria-labelledby="dropdownMenuButton">
+                    <input type="hidden" name="show_columns" id="show_columns" value="" >
+                    <a class="dropdown-item  " onclick="exports('excel')" href="javascript:void(0)">Export to excel
+                        <img src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons ml-1" /> 
+                    </a>
+                    <a class="dropdown-item " onclick="exports('pdf')" href="javascript:void(0)">Export to Pdf 
+                        <img src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons ml-1" />
+                    </a>
+                </div>
+            </div> -->
+           
+    </div>
+                </div>
+            </div>
+
+            <div class="row" id="tableBox">
+                <div class="col-md-12  h-100  commonTableBg px-0 contact-mang-table" id="ajax-div">
+                    <input type="hidden" name="page" id="page" value="2" />
+                    <input type="hidden" name="page_status" id="page_status" value="0" />
+                    <input type="hidden" name="total_pages" id="total_pages" value="{{ total_pages }}" />
+
+                    <div class="row h-100 " id="contact-card-view" >
+                        <div class="col-md-12  h-100  commonTableBgf px-0  contact-mang-cardview" >
+                          
+                            {% if users %}
+                                <ul class="row " >
+                                    {% for user in users %}
+                                        <li>
+                                           <div  class="contact-cardview-card {% if forloop.first %}contact-cardview-card-active" {% endif %} onclick="getUserContactCardRecord('{{ user.id }}')" style="cursor: pointer;">
+                                            <div class="row   border-bottom" style="padding-bottom: 9px;">
+                                                <div class=" contact-person-img-box"> 
+                                                    {% if user.profile_image is not None %}
+                                                    <img src="{{user.profile_image}}" >
+                                                    {% else %}
+                                                    <img src="/static/img/png/signout.png" >
+                                                    {% endif %}
+                                                </div>
+                                                <div class=" col-sm-5 px-1 pt-2 ">
+                                                    <span class="font-wt-b d-block font-13" style="margin-bottom: -2px;"> {{user.first_name}} {{user.middle_name}} {{user.last_name}} </span>
+                                                    <span class="accent-color smallText">{{user.emp_sap_id}}</span>
+                                                </div>
+                                                <div class="col-sm-5 px-0">
+                                                    <div class="row" style="justify-content: flex-end;">
+                                                        <div class="labelContainerOP-emp">
+                                                            <label class="switch">
+                                                                <input type="checkbox" class="checkbox" name="is_active"
+                                                                id="is_active_{{ vehicle.id }}"
+                                                                {% if user.status == 1 %} checked="" {% else %}
+                                                                {% endif %}
+                                                                onclick="updateUserStatus('{{ user.id }}', '{{ user.status }}')">
+                                                                <span class="slider round"></span>
+                                                            </label>
+                                                        </div>
+                                                        <div class="grey-color pl-2 pt-1" style="font-size: 20px;">
+                                                            <img src="/static/img/svg/Ellipse-dot.svg" style="width:3px;">
+                                                        </div>
+                                                    </div>
+                                                    <!-- <div class="tagsTwo" style="position: relative;">
+                                                        {% if user.tags %}
+                                                        {% for tags in user.tags %}
+                                                        <div class="sponsoredTag" >{{tags.tag}}</div>
+                                                        {% endfor %}
+                                                        {% else %}
+                                                        {% endif %}
+                                                    
+                                                    </div> -->
+                                                    <div class="tagsTwo" style="position: relative;">
+                                                        <div class="sponsoredTag">student</div> 
+                                                        <div class="sub-spansoredTag ">+<span class="d-inline-block" style="margin-left: 3px">1</span></div>
+                                                    
+                                                    </div>
+                                                </div>
+                                            </div>    
+                                        
+                                            <div class="row mt-2">
+                                                <div class="col-md-12 col-12 px-0">
+                                                    <div class="row">
+                                                        <div class="col-sm-2 col-2 px-0">
+                                                            
+                                                            <img src="/static/img/svg/contact-full-blue.svg" class="profileIconSize" >
+                                                            
+                                                        </div>
+                                                        <div class="  col-sm-10 col-10 px-0 ">
+                                                            <span class="largeText">
+                                                                {% if user.contact_number  %}
+                                                                {{user.contact_number}}
+                                                                {% else %}
+                                                                N/A
+                                                                {% endif %} 
+                                                                <span class="grey-color">
+                                                                    {% if user.contact_type  %}
+                                                                    ({{user.contact_type}})
+                                                                
+                                                                    {% endif %}
+                                                                </span></span>
+                                                        
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-12 col-12 px-0 mt-1">
+                                                    <div class="row">
+                                                        <div class="col-sm-2 col-2 px-0">
+                                                            <img src="/static/img/svg/blue-msg-icon.svg" class="profileIconSize">
+                                                        </div>
+                                                        <div class="col-sm-10 col-10 px-0 ">
+                                                            <span class="largeText">{{user.official_email}}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="row mt-1">
+                                                <div class="col-md-12 col-12 px-0">
+                                                    <div class="row">
+                                                        <div class="col-sm-2 col-2 px-0">
+                                                            <img src="/static/img/svg/org.svg" class="profileIconSize"  style="width: 18px; margin-top: -1px">
+                                                        </div>
+                                                        <div class="col-sm-10 col-10 px-0">
+                                                            <span class="largeText">{{user.organization_name}}</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                           </div>
+                                        </li>
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                               
+                                    
+                                {% endif %}
+
+                           
+                        </div>
+                    </div>
+                    <table id="addOrgTable" class="detail-table table table-borderless table-striped table-hover mt-0 "style="width: 100%;display: none;"  >
+                    <thead>
+                        <tr>
+                            <th class="table_user_name" id="table_user_name">
+                                Name
+                                <i class="fa fa-fw fa-sort float-right"></i>
+                                <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                            </th>
+                            <th class="table_contact_number " id="table_contact_number">Contact No
+                                <i class="fa fa-fw fa-sort float-right"></i>
+                                <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                            </th>
+                            <th class="table_email_id " id="table_email_id">Email ID
+                                <i class="fa fa-fw fa-sort float-right"></i>
+                                <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                            </th>
+                            <th class="table_organisation " id="table_organisation"> Organization
+                                <i class="fa fa-fw fa-sort float-right"></i>
+                                <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                            </th>
+                            <th class="table_tags " id="table_tags">Tags
+                                <i class="fa fa-fw fa-sort float-right"></i>
+                                <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                            </th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    
+                    <tbody id="tablebody">
+                        {% if users %}
+                        {% for user in users %}
+                        <tr {% if forloop.first %} class="odd selected" {% endif %}>
+                            <td  class="table_user_name" onclick="getUserContactRecord('{{ user.id }}')">
+                                {{user.first_name}} {{user.middle_name}} {{user.last_name}}
+                            </td>
+                            <td class="table_contact_number" onclick="getUserContactRecord('{{ user.id }}')">
+                                {% if user.contact_number  %}
+                                {{user.contact_number}}
+                                {% else %}
+                                N/A
+                                {% endif %}
+                            </td>
+                            <td class="table_email_id" onclick="getUserContactRecord('{{ user.id }}')">{{user.official_email}}</td>
+                            <td class="table_organisation" onclick="getUserContactRecord('{{ user.id }}')">{{user.organization_name}}</td>
+                            <td class="table_tags" onclick="getUserContactRecord('{{ user.id }}')">
+                                {% if user.tags %}
+                                {% for tags in user.tags %}
+                                <div class="sponsoredTag" >{{tags.tag}}</div>
+                                <!-- <div class="sub-spansoredTag">Sales Head</div> -->
+                                {% endfor %}
+                                {% else %}
+                                N/A
+                                {% endif %}
+                                
+                            </td>
+                            <td  onclick="getUserContactRecord('{{ user.id }}')">
+                                <div class="row ">
+                                    <a href="#" title="">
+                                        <img src="{% static 'img/svg/editcopy.svg' %}" class="tableRowIcon" />
+                                    </a> 
+                                    <div class="labelContainerOP-emp">
+                                        <label class="switch">
+                                            <input type="checkbox" class="checkbox" name="is_active"
+                                            id="is_active_{{ user.id }}"
+                                            {% if user.status == 1 %} checked="" {% else %}
+                                            {% endif %}
+                                            onclick="updateUserStatus('{{ user.id }}', '{{ user.status }}')">
+                                            <span class="slider round"></span>
+                                        </label>
+                                        
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        <tr id="loading" style="display: none;">
+                            <td class="text-center" colspan="4"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" style="text-align: center; background-color: #ddd;">No Record Found...</td>
+                        </tr>
+                        {% endif %}
+                        
+                        
+                        
+                        
+                    </tbody>
+                    </table>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-sm-4 col-12 p-0  mob-pl-0 mob-mt-8 h-100">
+        <div class="primaryContainerBG h-100" id="detailsBox">
+        {% if user_details.first_name %}
+        <div class="row" id="detailsBoxFirst" style="display: block;">
+                <div class="col-sm-12 col-12 px-0 mb-2">
+                    <div class="row  pb-3">
+                        <div class="contact-person-img-box"> 
+                            <img src="/static/img/png/signout.png" >
+                        </div>
+                        
+                        <div class=" col-sm-6 col-10 px-3 pt-2">
+                            <span class="font-wt-b d-block" style="margin-bottom: -5px;">{{user_details.first_name}} {{user_details.middle_name}} {{user_details.last_name}}</span>
+                            <span class="accent-color font-11">{{user_details.emp_sap_id}}</span>
+                        </div>
+                        <div class="col-sm-4 px-0  pt-2">
+                            <div class="row " style="justify-content: flex-end; position: relative;">
+                                <div class="sponsoredTag">{{user_details.role_name}}</div>
+                                <div class="dropdown pl-2" >
+                                    <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                </button>
+                                
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">
+                                <input type="hidden" name="show_columns" id="show_columns" value="" >
+                                <a class="dropdown-item  " onclick="exports('excel')" href="javascript:void(0)">Export to excel
+                                    <img src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons ml-1" /> 
+                                </a>
+                                <a class="dropdown-item " onclick="exports('pdf')" href="javascript:void(0)">Export to Pdf 
+                                    <img src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons ml-1" />
+                                </a>
+                            </div>
+                        </div>
+                        <div class="grey-color pl-2 pt-1" style="font-size: 20px;">
+                            <i class="fas fa-ellipsis-v">-</i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mt-2 border-bottom pb-2">
+                <div class="col-md-6 col-6 px-0">
+                    <div class="row">
+                        <div class="col-sm-2 col-2 px-0">
+                            <img src="/static/img/svg/contactNo.svg" class="profileIconSize">
+                        </div>
+                        <div class="  col-sm-10 col-10 px-0 ">
+                            <h6 class="smallText">Contact No</h6>
+                            <h6 class="largeText">
+                                {% if contactInfo.contact_number  %}
+                                                {{contactInfo.contact_number}}
+                                                {% if contactInfo.contact_type  %}
+                                                    ({{contactInfo.contact_type}})
+                                                
+                                                    {% endif %}
+                                                {% else %}
+                                                N/A
+                                                {% endif %} 
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-6 px-0">
+                    <div class="row">
+                        <div class="col-sm-2 col-2 px-0">
+                            <img src="/static/img/svg/org.svg" class="profileIconSize">
+                        </div>
+                        <div class="  col-sm-10 col-10 px-0 ">
+                            <h6 class="smallText">Organisation</h6>
+                            <h6 class="largeText">{{user_details.organization_name}}</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-6 px-0">
+                    <div class="row">
+                        <div class="col-sm-2 col-2 px-0">
+                            <img src="/static/img/svg/@.svg" class="profileIconSize">
+                        </div>
+                        <div class="  col-sm-10 col-10 px-0">
+                            <h6 class="smallText">Email ID</h6>
+                            <h6 class="largeText">{{user_details.official_email}}</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>  
+        <div class="col-sm-12 col-12 px-0">
+            <div class="mt-1 mb-2 ele-swipe-slide-div">
+                <ul class="all-cont-info ele-swipe-slide around-md">
+                    {% if role_attributes %}
+                    {% for role_attribute in role_attributes %}
+                    {% if role_attribute.id == 2 %}
+                    <li style="cursor:pointer" class="allInfoSection_tab activeAllcontinfo" onclick="handleTabChange({{user_details.id}},this,'PersonalInfo')">
+                        {{role_attribute.attribute}}
+                    </li>
+                    {% elif role_attribute.id == 3 %}
+                    <li style="cursor:pointer" class="allInfoSection_tab " onclick="handleTabChange({{user_details.id}},this,'academicInfo')">
+                        {{role_attribute.attribute}}
+                    </li>
+                    {% elif role_attribute.id == 4 %}
+                    <li style="cursor:pointer" class="allInfoSection_tab " onclick="handleTabChange({{user_details.id}},this,'OfficalInfo')">
+                        {{role_attribute.attribute}}
+                    </li>
+                    {% elif role_attribute.id == 5 %}
+                    <li style="cursor:pointer" class="allInfoSection_tab " onclick="handleTabChange({{user_details.id}},this,'FinancialInfo')">
+                        {{role_attribute.attribute}}
+                    </li>
+                    {% elif role_attribute.id == 6 %}
+                    <li style="cursor:pointer" class="allInfoSection_tab " onclick="handleTabChange({{user_details.id}},this,'vehicleInfo')">
+                        {{role_attribute.attribute}}
+                    </li>
+                    {% elif role_attribute.id == 7 %}
+                    <li style="cursor:pointer" class="allInfoSection_tab " onclick="handleTabChange({{user_details.id}},this,'biometricInfo')">
+                        {{role_attribute.attribute}}
+                    </li>
+                    {% elif role_attribute.id == 8 %}
+                    <li style="cursor:pointer" class="allInfoSection_tab " onclick="handleTabChange({{user_details.id}},this,'documentInfo')">
+                        {{role_attribute.attribute}}
+                    </li>
+                    {% else %}
+                    {% endif %}
+                    {% endfor %}
+                    {% else %}
+                    {% endif %}
+                    <div class="">
+                        <a class="gscr_lSPrev" style="display: block;">
+                            <i class="far fa-angle-right"></i>
+                        </a>
+                        <a class="gscr_lSNext" style="display: block;">
+                            <i class="far fa-angle-left"></i>
+                        </a>
+                    </div>
+                </ul>
+            </div>
+            
+            <div id="attributeDetail" >
+                {% if personalInfo %}
+                <div class="allInfoSection px-2 my-1 "  id="PersonalInfo" style="display: block;">
+            
+                    <div class="row mt-3">
+                        <div class="col-md-6 col-6 px-0">
+                            <div class="row">
+                                <div class="col-sm-2 col-2 px-0">
+                                    <img src="/static/img/svg/gender.svg" class="profileIconSize">
+                                </div>
+                                <div class="  col-sm-10 col-10 px-0 ">
+                                    <h6 class="smallText">Gender*</h6>
+                                    <h6 class="largeText">
+                                        {% if personalInfo.gender %}
+                                        {{ personalInfo.gender }}
+                                        {% else %} 
+                                        N/A
+                                        {% endif %}
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-6 px-0">
+                            <div class="row">
+                                <div class="col-sm-2 col-2 px-0">
+                                    <img src="/static/img/svg/bloodgroup.svg" class="profileIconSize">
+                                </div>
+                                <div class="  col-sm-10 col-10 px-0 ">
+                                    <h6 class="smallText">Blood Group*</h6>
+                                    <h6 class="largeText">
+                                        {% if personalInfo.blood_group %}
+                                        {{ personalInfo.blood_group }}
+                                        {% else %} 
+                                        N/A
+                                        {% endif %}
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6 col-6 px-0">
+                            <div class="row">
+                                <div class="col-sm-2 col-2 px-0">
+                                    <img src="/static/img/svg/father.svg" class="profileIconSize">
+                                </div>
+                                <div class="  col-sm-10 col-10 px-0 ">
+                                    <h6 class="smallText">Father Name*</h6>
+                                    <h6 class="largeText">
+                                        {% if personalInfo.father_first_name %}
+                                        {{ personalInfo.father_first_name }}
+                                            {% if personalInfo.father_first_name %}
+                                            {{ personalInfo.father_last_name }}
+                                            {% endif %}
+                                        {% else %} 
+                                        N/A
+                                        {% endif %}
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-6 px-0">
+                            <div class="row">
+                                <div class="col-sm-2 col-2 px-0">
+                                    <img src="/static/img/svg/spouse.svg" class="profileIconSize">
+                                </div>
+                                <div class="  col-sm-10 col-10 px-0 ">
+                                    <h6 class="smallText">Mother Name*</h6>
+                                    <h6 class="largeText">
+                                        {% if personalInfo.mother_first_name %}
+                                        {{ personalInfo.mother_first_name }}
+                                            {% if personalInfo.mother_last_name %}
+                                            {{ personalInfo.mother_last_name }}
+                                            {% endif %}
+                                        {% else %} 
+                                        N/A
+                                        {% endif %}
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-2">
+                        <div class="col-md-6 col-6 px-0">
+                            <div class="row">
+                                <div class="col-sm-2 col-2 px-0">
+                                    <img src="/static/img/svg/spouse.svg" class="profileIconSize">
+                                </div>
+                                <div class="  col-sm-10 col-10 px-0 ">
+                                    <h6 class="smallText">Spouse's Name*</h6>
+                                    <h6 class="largeText">
+                                        {% if personalInfo.spouse_name %}
+                                        {{ personalInfo.spouse_name }}
+                                        {% else %} 
+                                        N/A
+                                        {% endif %}
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-6 px-0">
+                            <div class="row">
+                                <div class="col-sm-2 col-2 px-0">
+                                    <img src="/static/img/svg/spouse.svg" class="profileIconSize">
+                                </div>
+                                <div class="  col-sm-10 col-10 px-0 ">
+                                    <h6 class="smallText">Spouse's Employer</h6>
+                                    <h6 class="largeText">
+                                        {% if personalInfo.spouse_employer %}
+                                        {{ personalInfo.spouse_employer }}
+                                        {% else %} 
+                                        N/A
+                                        {% endif %}
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6 col-6 px-0">
+                            <div class="row">
+                                <div class="col-sm-2 col-2 px-0">
+                                    <img src="/static/img/svg/contact-full-blue.svg" >
+                                </div>
+                                <div class="  col-sm-10 col-10 px-0 ">
+                                    <h6 class="smallText">Spouse's Work Phone*</h6>
+                                    <h6 class="largeText">
+                                        {% if personalInfo.spouse_work_phone %}
+                                        {{ personalInfo.spouse_work_phone }}
+                                        {% else %} 
+                                        N/A
+                                        {% endif %}
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-6 px-0">
+                            <div class="row">
+                                <div class="col-sm-2 col-2 px-0">
+                                    <img src="/static/img/svg/no-of children.svg" class="profileIconSize">
+                                </div>
+                                <div class="  col-sm-10 col-10 px-0 ">
+                                    <h6 class="smallText">No of Children*</h6>
+                                    <h6 class="largeText">
+                                        {% if personalInfo.no_of_children %}
+                                        {{ personalInfo.no_of_children }}
+                                        {% else %} 
+                                        N/A
+                                        {% endif %}
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-2">
+                        <div class="col-md-6 col-6 px-0">
+                            <div class="row">
+                                <div class="col-sm-2 col-2 px-0">
+                                    <img src="/static/img/svg/Disability.svg" width="17" class="">
+                                </div>
+                                <div class="  col-sm-10 col-10 px-0 ">
+                                    <h6 class="smallText">Disability(if any)*</h6>
+                                    <h6 class="largeText">
+                                        {% if personalInfo.disability %}
+                                        {{ personalInfo.disability }}
+                                        {% else %} 
+                                        N/A
+                                        {% endif %}
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-6 px-0">
+                            <div class="row">
+                                <div class="col-sm-2 col-2 px-0">
+                                    <img src="/static/img/svg/Identification.svg" width="18" class="">
+                                </div>
+                                <div class="  col-sm-10 col-10 px-0 ">
+                                    <h6 class="smallText">Identification mark(if any)*</h6>
+                                    <h6 class="largeText">
+                                        {% if personalInfo.identification_mark %}
+                                        {{ personalInfo.identification_mark }}
+                                        {% else %} 
+                                        N/A
+                                        {% endif %}
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-6 col-6 px-0">
+                            <div class="row">
+                                <div class="col-sm-2 col-2 px-0">
+                                    <img src="/static/img/svg/Caste-Catagory.svg" width="18" class="">
+                                </div>
+                                <div class="  col-sm-10 col-10 px-0 ">
+                                    <h6 class="smallText">Caste Catagory</h6>
+                                    <h6 class="largeText">
+                                        {% if personalInfo.caste_category %}
+                                        {{ personalInfo.caste_category }}
+                                        {% else %} 
+                                        N/A
+                                        {% endif %}
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 col-6 px-0">
+                            <div class="row">
+                                <div class="col-sm-2 col-2 px-0">
+                                    <img src="/static/img/svg/Caste-Privilage.svg" width="18" class="">
+                                </div>
+                                <div class="  col-sm-10 col-10 px-0 ">
+                                    <h6 class="smallText">Caste Privilage</h6>
+                                    <h6 class="largeText">
+                                        {% if personalInfo.previlege_category %}
+                                        {{ personalInfo.previlege_category }}
+                                        {% else %} 
+                                        N/A
+                                        {% endif %}
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <p>No data found</p>
+                {% endif %}
+        
+            </div>
+        
+        </div>
+    
+    </div>
+    {% else %}
+    <p>No data found</p>
+    {% endif %}
+    </div>
+    <!-- <div class="row mt-3">  
+        <p style="text-align: center; color: red;">No Record Found...</p>
+    </div> -->
+    </div>
+</div>
+
+<!-- *************************************Modal********************************** -->
+
+<div class="overlayModal" id="addOrganisationModal" data-keyboard="false" data-backdrop="static">
+</div>
+<div class="overlayModal" id="addDeptModal" data-keyboard="false" data-backdrop="static">
+</div>
+<div class="overlayModal" id="addContactCardModal" style="display: none;"></div>
+<!-- *************************************Modal********************************** -->
+{% endblock content %}
+
+{% block script %}
+<script type="text/javascript">
+
+$(document).ready(function () {
+        var prevTop = 0;
+        
+        $('.commonTableBg').on('scroll', function () {
+            var page = $('#page').val();
+            var totalPages = $('#total_pages').val();
+            
+            var currentTop = $(this).scrollTop();
+            if (prevTop !== currentTop) {
+                prevTop = currentTop;
+                if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+                    if(parseInt($('#page_status').val()) == 0 && parseInt(page)  <= parseInt(totalPages)){
+                        $('#loading').show(); 
+                        $('#page_status').val('1');
+                        $.ajax({
+                            url: "{% url 'src:ajax-contact-list' %}",
+                            method: 'GET',
+                            data: { page:page },
+                            success: function (data) {
+                                setTimeout(() => {
+                                    $('#tablebody').find('tr:last').prev().after(data);
+                                    $('#page').val(parseInt(page)+1);
+                                    $('#loading').hide();
+                                    $('#page_status').val('0');
+                                    $('#addOrgTable').trigger('update');
+                                }, 2000);
+                            },
+                            error: function (err) {
+                                alert(err.message);
+                               // window.location.reload();
+                            }
+                        });
+                    }
+                }
+            }
+        })
+        
+    });
+
+function showHideColumns(inputid, colNo) {
+        var checkbox_val = [];
+        var checkbox = document.getElementById(inputid);
+        if (checkbox.checked == true) {
+            $('.'+inputid).hide();
+        }else{
+            $('.'+inputid).show();
+        }
+        $("input:checkbox[class=colCheck]").each(function () {
+            if(!$(this).is(':checked')){
+                checkbox_val.push($(this).attr("id"))
+            }
+        });
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+    }
+
+$(document).ready(function () {
+        setHeightWidth();
+        
+        $('#addOrgTable').tablesorter({
+            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+            widgetOptions: {
+                resizable_addLastColumn: true,
+                resizable: false,
+                resizable_widths: ["15%", "20%", "10%", "20%", "20%","20%"],
+                stickyHeaders_attachTo: ".primaryContainerBG",
+                filter_external: '.search',
+                filter_columnFilters: false,
+            }
+        });
+        $("#addOrgTable tbody tr").click(function () {
+            $(this).addClass("selected").siblings().removeClass("selected");
+        });
+        
+       
+    });
+
+    $(window).resize(function () {
+        setHeightWidth();
+    });
+
+function toggleFreeze(inputid, colid, colNo) {
+        var checkbox = document.getElementById(inputid);
+        
+        if (checkbox.checked == true) {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+            });
+            $('#' + colid + ' #freeze').show();
+            $('#' + colid + ' #unfreeze').hide();
+        } else {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").removeClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("sorter-false");
+            });
+            $('#' + colid + ' #unfreeze').show();
+            $('#' + colid + ' #freeze').hide();
+        }
+    }
+
+
+function updateUserStatus(id, active_status) {
+                if ($('#is_active_' + id).prop("checked") == true) {
+                    is_active = 1;
+                    status = 'Unblock';
+                } else {
+                    is_active = 0;  
+                    status = 'Block';
+                }
+                
+                //showLoader();
+                $.ajax({
+                    url: "{% url 'src:update-user-status' %}",
+                    method: 'POST',
+                    data: {
+                        id: id,
+                        is_active: is_active,
+                        csrfmiddlewaretoken: '{{ csrf_token }}'
+                    },
+                    success: function (data) {
+                        if (data.error == false) {
+                            hideLoader();
+                            openToaster("success", data.message);
+                        }
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+            }
+
+function changeView(element, view_type) {
+    if (view_type=="card-view") {
+        $(element).addClass('address-box-active');
+        $(element).siblings().removeClass('address-box-active');
+        $("#ajax-div").removeClass('primaryContainerBG');
+        $("#contact-card-view").show();
+        $("#addOrgTable").hide();
+        $("#hideColumn").hide();
+        $("#lockColumn").hide();
+    } else {
+        $(element).addClass('address-box-active');
+        $(element).siblings().removeClass('address-box-active');
+        $("#ajax-div").addClass('primaryContainerBG');
+        $("#contact-card-view").hide();
+        $("#addOrgTable").show();
+        $("#hideColumn").show();
+        $("#lockColumn").show();
+    }
+
+}
+    
+    function handleTabChange(user_id, element,target) {
+        $('#attributeDetail').html('<div style="margin-top:40px; text-align:center"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+            //showLoader();
+            var url = "{% url 'src:get-user-attribute-detail' 'userId' 'attributeName' %}";
+            url = url.replace('userId',user_id)
+            url = url.replace('attributeName',target)
+
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    //hideLoader();
+                    $('.allInfoSection_tab').removeClass('activeAllcontinfo');
+                    $(element).addClass('activeAllcontinfo');
+                    $('.allInfoSection').hide();
+                    $('#attributeDetail').html(data);
+                    $('#'+target).show();
+                    
+                    
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+        function handleTabChange123(element,target){
+            $('.allInfoSection_tab').removeClass('activeAllcontinfo');
+            $(element).addClass('activeAllcontinfo');
+            
+            $('.allInfoSection').hide();
+            $('#'+target).show();
+        }
+    </script>
+    
+    
+    <script>
+        $(document).ready(function(){
+            $(".toggle-search-dropdown").click(function(){
+                $("#dropdownAdvanceSerch").toggle();
+            });
+            $(".toggle-search-dropdown").click(function(){
+                $("#dropDownPopup").addClass("dropDownPopup");
+            });
+        });
+        
+        function addContactCard() {
+            showLoader();
+            var url = "{% url 'src:add-contact-card' %}";
+            $.ajax({
+                url: url,
+                method: 'GET',
+                data: $('#addRoleForm').serialize(),
+                success: function (data) {
+                    if(typeof data.flag !== "undefined" && !data.flag){
+                        hideLoader();
+                        openToaster("danger", data.message);
+                    }else{
+                        hideLoader();
+                        $("#addContactCardModal").show();
+                        $('#addContactCardModal').html(data);
+                        var mch = $(".modal-AddPermission").height() - $(".modal-header").outerHeight();
+                        $("#addContactCardModalBody").height(mch);
+                        $(".selectField").select2();
+                    }
+                    
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            });
+        }
+        
+        function getUserContactRecord(id) {
+            $('#detailsBox').html('<div style="margin-top:40px; text-align:center"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+                //showLoader();
+                $.ajax({
+                    url: "{% url 'src:get-user-contact-record' %}",
+                    method: 'GET',
+                    data: {
+                        id: id
+                    },
+                    success: function (data) {
+                        //hideLoader();
+                        $('#detailsBox').html(data);
+                        $('#addOrgTable').tablesorter({
+                            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                            widgetOptions: {
+                                resizable_addLastColumn: true,
+                                resizable: false,
+                                resizable_widths: ["15%", "20%", "10%", "20%", "20%","20%"],
+                                stickyHeaders_attachTo: ".primaryContainerBG",
+                                filter_external: '.search',
+                                filter_columnFilters: false,
+                            }
+                        });
+                        $("#addOrgTable tbody tr").click(function () {
+                            $(this).addClass("selected").siblings().removeClass("selected");
+                        });
+                        $(".deptRow").click(function () {
+                            $(this).addClass("deptSelected").siblings().removeClass("deptSelected");
+                        });
+                        
+                        
+                        $(".primaryContainerBG").scroll(function () {
+                            var divTable = $(".primaryContainerBG");
+                            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                        });
+                        
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+            }
+
+            function getUserContactCardRecord(id) {
+            $('#detailsBox').html('<div style="margin-top:40px; text-align:center"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+                //showLoader();
+                $.ajax({
+                    url: "{% url 'src:get-user-contact-record' %}",
+                    method: 'GET',
+                    data: {
+                        id: id
+                    },
+                    success: function (data) {
+                        //hideLoader();
+                        $('#detailsBox').html(data);
+                        $("#contact-card-view div ul li").click(function () {
+                            $(this).addClass("contact-cardview-card").siblings().removeClass("contact-cardview-card");
+                        });
+                        
+                        
+                        $(".primaryContainerBG").scroll(function () {
+                            var divTable = $(".primaryContainerBG");
+                            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                        });
+                        
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+            }
+            
+            
+        </script>
+        {% endblock %}

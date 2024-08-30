@@ -1,0 +1,375 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sansthaa ERP | Employee Attendance</title>
+    <link rel="icon" type="image/png" href="{% static 'img/favicon_io/favicon.ico' %}" />
+    <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'plugins/font-awesome-4.7.0/css/font-awesome.min.css' %}" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap-4.5.2-dist/css/bootstrap.min.css' %}" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.0/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="{% static 'css/global.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/student-attendance-screen.css' %}" />
+    <link rel="stylesheet" href="/static/css/footer.css" />
+    
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="{% static 'js/Nitgen.js' %}"></script>
+    <style>
+        .content{
+            bottom: 0;
+            color: #FFFFFF;
+            font-size: 26px;
+            position: relative;
+            z-index: 100;
+        }
+
+        .background{
+            color: #999999;
+            position: absolute;
+            top: 0;
+            left: 0;
+            margin: 0 3rem;
+        }
+
+        #wrapper {
+            width: 100%;
+            position: relative;
+        }
+        #frameBorder {
+            width: 200px;
+            height: 100px;
+            background-size: 100% 100%;
+            position: relative;
+        }
+        #cutout {
+            position: relative;
+        }
+        /* .ui-resizable-n, 
+        .ui-resizable-s, 
+        .ui-resizable-e, 
+        .ui-resizable-w  */
+        .ui-resizable-ne, 
+        .ui-resizable-nw, 
+        .ui-resizable-se, 
+        .ui-resizable-sw 
+        {
+          overflow: visible;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          /* background-color: #000; */
+          border: 5px solid #000000;
+        }
+        .ui-wrapper {
+          overflow: visible !important;
+        }
+        .ui-datepicker {
+          z-index: 1000 !important;
+        }
+        body.swal2-shown > [aria-hidden="true"] {
+          transition: 0.1s filter;
+          filter: blur(10px);
+        }
+
+    </style>
+     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.0/dist/sweetalert2.min.js"></script>
+    <script type="text/javascript">
+        var student_id = null;
+        
+        function read(result){
+            url = "{% url 'src:employee/get-by-employee-id' %}";
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data:{reg_number:result,csrfmiddlewaretoken: '{{ csrf_token }}'},
+                cache:false,
+                success: function (data) {
+                    if(typeof data.flag !== "undefined" && !data.flag){
+                        const swalWithBootstrapButtons = Swal.mixin()
+                            swalWithBootstrapButtons.fire({
+                                title: data.message,
+                                icon: 'error',
+                                confirmButtonText: 'Ok',
+                                confirmButtonColor: "#0073e0",
+                            }).then((result) => {
+                                if (result.isConfirmed) {
+                                location.reload();
+                                }
+                            });
+                        
+                    }else{
+                        $('#qr_data').hide(); 
+                        
+                        student_id = data.student_id;
+                        
+                        $('#audio_source').attr('src',data.audio);
+                        $('#help_section').hide();
+                        
+                        $('#student_section').html(data.student_html);
+                        $('#student_section').show();
+                        
+                        $('audio')[0].load();
+                        
+                        var promise = $('audio')[0].play();
+                        if (promise) promise.catch(error => {
+                            // Auto-play disabled show controls 
+                            $('audio').attr('controls', '');
+                        });
+                        
+                    }
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+            
+        }
+        
+        function verifyStudentThumb() {
+            
+            $('#scanning_idle').hide();
+            $('#scanning_thumb').show();
+            $('#scanning_success').hide();
+            $('#scanning_failed').hide();
+            
+            
+            var quality = 60; 
+            var timeout = 10; 
+            try {
+                var resultData =1;
+                var res = CaptureFinger();
+                if (res.httpStaus) {
+                    if (res.data.ErrorCode == "0") {
+                        $('#finger_iso').attr('src',"data:image/bmp;base64," + res.data.BitmapData);
+                        var isoTemplateDataLocal =  res.data.IsoTemplate;
+                        var url =  "{% url 'src:get-employee-thumbs' '1' %}",
+                        url = url.replace('1',student_id);
+                        
+                        $.ajax({
+                            url: url,
+                            type: "GET",
+                            success: function (data) {
+                                error = false;
+                                student_details = data.student_details
+                                var studentFinger = [student_details.finger_iso_1, student_details.finger_iso_2];
+                                var dataCnt = studentFinger.length;
+                                for(var i=0; i<dataCnt; i++){
+                                    var isoTemplateDataServer = studentFinger[i];
+                                    if(isoTemplateDataServer!=''){
+                                        var res = VerifyFinger(isoTemplateDataServer, isoTemplateDataLocal);
+                                        if (res.httpStaus) {
+                                            if (res.data.Status==true) {
+                                                // verified
+                                                error = false;
+                                                break;
+                                            }else{
+                                                // failed
+                                                error = true;
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                if(error){
+                                    $('#scanning_idle').hide();
+                                    $('#scanning_thumb').hide();
+                                    $('#scanning_success').hide();
+                                    $('#scanning_failed').show();
+                                    
+                                    $('#audio_source').attr('src','/media/attendance_audio/thumb_verification/error.mp3');
+                                    $('audio')[0].load();
+                                    
+                                    var promise = $('audio')[0].play();
+                                    if (promise) promise.catch(error => {
+                                        // Auto-play disabled show controls 
+                                        $('audio').attr('controls', '');
+                                    });
+                                    
+                                    // verifyStudentThumb();
+                                    setTimeout(function(){  verifyStudentThumb(); },3500);
+                                    
+                                    // alert('Authentication failed.');
+                                    
+                                }else{
+                                    
+                                    $('#scanning_idle').hide();
+                                    $('#scanning_thumb').hide();
+                                    $('#scanning_success').show();
+                                    $('#scanning_failed').hide();
+                                    
+                                    markStudentAttendance();
+                                    // alert('Authentication successful.');
+                                    
+                                }
+                                
+                            },
+                            error: function (jqXHR, ajaxOptions, thrownError) {
+                                console.log(getHttpError(jqXHR));
+                            },
+                        });
+                        
+                    }
+                    
+                }
+                else {
+                    alert(res.err);
+                }
+                
+            }
+            catch (e) {
+                alert(e);
+            }
+            return false;
+        } 
+        
+        function markStudentAttendance(){
+            url = "{% url 'src:attendance/mark-employee-attendance'  %}";
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data:{'student_id':student_id,csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+                success: function (data) {
+                    console.log(data)
+                    if(data.flag){
+                        
+                        $('#audio_source').attr('src','/media/attendance_audio/thumb_verification/success.mp3');
+                        $('audio')[0].load();
+                        
+                        var promise = $('audio')[0].play();
+                        if (promise) promise.catch(error => {
+                            // Auto-play disabled show controls 
+                            $('audio').attr('controls', '');
+                        });
+                        
+                        setTimeout(function(){ window.location.reload(); },3500);
+                        
+                        
+                    }else{
+                        alert(data.message);
+                        
+                    }
+                    
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+        
+    </script>
+    <style>
+        .iconAlignment {
+            text-align: right;
+        }
+        .socialMediaIcon {
+            width: 1rem;
+            margin: 0 0.5rem;
+            cursor: pointer;
+        }
+        .footerText {
+            font-size: 0.85rem;
+            font-family: sans-serif;
+            font-weight: 500;
+        }
+        .lightGrey {
+            color: #727272;
+        }
+        .blackFont {
+            color: #151515;
+        }
+        
+    </style>
+</head>
+<body class="comingSoon">
+    
+    <audio controls onended="verifyStudentThumb()" id="audio" style="display: none;">
+        <source id="audio_source"  src="/media/attendance_audio/null.mp3" type="audio/mpeg">
+        </audio>
+        <div class="mt-4 px-4" id="">
+            <div class="row border-redius-17 box-shadow-bg" id="containerHeight">
+                <div class="col-md-6 col-12  px-0 h-100">
+                    <div class="primaryContainerBG h-100 pl-3 pr-2 py-3 border-r-r"   id="">
+                        <div class="row h-100 w-100" id=" " >
+                            <div class="bg-img">
+                                <img src="{% static 'img/png/bg.png' %} " alt="" class=""> 
+                            </div>
+                            <div class="scan-student-id-card">
+                                <img src="{% static 'img/png/logobipe.png' %} " alt="" class=" d-inline-block" style="width: 40%; min-width: 150px;">
+                                <div style="min-width: 450px; position: relative;" >
+                                    <input type="text" class="inputField d-block" name="qr_data" id="qr_data" placeholder="Scan Employee ID" onchange="read(this.value)">
+                                    <img src="{% static 'img/svg/phoneQRicon.svg' %}" alt="" class="student-csan-id-icon">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-12  px-0 h-100 "  id="help_section">
+                    <div class="primaryContainerBG border-r-l h-100 py-3 pl-2 pr-2" id="">
+                        <div class="row h-100 w-100" id="" >
+                            <div class="bg-img">
+                                <img src="{% static 'img/png/help_emp.png' %} " alt="" class="" >
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-12  px-3 h-100 primaryContainerBG border-r-l  border-left" id="student_section"  style="display: none;">
+                    <div class="primaryContainerBG border-r-l h-100 py-3" id="">
+                        <div class="col-12 col-sm-12 px-0 border-left" >
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+        <footer class="footer footer-bottom" id="footer">
+            <div class="row">
+                <div class="col-sm-10  pr-0">
+                    <div class="row">
+                        <span class="footerText lightGrey">©copyright</span>
+                        <span class="footerText">
+                            2020. <span class="blackFont">A Product of </span>
+                            <a href="https://sortstring.com">Sort String </a>
+                            <span class="blackFont">Solutions LLP </span> 
+                            <a href="https://sortstring.com/privacy-policy" target="_blank">
+                                <span class="footerText lightGrey">- Privacy Poilcy</span>
+                            </a>
+                            <a href="https://sortstring.com/contact" target="_blank">
+                                <span class="footerText lightGrey">- Help</span>
+                            </a>
+                        </span>
+                        
+                    </div>
+                </div>
+                
+                <div class="col-sm-2 iconAlignment">
+                    <a href="https://www.facebook.com/sortstringsolutions/" target="_blank"><img src="/static/img/svg/Facebook.svg" class="socialMediaIcon"></a>
+                    <a href="https://www.linkedin.com/company/sortstring-solutions/" target="_blank"><img src="/static/img/svg/Instagram.svg" class="socialMediaIcon"></a>
+                    <a href="https://twitter.com/sort_string" target="_blank"><img src="/static/img/svg/Twitter.svg" class="socialMediaIcon"></a>
+                </div>
+            </div>
+        </footer>        
+        <script>
+            $(document).ready(function(){
+                setHeightWidth();
+                $('#qr_data').focus(); 
+            });
+            function setHeightWidth() {
+                var containerHeight =
+                window.innerHeight - 80;
+                $("#containerHeight").height(containerHeight);
+            }
+            
+        </script>
+        
+        
+        
+    </body>
+    </html>

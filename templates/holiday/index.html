@@ -1,0 +1,966 @@
+{% extends 'layout/layout.html' %}
+{% block title %}
+{{page_title}} 
+{% endblock %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} 
+<style>
+    .ck-editor__editable_inline {
+        min-height: 150px;
+    }
+    
+    .ui-autocomplete {
+        max-height: 100px !important;
+        overflow-y: auto !important;
+        /* prevent horizontal scrollbar */
+        overflow-x: hidden !important;
+    }
+    /* IE 6 doesn't support max-height
+    * we use height instead, but this forces the menu to always be this tall
+    */
+    * html .ui-autocomplete {
+        height: 100px !important;
+    }
+    
+    /* calendar css start */
+    .calendar {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+    .calendar__input {
+        display: none;
+    }
+    
+    .calendar__label {
+        display: block;
+    }
+    
+    .calendar__label__day {
+        padding-bottom: 0.4rem;
+        background-color: white;
+        font-size: 0.8rem;
+    }
+    .holiday{
+        background-color: #629632; 
+        color: white;
+    }
+    
+    /* calendar css start */
+    
+    
+</style>
+<link rel="stylesheet" href="{% static 'css/jquery-confirm.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/manage-holidays.css' %}">
+
+{% endblock %}
+
+<div class="row px-3" id="containerHeight">
+    <div class="col-md-8 col-12 pl-0 pr-3 h-100">
+        <div class="primaryContainer h-100" id="mainbox" style="background-color: #ffffff;">
+            <div class="row mb-2" id="topRow" style="background-color: #f7f8fb;">
+                <div class="col-md-5 px-0 ">
+                    <h6 class="font-wt-b d-inline-block mr-2">{{page_title}}</h6>
+                    <i class="fa fa-star add_to_fav   {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></i>
+                </div>
+                <div class="col-md-7 px-0">
+                    <div class="row">
+                    </div>
+                   
+                </div>
+            </div>
+            {% if holiday %}
+            
+            <div class="primaryContainerBG h-100" id="ajaxCalendarDiv">
+                <form action="" id="markVacationForm">
+                    <div class="row">
+                        <div class="col-md-6 px-0">
+                            <div class="row">
+                                <span class="slider-icon-box" onclick="getHolidayCalendar('previous','{{previous_month}}','{{current_year}}')">
+                                    <img src="{% static 'img/svg/arrow_left.svg' %}" alt="">
+                                </span>
+                                <span class="calendar-title">{{current_month_name}} 
+                                    <b style="color: #000;">{{current_year}}</b>
+                                </span>
+                                <span class="slider-icon-box mr-3"  onclick="getHolidayCalendar('next','{{next_month}}','{{current_year}}')"> 
+                                    <img src="{% static 'img/svg/arrow_right.svg' %}" alt="" >
+                                </span>
+                                
+                            </div>
+                            
+                        </div>
+                        <div class="col-md-6 px-0">
+                            
+                        </div>                       
+                        
+                        <div class="col-md-12 px-0 calendar-table">
+                            <table class="">
+                                <thead>
+                                    <tr>
+                                        <th>Monday</th>
+                                        <th>Tuesday</th>
+                                        <th>Wednesday</th>
+                                        <th>Thursday</th>
+                                        <th>Friday</th>
+                                        <th>Saturday</th>
+                                        <th>Sunday</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for calendar_date in calendar_dates %}
+                                    <tr>
+                                        {% for data in calendar_date %}
+                                        <td class="{% if data.is_holiday == 1 %}yellow{% endif %}">
+                                            <input type="checkbox" name="" id="date-{{data.full_date|date:'Y-m-d'}}" value="{{data.full_date|date:'Y-m-d'}}" onclick="" class="calendar__input" disabled="">
+                                            <label for="date-{{data.full_date|date:'Y-m-d'}}" class="calendar__label">
+                                                <div class="calendar__label__date" >
+                                                    {{data.short_date }}<br>
+                                                </div>
+                                            </label>
+                                            <span>{% if data.is_holiday == 1 %}{{data.holiday}}{% endif %}</span>
+                                        </td>                                        
+                                        {% endfor %}
+                                    </tr>
+                                    {% endfor %}
+                                    
+                                </tbody>
+                            </table>
+                            
+                        </div>
+                    </div>
+                </form>
+            </div>
+            {% else %}
+            <div class="primaryContainerBG h-100 calender-container" id="ajaxCalendarDiv">
+            </div>
+            {% endif %}
+            
+        </div>
+    </div>
+    <div class="col-md-4 col-12  px-0 h-100">
+        <div class="primaryContainerBG h-100 px-0">
+            <div class="col-sm-12 col-12 px-3 border-bottom">
+                <div class="row">
+                    <div class="col-sm-6 col-6 px-0">
+                        <div class="font-13 dark-blue-color font-wt-b mt-2">Holiday List<span id="total_holidays">({{total_holidays}})</span></div>
+                    </div>
+                    <div class="col-sm-6 col-6 px-0">
+                        <button type="button" class="btn btn-save float-right" onclick="addHoliday()">Add New
+                        </button>
+                    </div>
+                </div>
+                <div class="row my-2">
+                    <div class="col-sm-4 col-6 px-0">
+                        <select class="inputField selectField w-100 All" name="holiday_status" id="holiday_status" onchange="getHolidayRecord()">
+                            <option value="-1">All Status</option>
+                            <option value="0" {% if order_status == 1 %} selected {% endif %}>Discarded</option>
+                            <option value="1" {% if order_status == 1 %} selected {% endif %}>Initiated</option>
+                            <option value="2" {% if order_status == 2 %} selected {% endif %}>Forwarded</option>
+                            <option value="3" {% if order_status == 3 %} selected {% endif %}>Approved</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-6 col-6 px-0"> 
+                        <!-- <button type="button" class="btn iconBoxSmall iconForwardSmall" data-toggle="modal" data-target="#addOrganisationModal" id="forwardButton" name="forwardButton" title="Forward" value="" style="display: none;" onclick="getRecordUpdated(this.value)"> </button>
+                        <button type="button" class="btn iconBoxSmall iconApprovedSmall" data-toggle="modal" data-target="#addOrganisationModal" id="approvedButton" name="approvedButton" title="Approve" value="" style="display: none;" onclick="getRecordUpdated(this.value)"></button>
+
+                        <button type="button" class="btn iconBoxSmall iconDiscardSmall" data-toggle="modal" data-target="#addOrganisationModal" id="discardButton" name="discardButton" title="Discard" value="0" style="display: none;" onclick="getRecordUpdated(this.value)"></button> -->
+                    </div>
+                    <div class="col-sm-2 col-6 px-0">
+                        <div class="dropdown float-right" >
+                            <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                        </button>
+                        
+                        <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                        aria-labelledby="dropdownMenuButton">
+                        <input type="hidden" name="show_columns" id="show_columns" value="" >
+                        <a class="dropdown-item  " onclick="exports('excel')" href="javascript:void(0)">Export to excel
+                            <img src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons ml-1" /> 
+                        </a>
+                        <!-- <a class="dropdown-item " onclick="exports('pdf')" href="javascript:void(0)">Export to Pdf 
+                            <img src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons ml-1" />
+                        </a> -->
+                    </div>
+                </div>
+                    </div>
+                </div>
+            </div>
+    <div class="row h-100 mt-2 mob-h-100" id="tableBox">
+        <div class="col-sm-12 col-12 primaryContainerBG h-100 p-0 commonTableBg manage-holiday-table" id="ajax-div">
+            <table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0 " style="width: 100%;">
+                <thead>
+                    <tr>
+                       <td >
+                            <div class="row"> 
+                                <div class="sorter-false all_checkbox_class col-sm-1 pr-0" style="margin-top: 6px; padding-left: 0px;">
+                                    <input type="checkbox" class="checked_all" id="new_module_1" onchange="masterCheckBox()">
+                                </div>
+                                <div class="col-sm-11 px-0">
+                                    <div class="row " style="justify-content: flex-end;">
+                                        <button type="button" class="btn iconBox  iconForwardSmall" data-toggle="modal" data-target="#addOrganisationModal" id="forwardButton" name="forwardButton" title="Forward" value="2"  onclick="getRecordUpdated(this.value)"> </button>
+                                        <button type="button" class="btn iconBox  iconApprovedSmall" data-toggle="modal" data-target="#addOrganisationModal" id="approvedButton" name="approvedButton" title="Approve" value="" style="display: none;" onclick="getRecordUpdated(this.value)"></button>
+                                        <button type="button" class="btn iconBox  iconDiscardSmall" data-toggle="modal" data-target="#addDescription" id="discardButton" name="discardButton" title="Discard" value="0"  onclick="getRecordUpdated(this.value)"></button>
+                                    </div>
+                                </div>
+                            </div>
+                        </td> 
+
+                    </tr>
+                </thead>
+                <tbody class="" id="tablebody">
+                    {% if holidays %}
+                    {% for holiday in holidays %}
+                    <tr  {% if forloop.first %} class="odd selected" {% endif %}>                     
+                        <td>                         
+                        <div class="accent-color font-wt-b font-12" style="margin-left: 11px;">
+                        {{holiday.month_name}}</div>                          
+                            <ul>
+                                {% for month_holiday in holiday.month_holidays %}
+                                    
+                                <li class="holidays_row">
+                                    <div class="row">
+                                        <div class="checkBox mr-2" style="margin-top: 3px;">
+                                            {% if holiday.holiday_status != 3 %}
+                                                <input type="checkbox" class="checkbox" id="new_module_1" name="holiday_id[]" value="{{ holiday.id }}">
+                                                {% else %} 
+                                                {% if holiday.holiday_status == 1 %}
+                                                <input type="checkbox" class="checkbox" id="new_module_1" name="holiday_id[]" value="{{ holiday.id }}">
+                                                {% elif holiday.holiday_status == 2 %}
+                                                <input type="checkbox" class="checkbox" id="new_module_1" name="holiday_id[]" value="{{ holiday.id }}">
+                                                {% elif holiday.holiday_status == 3 %}
+                                                <input type="checkbox" class="checkbox" id="new_module_1" name="holiday_id[]" value="{{ holiday.id }}">
+                                                {% else %}
+                                                <input type="checkbox" disabled checked style="display: none;">
+                                                {% endif %}
+                                                {% endif %}
+                                        </div>
+
+                                        <div class="col-sm-3 col-4 px-0 holidays_name" >{{month_holiday.holiday}}</div>
+                                        
+                                        <div class="col-sm-6 col-5 px-0 holidays_date" > 
+                                            <span class="d-inline-block ml-1">{{ month_holiday.start_date|date:'d M' }} {{ month_holiday.start_date|date:'D' }} - {{ month_holiday.end_date|date:'d M' }} {{ month_holiday.end_date|date:'D' }} ,</span>
+                                            <span class="d-inline-block ml-1">{{month_holiday.start_date|date:'Y'}}</span>
+                                        </div>
+                                       
+                                        <div class="col-sm-2 col-3 px-0 ">
+                                            <div class="row" style="justify-content: flex-end;">
+                                                <a href="javascript:;" class="" onclick="editHoliday('{{ month_holiday.id }}')">
+                                                    <img class="tableRowIcon tableRowIcon-product-icon mr-0" src="/static/img/svg/editcopy.svg" style="width: 18px;" title="Edit">
+                                                </a> 
+                                                <label class="switch ml-2" style="margin-top: 3px;">
+                                                    <input type="checkbox" class="checkbox_slider" name="is_active"
+                                                    id="is_active_{{ month_holiday.id }}"
+                                                    {% if month_holiday.status == 1 %} checked="" {% else %}
+                                                    {% endif %}
+                                                    onclick="updateHolidayStatus('{{ month_holiday.id }}', '{{ month_holiday.status }}')">
+                                                    <span class="slider round" title="Enable/Disable"></span>
+                                                </label>
+                                                <!-- <a onclick="addpdf('{{ month_holiday.id }}')" href="javascript:void(0)"> 
+                                                    <img src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons ml-1" />
+                                                </a> -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-sm-12 pr-0 grey-color d-block font-11" style="padding-left: 1.4rem;" >
+                                        {{month_holiday.description|safe}}
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        
+                        
+                    </tr>
+                    {% endfor %}
+                    <tr id="loading" style="display: none;">
+                        <td class="text-center" colspan="4"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                        </td>
+                    </tr>
+                    
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align: center;">No Record Found...</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<!-- *************************************Modal********************************** -->
+<div class="overlayModal" id="AddnewHolidayModal" style="display: none;">
+    
+</div>
+<div class="overlayModal" id="addOrganisationModal" data-keyboard="false" data-backdrop="static">
+    
+</div>
+<div class="overlayModal" id="addDeptModal" data-keyboard="false" data-backdrop="static">
+    
+</div>
+<div class="overlayModal" id="addDescription"  data-keyboard="false" data-backdrop="static" style="display: none;">
+    <div class="md-modal centered basic-inform-popup" >
+        <form name="addBasicDetailsForms" id="addBasicDetailsForms" method="POST" enctype="multipart/form-data" >
+            {% csrf_token %}
+            <input type="hidden" name="user_id" id="user_id" value="{{ user.id }}" >
+            <div class="modal-header" id="headerStep1">
+                <div class="col-12 col-sm-12 px-0">
+                    <div class="row">
+                        <div class="col-5 col-sm-5 px-0 ">
+                            <h5 class="mt-md-2">Description</h5>
+                        </div>
+                        <div class="col-7 col-sm-7 px-0">
+                            <button class="btn btn-close float-right mr-0" value="close" type="button" onclick="closeDiv()">
+                                Close
+                            </button>
+                            <button class="btn btn-save float-right mr-2" type="button" value="0" onclick="discard(this.value)" >
+                                Submit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>        
+            <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+                <div class="col-md-12 col-12 px-0 " id="step1">
+                    <div class="row">
+                        <div class="col-md-12 col-12 pl-0 pr-3 mob-pr-0">
+                            <textarea class="inputField" id="description" name="description"></textarea>                        
+                        </div>                    
+                    </div>
+                </div>
+            </div>
+        </form>   
+    </div>
+</div>
+
+<!-- *************************************Modal********************************** -->
+{% endblock content %}
+{% block script %}
+
+<script src="{% static 'js/jquery-confirm.min.js' %}"></script>
+<script src="{% static 'js/ckeditor.js' %}"></script>
+<script type="text/javascript">
+
+    function closeDiv(){
+            $("#addDescription").hide();
+            $(".overlayModal").hide();  
+            $(".addOrganisationModal").hide();          
+        }
+    function discard(id){
+
+        var checkBoxVal = $('.checkboxSingle').val();
+        var holidayId = [];
+        var description = $('#description').val();
+        $("input:checkbox[class=checkboxSingle]:checked").each(function(){
+            var id = parseInt($(this).val());
+            holidayId.push(id);
+        });
+        if(id == '0' & holidayId.length > 0 & description != '' ){
+            $('#addDescription').hide();
+            url = "{% url 'src:update-holiday-status' %}"                
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: { statusId:id, holiday_id:holidayId,description:description, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                success: function (data) {
+                    $('#tablebody').html(data);
+                    if (data.error == false) {
+                        hideLoader();
+                        openToaster("success", data.message);
+                        setTimeout(function(){
+                        window.location.reload(1);
+                        }, 500);
+                    }else{
+                        openToaster("alert", data.message);
+                    }
+                },
+                error: function (err) {
+                    alert(err.message);
+                }
+            });                
+        }
+
+    }
+
+
+    function getRecordUpdated(id){                        
+            var checkBoxVal = $('.checkboxSingle').val();
+            var holidayId = [];
+            var description = $('#description').val();
+            $("input:checkbox[class=checkboxSingle]:checked").each(function(){
+                var id = parseInt($(this).val());
+                holidayId.push(id);
+            });
+            if(id == '0' & holidayId.length > 0){
+                $('#addDescription').show();                
+            }
+
+            url = "{% url 'src:update-holiday-status' %}"
+            
+            if(url != "" & id != '0' & holidayId.length > 0){
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    data: { statusId:id, holiday_id:holidayId,description:description, csrfmiddlewaretoken: '{{ csrf_token }}'},
+
+                    success: function (data) {
+
+                        $('#tablebody').html(data);
+                        if (data.error == false) {
+                            hideLoader();
+                            openToaster("success", data.message);
+                            window.location.reload();
+                        }else{
+                            openToaster("alert", data.message);
+                        }
+                    },
+                    error: function (err) {
+                        alert(err.message);
+                    }
+                });
+            }  
+        }
+
+    function masterCheckBox(){
+            var check_all = $('.checked_all:checked').length;
+            var holiday_status = $('#holiday_status').val();
+            if(check_all==0){
+                $('.checkboxSingle').prop('checked',false);
+                $('#forwardButton').hide();
+                $('#approvedButton').hide();
+                $('#discardButton').hide();
+            }else{
+                $('.checkboxSingle').prop('checked',true);
+                if(holiday_status == '1'){
+                    $('#forwardButton').show();
+                    $('#discardButton').show();
+                    $('#approvedButton').hide();
+                }
+                if(holiday_status == '2'){
+                    $('#forwardButton').hide();
+                    $('#approvedButton').show();
+                    $('#discardButton').show();
+                }
+            }
+        }
+        function handleCheckBox(){
+            
+            var holiday_status = $('#holiday_status').val();
+            var totalCheckbox = $('.checkboxSingle').length;
+            var totalCheckedBox = $('.checkboxSingle:checked').length;
+            if(totalCheckedBox == totalCheckbox){
+                $('.checked_all').prop('checked',true);
+                if(holiday_status == '1'){
+                    $('#forwardButton').show();
+                    $('#discardButton').show();
+                    $('#approvedButton').hide();
+                }
+                if(holiday_status == '2'){
+                    $('#forwardButton').hide();
+                    $('#approvedButton').show();
+                    $('#discardButton').show();
+                }
+            }
+            else{
+                $('.checked_all').prop('checked',false);
+                $('#forwardButton').hide();
+                $('#approvedButton').hide();
+                $('#discardButton').hide();
+            }
+            
+            if(totalCheckedBox > 0){
+                $('.checked_all').show();
+                if(holiday_status =='1'){
+                    $(".checkboxSingle").attr("disabled", false);
+                    $(".checked_all").attr("disabled", false);
+                    $('#forwardButton').show();
+                    $('#discardButton').show();
+                    $('#approvedButton').hide();
+                    $("#forwardButton").val("2");
+                    $("#discardButton").val("0");
+                }
+                if(holiday_status == '2'){
+                    $(".checkboxSingle").attr("disabled", false);
+                    $(".checked_all").attr("disabled", false);
+                    $('#forwardButton').hide();
+                    $('#approvedButton').show();
+                    $('#discardButton').show();
+                    $("#approvedButton").val("3");                
+                    $("#discardButton").val("0");
+                    }
+                if(holiday_status == '-1'){
+                    $(".checkboxSingle").attr("disabled", true);
+                    $(".checked_all").attr("disabled", true);
+                    $(".checkbox").hide();
+                    $(".checked_all").hide();
+                    $('#forwardButton').hide();
+                    $('#approvedButton').hide();
+                    $('#discardButton').hide();
+                    }
+
+            }else{
+                $('.checked_all').hide();
+                $('#forwardButton').hide();
+                $('#approvedButton').hide();
+                $('#discardButton').hide();
+            }
+            
+        }
+
+    function addHoliday() {
+        $('#AddnewHolidayModal').html('');
+        showLoader();
+        url = "{% url 'src:add-holiday'  %}";
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+                if(typeof data.flag !== "undefined" && !data.flag){
+                    hideLoader();
+                    openToaster("danger", data.message);
+                    setTimeout(function(){
+                        window.location.reload(1);
+                        }, 500);
+                }else{
+                    hideLoader();
+                    $("#AddnewHolidayModal").show();
+                    $('#AddnewHolidayModal').html(data);
+                    $('.selectField').select2();
+                    
+                    $("#from_date").datepicker({  
+                        changeMonth: true,
+                        changeYear: true,  
+                        yearRange: "-100:+0",
+                        dateFormat: 'dd/mm/yy' 
+                    });
+                    
+                    $("#to_date").datepicker({  
+                        changeMonth: true,
+                        changeYear: true,  
+                        yearRange: "-100:+0",
+                        dateFormat: 'dd/mm/yy' 
+                    });
+                    
+                    
+                    ClassicEditor
+                    .create( document.querySelector('#holiday_description'), {
+                        // toolbar: [ 'heading', '|', 'bold', 'italic', 'link' ]
+                    } )
+                    .then( editor => {
+                        window.editor = editor;
+                    } )
+                    .catch( err => {
+                        console.error( err.stack );
+                    } );
+                    
+                }
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    function editHoliday(id) {
+        $('#AddnewHolidayModal').html('');
+        showLoader();
+        url = "{% url 'src:edit-holiday' 'holiday_id' %}";
+        url = url.replace('holiday_id',id)
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+                if(typeof data.flag !== "undefined" && !data.flag){
+                    hideLoader();
+                    openToaster("danger", data.message);
+                    setTimeout(function(){
+                        window.location.reload(1);
+                        }, 500);
+                }else{
+                    hideLoader();
+                    $("#AddnewHolidayModal").show();
+                    $('#AddnewHolidayModal').html(data);
+                    $('.selectField').select2();
+                    
+                    
+                    
+                    
+                    ClassicEditor
+                    .create( document.querySelector('#edit_holiday_description'), {
+                        // toolbar: [ 'heading', '|', 'bold', 'italic', 'link' ]
+                    } )
+                    .then( editor => {
+                        window.editor = editor;
+                        editor.height = "500px";
+                    } )
+                    .catch( err => {
+                        console.error( err.stack );
+                    } );
+                    
+                }
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    function updateHolidayStatus(id, active_status) {
+        console.log("updateHolidayStatus");
+        if ($('#is_active_' + id).prop("checked") == true) {
+            is_active = 1;
+            status = 'Unblock';
+        } else {
+            is_active = 0;  
+            status = 'Block';
+        }
+        console.log(is_active);
+        $.ajax({
+            url: "{% url 'src:update-holiday-status' %}",
+            method: 'POST',
+            data: {
+                id: id,
+                is_active: is_active,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function (data) {
+                if(typeof data.flag !== "undefined" && !data.flag){
+                    hideLoader();
+                    openToaster("danger", data.message);
+                    setTimeout(function(){
+                        window.location.reload(1);
+                        }, 500);
+                    if ($('#is_active_' + id).prop("checked") == true) {
+                        $('#is_active_' + id).prop("checked",false);
+                    }else{
+                        $('#is_active_' + id).prop("checked",true); 
+                    }
+                }else{
+                    if (data.error == false) {
+                        hideLoader();
+                        openToaster("success", data.message);
+                    }
+                }
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    
+    
+    
+    
+    $(document).ready(function () {
+        var holiday_status = $('#holiday_status').val();
+        if(holiday_status == '-1'){
+            $(".checkbox").attr("disabled", true);
+            $(".checked_all").attr("disabled", true);
+            $(".checkbox").hide();
+            $(".checked_all").hide();
+            $('#forwardButton').hide();
+            $('#approvedButton').hide();
+            $('#discardButton').hide();
+        }
+        
+        
+        $("#addOrgTable tbody tr").click(function () {
+            $(this).addClass("selected").siblings().removeClass("selected");
+        });
+        
+        
+        var prevTop = 0;
+        
+        $('#ajax-div').on('scroll', function () {
+            var page = $('#page').val();
+            var totalPages = $('#total_pages').val();
+            
+            var currentTop = $(this).scrollTop();
+            if (prevTop !== currentTop) {
+                prevTop = currentTop;
+                if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+                    
+                    if($('#page_status').val() == 0 && page  <= totalPages){
+                        $('#loading').show(); 
+                        $('#page_status').val('1');
+                        $.ajax({
+                            url: "{% url 'src:ajax-organization-lists' %}",
+                            method: 'GET',
+                            data: { page:page },
+                            success: function (data) {
+                                setTimeout(() => {
+                                    $('#tablebody').find('tr:last').prev().after(data);
+                                    $('#page').val(parseInt(page)+1);
+                                    $('#loading').hide();
+                                    $('#page_status').val('0');
+                                    $('#addOrgTable').trigger('update');
+                                }, 2000);
+                            },
+                            error: function (err) {
+                                alert(err.message);
+                                window.location.reload();
+                            }
+                        });
+                    }
+                }
+            }
+        })
+        
+    });
+</script>
+
+<script>
+    
+    function getHolidayRecord(){
+        var holiday_status = $('#holiday_status').val();
+        var totalCheckedBox = 0
+        $('#forwardButton').hide();
+        $('#approvedButton').hide();
+        $('#discardButton').hide();
+        $(".checked_all").attr("checked", false);
+        
+        if(holiday_status =='1'| holiday_status == 1){
+                $(".checkboxSingle").attr("disabled", false);
+                $(".checked_all").attr("disabled", false);
+                if(totalCheckedBox>0){
+                    $(".checked_all").hide();
+                    $('#forwardButton').show();
+                    $('#approvedButton').hide();
+                    $('#discardButton').show();
+                }
+                                    
+                $("#forwardButton").val("2");
+                $("#discardButton").val("0");
+            }
+            if(holiday_status == '2' | holiday_status == 2){
+                $(".checkboxSingle").attr("disabled", false);
+                $(".checked_all").attr("disabled", false);
+                if(totalCheckedBox>0){
+                    $(".checked_all").hide();
+                    $('#forwardButton').hide();
+                    $('#approvedButton').show();
+                    $('#discardButton').show();
+                }
+                $("#approvedButton").val("3");                
+                $("#discardButton").val("0");
+                }
+            if(holiday_status == ''| holiday_status == '3'| holiday_status == '0'){
+                $(".checkboxSingle").hide();
+                $(".checked_all").hide();
+                }
+        $('#tablebody').html('');
+        url = "{% url 'src:holidays/filter-holiday' 'holiday_status'%}"
+        if(holiday_status != ''){
+            url = url.replace('holiday_status',holiday_status);
+        }
+        
+        if(url != ""){
+            
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: { csrfmiddlewaretoken: '{{ csrf_token }}'},
+                success: function (data) {
+                    hideLoader();
+                    $('#tablebody').html(data);
+                    if(holiday_status == '-1'| holiday_status == '0' | holiday_status == '3'){
+                        $(".checkboxSingle").attr("disabled", true);
+                        $(".checked_all").attr("disabled", true);
+                        $(".checkbox").hide();
+                        $(".checked_all").hide();
+                        $('#forwardButton').hide();
+                        $('#approvedButton').hide();
+                        $('#discardButton').hide();   
+                    }else{
+                        $(".checked_all").hide();
+                    }
+                },
+                error: function (err) {
+                    alert(err.message);
+                    // window.location.reload();
+                }
+            });
+        }
+        
+    }
+    
+    function exports(type){
+        var holiday_status = $('#holiday_status').val();
+        if(type == 'excel'){
+            var url = "{% url 'src:export-holidays-to-xlsx' 'holiday_status' %}";
+            url = url.replace('holiday_status',holiday_status);
+            window.location.href = url;
+        } else {
+            var url = "{% url 'src:export-holidays-to-pdf' 'holiday_status' %}";
+            url = url.replace('holiday_status',holiday_status);
+            window.location.href = url;
+        }
+        
+    }
+    
+    function getHolidayCalendar(action,month,year) {
+        debugger;
+        $('#ajaxCalendarDiv').html(`<div style="margin-top:40px; text-align:center"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>`).addClass('calender-container');
+            url = "{% url 'src:holidays/holiday-calendar' %}";
+            $.ajax({
+                url:url,
+                method: 'GET',
+                data:{month:month,year:year,action:action},
+                success: function (data) {
+                    $('#ajaxCalendarDiv').html(data).removeClass('calender-container');;
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+        
+        
+        function handleTabChange(element,type){
+            $('.customer-tab').removeClass('activeTab');
+            $(element).addClass('activeTab');
+            $('#date_selection_type').val(type);
+            $('#range_start_date').val('');
+            $('#range_end_date').val('');
+            $('.new_vacation').each(function(){
+                $(this).prop('checked',false);
+                $(this).next().find('div').removeClass('checked_date');
+                
+            });
+            
+        }
+        
+        function updateHolidayDates(element){
+            var date_selection_type = $('#date_selection_type').val();
+            if(date_selection_type == 1){
+                $('[name="vacation_date[]"]').each(function(){
+                    if($(this).prop('checked')){
+                        $(this).addClass('new_vacation');
+                        $(this).next().find('div').addClass('checked_date');
+                    }else{
+                        $(this).addClass('new_vacation');
+                        $(this).next().find('div').removeClass('checked_date');
+                    }
+                });
+            }else{
+                range_start_date = $('#range_start_date').val();
+                range_end_date = $('#range_end_date').val();
+                if (range_start_date == "" && range_end_date == ""){
+                    $(element).addClass('new_vacation');
+                    $(element).next().find('div').addClass('checked_date');
+                    $('#range_start_date').val($(element).val());
+                }else if (range_start_date != "" && range_end_date == ""){
+                    $(element).addClass('new_vacation');
+                    $(element).next().find('div').addClass('checked_date');
+                    $('#range_end_date').val($(element).val());
+                    
+                    // range date selection
+                    range_start_date = $('#range_start_date').val();
+                    range_end_date = $('#range_end_date').val();
+                    var daylist = getDaysArray(new Date(range_start_date),new Date(range_end_date));
+                    daylist.forEach(element => {
+                        
+                        date = parseInt(element.getDate())
+                        if(date < 10){
+                            date = "0"+date;
+                        }
+                        month = parseInt(element.getMonth()) + 1
+                        if(month < 10){
+                            month = "0"+month;
+                        }
+                        var date_element_id = 'date-'+element.getFullYear()+"-"+month+"-"+date;
+                        $('#'+date_element_id).prop('checked',true);
+                        $('#'+date_element_id).addClass('new_vacation');
+                        $('#'+date_element_id).next().find('div').addClass('checked_date');
+                        
+                    });
+                    
+                }else if (range_start_date != "" && range_end_date != ""){
+                    $('#range_start_date').val('');
+                    $('#range_end_date').val('');
+                    $('.new_vacation').each(function(){
+                        $(this).prop('checked',false);
+                        $(this).next().find('div').removeClass('checked_date');
+                    });
+                    $(element).prop('checked',true);
+                    $(element).addClass('new_vacation');
+                    $(element).next().find('div').addClass('checked_date');
+                    $('#range_start_date').val($(element).val());
+                }
+            }
+        }
+        
+        function getDaysArray(startDate, endDate) {
+            var dates = [],
+            currentDate = startDate,
+            addDays = function(days) {
+                var date = new Date(this.valueOf());
+                date.setDate(date.getDate() + days);
+                return date;
+            };
+            while (currentDate <= endDate) {
+                dates.push(currentDate);
+                currentDate = addDays.call(currentDate, 1);
+            }
+            return dates;
+        }
+        
+        function updateHoliday(){
+            {% comment %}
+            var question = "Do you want to add the vacation for selected days ?";
+            $.confirm({
+                title: 'Confirm!',
+                content: question,
+                buttons: {
+                    confirm: function () {
+                        showLoader();
+                        url = "{% url 'src:vacations/update-customer-vacation' %}";
+                        $.ajax({
+                            url:url,
+                            method: 'POST',
+                            data:$('#markVacationForm').serialize(),
+                            success: function (data) {
+                                if(typeof data.flag !== "undefined" && !data.flag){
+                                    hideLoader();
+                                    openToaster("danger", data.message);
+                                }else{
+                                    hideLoader();
+                                    if(data.flag){
+                                        openToaster('success',data.message);
+                                        getHolidayCalendar('{{current_month}}','{{current_year}}');
+                                    }else{
+                                        openToaster('danger',data.message);
+                                    }
+                                }
+                            },
+                            error: function (err) {
+                                hideLoader();
+                                console.log(err)
+                            }
+                        });
+                        
+                    },
+                    cancel: function () {
+                        hideLoader();
+                    }
+                }
+            });
+            {% endcomment %}
+        }
+        function addpdf(id) {
+            url = "{% url 'src:add-pdf' 'holiday_id' %}";
+            url = url.replace('holiday_id',id)
+            window.location.href = url;
+        }
+    </script>
+    {% endblock %}

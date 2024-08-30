@@ -1,0 +1,138 @@
+{% block script %}
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+{%endblock%}
+<div id="preview_old" class=" bg-white d-flex px-0" style="width: 636px !important; height: 1011px;">
+
+    <div id="wrapper">
+        <div class="rounded-pill bg-white border position-absolute mt-5" style="left: 20px; bottom: 95px; z-index: 102; min-width: 120px; margin-bottom: 10px;">
+            <p style="font-size: 20px; font-width: 20px; color: #8B0000;"> <img src="/static/id_card_design/bgico.png" alt="" width="40px">&nbsp;<b>{{blood_group}}</b></p>
+        </div>
+        <div class="bg-white border position-absolute" style="z-index: 102; left: 20px; bottom: 30px; min-width: 170px; padding: 10px; border-radius: 20px;">
+            <p  style="font-size: 20px; font-weight: bolder; color: #191970;"> <img src="/static/id_card_design/bday.png" alt="" width="30px">&nbsp;{% if dob %}{{dob}}{% else %}-{% endif %}</p>
+        </div>
+        <div class="content" id="mydiv" style="border: none">
+            <div id="frameBorder" style="border: none">
+            <img width="500px" style="z-index: 100;" id="cutout" src="" alt=""> <!-- border: 5px solid lightgrey; -->
+            </div>
+        </div>
+        <div class="background" style="min-height: 1011px;">
+            <div style="min-width: 176px; background-color: #bec3ca; min-height: inherit;">
+            </div>
+        </div>
+        
+    </div>
+    <div class="mt-4" id="crop-result" style="z-index: 200; width: 100%; position: relative;">
+        <div class="mt-4" style="top: 52px; z-index: 58; margin: 50px 50px 10px 50px;">
+            <img src="{{college_logo}}" alt="" width="250px" height="284px">
+        </div>
+        <div style=" border-radius: 5px 0 0 5px; padding-left: 10px; min-height: 558px; max-height: 558px; z-index: 4 !important; padding: 40px 0 0 20px !important; width: 365px;">            
+            <h1 class="h1 pd-0 px-1 pt-2 pd-1" style="line-height: 1px;font-weight: bolder; text-align: left; color: #24366f; z-index: 200 !important;">{{first_name}} <span style="color:black;">{{last_name}}</span></h1>
+            <h1 class="h4 p-2 ml-1 mt-5" style="opacity: 1; font-weight: bolder; z-index: 200 !important; color: white; background-color: #ff9700; border-bottom: 5px solid #ffc342;">{{role_name}}</h1>
+            <table style="margin: 10px 0; padding-bottom: 10px;">
+                <tr style="padding: 30px 0">
+                    <td style="vertical-align: top; width: 40px; padding: 5px 0;">
+                        <img src="/static/id_card_design/mail.png" alt="" width="40px">
+                    </td>
+                    <td style="padding: 0 10px;">
+                        <h1 class="h4" style="z-index: 200 !important;">{{mail_id}}</h1>
+                    </td>
+                </tr>
+                <tr style="margin: 30px 0">
+                    <td style="vertical-align: top; width: 40px; padding: 5px 0;">
+                        <img src="/static/id_card_design/call.png" alt="" width="40px">
+                    </td>
+                    <td style="padding: 0 10px;">
+                        <h1 class="h4" style="z-index: 200 !important;">{{contact}}</h1>
+                    </td>
+                </tr>
+                <tr style="margin: 15px">
+                    <td style="vertical-align: top; margin-right: 5px; width: 40px; padding: 5px 0;">
+                        <img src="/static/id_card_design/Address.png" alt="" width="40px">
+                    </td>
+                    <td style="padding: 0 10px 10px 10px; ">
+                        <h1 class="h4" style="z-index: 200 !important;">{{address}}</h1>
+                    </td>
+                </tr>
+            </table>
+            <div style="text-align: right; bottom: 25px; position: absolute; background-color: #fff; border-radius: 5px; z-index: 15 !important; border: 1px solid rgba(200, 200, 200, 0.2); width: 333px;">
+                <img style="text-align: center !important; width: inherit;" src="{{QR}}"/>
+                <span style="float:left; font-size:22px;"><b>{{reg_no}}</b></span>
+                <a href="#" style="font-size: 18px; padding-right: 5px; text-align: right !important; left: 0; width: 270px;">
+                   <span style="font-size:20px;"><b>{{college_website}}</b></span>
+                </a>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+<script>
+    $(function() {
+        $("body").click(function(e) {
+            if (e.target.id == "cutout" || $(e.target).parents("#cutout").length) {
+                $('#crop-result').css('z-index', 0)
+            } 
+            else if (e.target.id == "crop-result" || $(e.target).parents("#crop-result").length){
+                $('#crop-result').css('z-index', 200)
+            }
+            else {
+                $('#crop-result').css('z-index', 200)
+            }
+        });
+    })
+    $(document).ready(function() {
+        var element = $("#preview");
+        var getCanvas;
+        $("#generate").on('click', function () {
+            $("#preview_old").css("height", "1011px");
+            $("#cutout").css("border", "none");
+            $('#crop-result').css('z-index', 200)
+            html2canvas($("#preview_old")[0]).then((canvas) => {
+                getCanvas = canvas;
+                var anchorTag = document.createElement("a");
+				document.body.appendChild(anchorTag);
+				anchorTag.download = "id_card.jpg";
+				anchorTag.href = canvas.toDataURL();
+				anchorTag.target = '_blank';
+                var reg_no = $("#reg_no").val()
+                $.ajax({
+                    url: "{% url 'src:employee-id-card-save'  %}",
+                    method: "POST",
+                    data: {
+                        reg_no: reg_no,
+                        id_card: anchorTag.href,
+                        csrfmiddlewaretoken: csrf
+                    },
+                    success: function(response) {
+                        if (response.response_status == 403){
+                            Swal.fire(
+							{
+								title: "Download Attempts exhausted",
+								text: "Please contact Administrator",
+								icon: 'error',
+								confirmButtonColor: '#0073e0',
+								confirmButtonText: 'Ok'
+							})
+                        }
+                        else if(response.response_status == 200) {
+				            anchorTag.click();
+                        }
+                    }
+                });
+            });
+            
+        });
+        $('#frameBorder').draggable();
+        $('#cutout').resizable({
+            aspectRatio: false,
+            handles: "n, e, s, w, ne, nw, se, sw",
+            autoHide: true,
+            classes: {
+                "ui-resizable": "highlight"
+            }
+        });
+    });
+
+</script>

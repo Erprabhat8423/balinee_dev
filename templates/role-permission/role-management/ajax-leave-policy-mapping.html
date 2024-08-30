@@ -1,0 +1,41 @@
+{% load static %}
+
+<div class="col-md-6 col-12 pl-0 pr-3 mob-border-right-0 mob-pr-0 text-left" style="border-right: 1px solid rgb(226 223 223);">
+    <span class="d-inline-block font-wt-b mb-2 font-13"style="padding-left: 13px; color: #0073e0;">Unmapped</span>
+    <div class="role-map-wraper">
+        <ul class="role-map-ul" id="entity_list">
+            {% for leave_policy in leave_policies %}
+            <li id="leave_policy_{{leave_policy.id}}" class="role-map-li" onclick="movePolicy('{{leave_policy.id}}','{{leave_policy.leave_policy}}')" >{{leave_policy.leave_policy}}
+                <div class="role-map-arrowangle role-map-arrowright">
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+<div class="col-md-6 col-12 pl-3 pr-0 mob-pl-0 mob-pt-8 text-right">
+    <span class="d-inline-block font-wt-b mb-2 font-13" style="padding-right: 17px; color: #0073e0;" >Mapped</span>
+    <form id="mappingForm">
+        {% csrf_token %}
+        
+        {% if mapping %}
+        <input type="hidden" name="leave_policy_id" value="{{mapping.entity_id}}" >
+        {% else %}
+        <input type="hidden" name="leave_policy_id" >
+        {% endif %}
+        
+        <input type="hidden" name="role_id" value="{{role.id}}">
+        <input type="hidden" name="entity_type" value="leave_policy">
+        <div class="role-map-wraper">
+            <ul class="role-map-ul" id="mapped_section">
+                {% if mapping %}
+                <li id="leave_policy_{{mapping_leave_policy.id}}" class="role-map-li" onclick="moveBackPolicy('{{mapping_leave_policy.id}}','{{mapping_leave_policy.leave_policy}}')">{{mapping_leave_policy.leave_policy}}
+                    <div class="role-map-arrowangle role-map-arrowleft">
+                    </div>
+                </li>
+                
+                {% endif %}
+            </ul>
+        </div>
+    </form>
+</div>

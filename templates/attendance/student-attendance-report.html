@@ -1,0 +1,1266 @@
+{% extends 'layout/layout.html' %}
+
+{% block title %}
+{{page_title}} 
+{% endblock %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} 
+<link rel="stylesheet" href="{% static 'css/jquery-confirm.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/student-attendance-screen.css' %}">
+
+<style>
+    .thumb-scan-box{
+        height: 75px !important;
+    }
+    .clock-value{
+        font-size: 40px ;
+    }
+</style>
+{% endblock %}
+
+
+<audio controls id="audio" style="display: none;">
+    <source id="audio_source"  src="/media/attendance_audio/null.mp3" type="audio/mpeg">
+    </audio>
+    
+    <div class="row" id="containerHeight">
+        <div class="col-md-8 col-12  h-100">
+            <div class="primaryContainer h-100" id="mainbox">
+                <div class="row mb-2" id="topRow">
+                    <div class="col-sm-7 col-12 px-0 mob-mt-8  mob-mb-8">
+                        <h1 class="page-main-heading">{{page_title}} <span id="total_record">({{totat_record}})</span>
+                            <i class="fa fa-star add_to_fav ml-2 {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')">
+                            </i>
+                        </h1>
+                    </div>
+                    
+                    <div class="col-sm-5 col-12 px-0">
+                        <div class="row" id="secondRow">
+                            <div class="col-sm-8 col-5 px-0">
+                                <input class="searchTable w-100" id="qr_data" placeholder="Search" type="search" onchange="read_student(this.value)">
+                            </div>   
+                            <div class="col-sm-4 col-5 px-0">
+                                <input id="filter_date" class="searchTable w-100 " placeholder="Date" value="{% now 'd/m/Y' %}" type="text" readonly onchange="filterStudentAttendance()" >
+                            </div>    
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-2">
+                    <div class="col-10 col-sm-10 px-0">
+                        <div class="row">
+                            <div class="col-md-3 col-3 pl-0 pr-2">
+                                <select class="inputField selectField" name="filter_college_id" id="filter_college_id" onchange="getCourseOption(this.value);filterStudentAttendance()">
+                                    <option value="">View By College</option>
+                                    {% for college in colleges %}
+                                    <option value="{{college.id}}">{{college.college_name|safe}}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-3 pl-0 pr-2">
+                                <select class="inputField selectField" name="filter_mentor" id="filter_mentor" onchange="filterStudentAttendance();">
+                                    <option value="">View By Mentor</option>.
+                                    {% for mentor in mentors %}
+                                    {% if mentor is not None %}
+                                    <option value="{{mentor}}">{{mentor}}</option>
+                                    {% endif %}
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-2 pl-0 pr-2">
+                                <select class="inputField selectField" name="filter_course" id="filter_course" onchange="filterStudentAttendance();">
+                                    <option value="">View By Course</option>
+                                </select>
+                            </div>
+                            
+                            <div class="col-md-2 pl-0 pr-2">
+                                <select class="inputField selectField" name="filter_sem" id="filter_sem" onchange="filterStudentAttendance();">
+                                    <option value="">View By Semester</option>
+                                    
+                                    <optgroup label="Semester">
+                                        <option value="sem_1">1st</option>
+                                        <option value="sem_2">2nd</option>
+                                        <option value="sem_3">3rd</option>
+                                        <option value="sem_4">4th</option>
+                                        <option value="sem_5">5th</option>
+                                        <option value="sem_6">6th</option>
+                                    </optgroup>
+                                    
+                                    <optgroup label="Year">
+                                        <option value="year_1">1st</option>
+                                        <option value="year_2">2nd</option>
+                                        <option value="year_3">3rd</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-2 col-sm-2 px-2">
+                        <div class="row">
+                <div class="dropdown show-hide "id="hideColumn">
+                    <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                    </button>
+                    <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                    aria-labelledby="dropdownMenuButton">
+                    
+                    <a class="dropdown-item columnHideItem">
+                        <input type="checkbox" class="colCheck" name="table_student_name" id="table_student_name" data-id="1" onclick="showHideColumns(this.id, 1)" />
+                        <label class="mb-0" for="table_student_name">Student name</label>
+                    </a>
+                    
+                    <a class="dropdown-item columnHideItem">
+                        <input type="checkbox" class="colCheck" name="table_phone_no" id="table_phone_no" data-id="2" onclick="showHideColumns(this.id, 2)" />
+                        <label class="mb-0" for="table_phone_no">Phone No.</label>
+                    </a>
+                    
+                    
+                    <a class="dropdown-item columnHideItem">
+                        <input type="checkbox" class="colCheck" name="table_mentor_name" id="table_mentor_name" data-id="3"
+                        onclick="showHideColumns(this.id, 3)" />
+                        <label class="mb-0" for="table_mentor_name">Mentor</label>
+                    </a>
+                    
+                    <a class="dropdown-item columnHideItem">
+                        <input type="checkbox" class="colCheck" name="table_college" id="table_college" data-id="4" onclick="showHideColumns(this.id, 4)" />
+                        <label class="mb-0" for="table_college">College</label>
+                    </a>
+                    
+                    <a class="dropdown-item columnHideItem">
+                        <input type="checkbox" class="colCheck" name="table_course" id="table_course" data-id="5" onclick="showHideColumns(this.id, 5)" />
+                        <label class="mb-0" for="table_course">Course</label>
+                    </a>
+                    
+                    
+                    
+                    <a class="dropdown-item columnHideItem">
+                        <input type="checkbox" class="colCheck" name="table_punch_in" id="table_punch_in" data-id="6" onclick="showHideColumns(this.id, 6)" />
+                        <label class="mb-0" for="table_punch_in">IN TIME</label>
+                    </a>
+                    
+                    <a class="dropdown-item columnHideItem">
+                        <input type="checkbox" class="colCheck" name="table_punch_out" id="table_punch_out" data-id="7" onclick="showHideColumns(this.id, 7)" />
+                        <label class="mb-0" for="table_punch_out">OUT TIME</label>
+                    </a>
+                    
+                    
+                </div>
+            </div>
+            
+            <div class="dropdown fixed-column " style="display: inline-block;" id="lockColumn">
+                <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                aria-labelledby="dropdownMenuButton">
+                
+                <a class="dropdown-item columnHideItem">
+                    <input type="checkbox" class="colFreezeCheck" name="table_student_name"
+                    id="lock_table_student_name" data-id="1" 
+                    onclick="toggleFreeze(this.id,'table_student_name',1)" />
+                    <label class="mb-0" for="lock_table_student_name">Student Name</label>
+                </a>
+                <a class="dropdown-item columnHideItem">
+                    <input type="checkbox" class="colFreezeCheck" name="table_phone_no" id="lock_table_phone_no" data-id="2"
+                    onclick="toggleFreeze(this.id,'table_phone_no',2)" />
+                    <label class="mb-0" for="lock_table_phone_no">Phone No.</label>
+                </a>
+                <a class="dropdown-item columnHideItem">
+                    <input type="checkbox" class="colFreezeCheck" name="table_mentor_name"
+                    id="lock_table_mentor_name" data-id="3"  
+                    onclick="toggleFreeze(this.id,'table_mentor_name',3)" />
+                    <label class="mb-0" for="lock_table_mentor_name">Mentor</label>
+                </a>
+                <a class="dropdown-item columnHideItem">
+                    <input type="checkbox" class="colFreezeCheck" name="table_college" id="lock_table_college" data-id="4"
+                    onclick="toggleFreeze(this.id,'table_college',4)" />
+                    <label class="mb-0" for="lock_table_college">College</label>
+                </a>
+                <a class="dropdown-item columnHideItem">
+                    <input type="checkbox" class="colFreezeCheck" name="table_course" id="lock_table_course" data-id="5"
+                    onclick="toggleFreeze(this.id,'table_course',5)" />
+                    <label class="mb-0" for="lock_table_course">Course</label>
+                </a>
+                
+                <a class="dropdown-item columnHideItem">
+                    <input type="checkbox" class="colFreezeCheck" name="table_punch_in" id="lock_table_punch_in" data-id="6"
+                    onclick="toggleFreeze(this.id,'table_punch_in',6)" />
+                    <label class="mb-0" for="lock_table_punch_in">IN TIME</label>
+                </a>
+                <a class="dropdown-item columnHideItem">
+                    <input type="checkbox" class="colFreezeCheck" name="table_punch_out" id="lock_table_punch_out" data-id="7"
+                    onclick="toggleFreeze(this.id,'table_punch_out',7)" />
+                    <label class="mb-0" for="lock_table_punch_out">OUT TIME</label>
+                </a>
+            </div>
+        </div>
+        
+    </div>
+</div>
+</div>
+<div class="row" id="tableBox">
+    <div class="col-md-12 primaryContainerBG h-100 p-0 commonTableBg" id="ajax-div" style="">
+        <input type="hidden" name="page" id="page" value="2" />
+        <input type="hidden" name="page_status" id="page_status" value="0" />
+        <input type="hidden" name="total_pages" id="total_pages" value="{{ total_pages }}" />
+        
+        <input type="hidden" id="current_filter_date" value="{{ current_date }}" />
+        
+        <table id="addOrgTable" class="detail-table table table-borderless table-striped table-hover mt-0"
+        style="width: 100%;">
+        <thead>
+            <tr>
+                
+                <th class="table_student_name" id="table_student_name">
+                    Student Name
+                    <i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="table_phone_no" id="table_phone_no">Phone No.<i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="table_mentor_name" id="table_mentor_name">
+                    Mentor
+                    <i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="table_college" id="table_college">College<i
+                    class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                <th class="table_course" id="table_course">Course<i
+                    class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                
+                <th class="table_punch_in">IN TIME <i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze"></th>
+                    <th class="table_punch_out">OUT TIME<i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze"></th>
+                    </tr>
+                </thead>
+                <tbody id="tablebody">
+                    {% if students %}
+                    {% for student in students %}
+                    <tr  {% if forloop.first %} class="odd selected" {% endif %}>
+
+
+                        <td class="table_student_name" id="table_student_name" onclick="getStudentAttendanceDetail('{{ student.id }}')">
+                            <div class="row">
+                                <span class="col-sm-10 col-10 pl-0 pr-2"> {{ student.first_name | title }} {% if student.middle_name is not None%}{{ student.middle_name | title }} {% endif %}{{ student.last_name | title }} <br>
+                                {{ student.reg_no}}</span> 
+                                <!--<div class="col-sm-2 col-2 px-0">-->
+                                <!--    {% if student.is_registered == 1 %}-->
+                                <!--    <img src="{% static 'img/svg/Verified.svg' %}" alt="" width="15">-->
+                                <!--    {% else %}-->
+                                <!--    <img src="{% static 'img/svg/notVerified.svg' %}" alt="" width="15">-->
+                                <!--    {% endif %}-->
+                                <!--</div>-->
+                            </div>
+                        </td>
+
+                        <td class="table_phone_no" id="table_phone_no" onclick="getStudentAttendanceDetail('{{ student.id }}')">
+                            <div class="row">
+                                <span class="col-sm-10 col-10 pl-0 pr-2">
+                                    {{ student.primary_contact_no }}
+                                </span>
+                                <!--<div class="col-2 col-sm-2 px-0">-->
+                                <!--    {% if student.is_mobile_verified == 1 %}-->
+                                <!--    <img src="{% static 'img/svg/Verified.svg' %}" alt="" width="15">-->
+                                <!--    {% else %}-->
+                                <!--    <img src="{% static 'img/svg/notVerified.svg' %}" alt="" width="15">-->
+                                <!--    {% endif %}-->
+                                <!--</div>-->
+                            </div>
+                        </td>
+
+                        <td class="table_mentor_name" id="table_mentor_name" onclick="getStudentAttendanceDetail('{{ student.id }}')">
+                            {% if student.teacher_gaurdian_name is not None %}{{ student.teacher_gaurdian_name | title }}{% else %}--{% endif %}
+                        </td>
+                        <td class="table_college" id="table_college" onclick="getStudentAttendanceDetail('{{ student.id }}')">
+                            {{ student.alias|safe }}
+                        </td>
+                        <td class="table_course" id="table_course" onclick="getStudentAttendanceDetail('{{ student.id }}')">
+                            <span class="mr-2">{{ student.branch }}</span>
+                            <p class="mt-1">{{student.semester_year}}</p>
+                        </td>
+
+                        <td class="table_punch_in" id="table_punch_in">{% if student.punch_in_time %}{{student.punch_in_time |date:'H:i'}}{% else %}--:--{% endif %}</td>
+                        <td class="table_punch_out" id="table_punch_out"> {% if student.punch_out_time %}{{student.punch_out_time |date:'H:i'}}{% else %}--:--{% endif %}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr id="loading" style="display: none;">
+                        <td class="text-center" colspan="8"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="8" style="text-align: center;">No Record Found...</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+
+<div class="col-md-4 col-12 px-3 h-100">
+    <div class="primaryContainerBG h-100" id="detailsBox">
+        <div class="row">
+            {% if student_details %}
+            <div class="col-md-12 col-12 px-0 pb-3">
+                <div class="row ">
+                    <div class="col-md-2 col-2 px-0">
+                        {% if student_details.profile_image is not None %}
+                        <img src="{{college_base_url}}{{ student_details.profile_image }}" style="width: 100%;">
+                        {% else %}
+                        <img src="{% static 'img/png/default_icon.png' %}" style="width: 100%;">
+                        {% endif %}
+                    </div>
+                    
+                    <div class="col-md-10 px-0">
+                        <div class="row">
+                            <div class="col-md-8 col-8  px-3">
+                                <h6 class="font-wt-b">{{student_details.first_name}} {% if student_details.middle_name is not None %}{{student_details.middle_name}} {% endif %}{{student_details.last_name}}</h6>
+                                <h6 class="smallText accent-color">{{student_details.first_name}}
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-12 col-12 px-1 border-top pt-3">
+                <div class="row mb-2">
+                    <div class="col-md-6 col-6 pl-0">
+                        <div class="row mb-2">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/org.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 px-0">
+                                <h6 class="smallText">College</h6>
+                                <h6 class="largeText">{{student_details.college_name|safe }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-6 pr-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/depart_no.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 px-0">
+                                <h6 class="smallText">Course</h6>
+                                <h6 class="largeText">{{student_details.branch }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-2">
+                    <div class="col-md-6 col-6 pl-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 px-0">
+                                <h6 class="smallText">Mentor</h6>
+                                <h6 class="largeText">{{student_details.father_name }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-6 pr-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 px-0">
+                                <h6 class="smallText">Mother Name</h6>
+                                <h6 class="largeText">{% if student_details.mother_name is not None %}{{student_details.mother_name }}{% else %} -- {% endif %}</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>    
+                
+                <div class="row mb-2">
+                    <div class="col-md-6 col-6 pl-0">
+                        <div class="row">
+                            <div class="col-md-2 px-0">
+                                <img src="{% static 'img/svg/contactNo.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 px-0">
+                                <h6 class="smallText">Contact No.</h6>
+                                <h6 class="largeText"> {{student_details.primary_contact_no}}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-6 pr-0">
+                        <div class="row">
+                            <div class="col-md-2 pl-0">
+                                <img src="{% static 'img/svg/contactNo.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 px-0"> 
+                                <h6 class="smallText">Registration Id</h6>
+                                <h6 class="largeText"> {{student_details.reg_no}}</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row">    
+                    <div class="col-md-6 px-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/aadhaar.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 px-0">
+                                <h6 class="smallText">Aadhaar Number</h6>
+                                <h6 class="largeText">{% if student_details.aadhaar_no is not None %}
+                                    {{student_details.aadhaar_no}}
+                                    {% else %}
+                                    --
+                                    {% endif %}
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>    
+            </div>
+            
+            <div class="col-sm-12 col-12  px-0 ">
+                <div class="row border border-redius-17">
+                    <div class="col-sm-7 col-6 px-0 ">
+                        <div class="row ">
+                            <div class="center-fix">
+                                <div class="">
+                                    <span class="grey-color d-block min-mb-8 font-wt-b font-11">
+                                        Last  Punch Time
+                                    </span>
+                                    <span class="clock-value" id="last_punch_time">
+                                        {% if last_punch_in is not None %}
+                                        {{last_punch_in|date:"H:i "}}
+                                        {% else %}
+                                        00:00
+                                        {% endif %}
+                                    </span>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-sm-5 col-5 px-0">
+                        <div class="row border-left pt-2 pb-4">
+                            <div class="px-3 m-auto text-center pt-2">
+                                <a href="#" title="thumb-sacn-here" class="thumb-scan-box d-block">
+
+                                    <img src="{% static 'img/png/Thumbcheckrd.png' %}" alt="" id="scanning_idle">
+                                    <img src="{% static 'img/png/scan-fingerprint_2.gif' %}" alt="" id="scanning_thumb" style="display: none;">
+                                    <img src="{% static 'img/png/Thumbcheced.svg' %}" alt="" id="scanning_success"  style="display: none;">
+                                    <img src="{% static 'img/png/thumbUnchecked.svg' %}" alt="" id="scanning_failed"  style="display: none;">
+                                </a>
+                                <span class="d-block mt-2 font-wt-b font-12"> Scan Fingerprint</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            
+            <div class="col-md-12 col-12 mb-2 px-0" style="margin-top: -14px;">
+                <button class="btn btn-primary btn-block border-redius-17 m-auto" style="width: 50%;" onclick="manualVerifyStudentThumb('{{student_details.id}}');">
+                    <img src="{% static 'img/svg/fingerprint.svg' %}" alt="">
+                    Activate Scanner
+                </button>
+            </div>
+            
+            {% else %}
+            No Record Found
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+</div>
+
+<!-- *************************************Modal********************************** -->
+<div class="overlayModal" id="addOrganisationModal" data-keyboard="false" data-backdrop="static">
+
+</div>
+<div class="overlayModal" id="addDeptModal" data-keyboard="false" data-backdrop="static">
+
+</div>
+<div class="overlayModal" id="addProductModal" style="display: none;">
+
+</div>
+<!-- *************************************Modal********************************** -->
+{% endblock content %}
+{% block script %}
+
+
+<script src="{% static 'js/jquery-confirm.min.js' %}"></script>
+<script src="{% static 'js/Nitgen.js' %}"></script>
+<script type="text/javascript">
+
+
+    var student_id = null;
+    var attendance_type = 1;
+    var is_read = 0;
+    var reset = 1;
+    
+    
+    
+    function read_student(result){
+        result = result.replaceAll("\'", "\"")
+        try {
+            res = JSON.parse(result)
+            if ("reg_no" in res) {
+                result = res.reg_no
+                // $("#qr_data").val("")
+                // $("#qr_data").val(result)
+            }
+        }
+        catch(err) {
+            result = result
+        }
+
+        console.log("Result 2: ", result)
+        url = "{% url 'src:student/get-by-registration-number' %}";
+        $.ajax({
+            url: url,
+            method: 'POST',
+            data:{reg_number:result,csrfmiddlewaretoken: '{{ csrf_token }}'},
+            cache:false,
+            success: function (data) {                      
+                console.log(data);
+                if(typeof data.flag !== "undefined" && !data.flag){
+                    alert(data.message);
+                    window.location.reload();
+                }else{
+
+                    $("#qr_data").val("");
+
+                    student_id = data.student_id;                            
+                    $('#audio_source').attr('src',data.audio);                            
+                    $('#help_section').hide();                            
+                    $('#detailsBox').html(data.student_html);
+                    $('#detailsBox').show();
+                    $('#scanning_idle').hide();
+                    $('#scanning_thumb').show();
+                    $('#verifyStudentThumb').hide();
+                    $('audio')[0].load();
+                    $('audio').on('ended', function(){
+                        verifyStudentThumb(student_id);
+                    });
+                    // var aud = document.getElementById("audio");
+                    // aud.onended = function() {
+                        //     verifyStudentThumb(student_id);
+                        // };
+                        var promise = $('audio')[0].play();
+                        if (promise) promise.catch(error => {
+                            // Auto-play disabled show controls 
+                            $('audio').attr('controls', '');                                
+                        });
+
+                    }
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+
+    }
+    let tmp = 1;
+    function verifyStudentThumb(student_id) {
+        if(reset == 1){
+            $('#scanning_idle').hide();
+            $('#scanning_thumb').show();
+            $('#scanning_success').hide();
+            $('#scanning_failed').hide();
+            var quality = 60; 
+            var timeout = 10; 
+            try {
+                var resultData =1;
+                var res = CaptureFinger();
+                if (res.httpStaus) {
+                    if (res.data.ErrorCode == "0") {
+                        $('#finger_iso').attr('src',"data:image/bmp;base64," + res.data.BitmapData);
+                        var isoTemplateDataLocal =  res.data.IsoTemplate;
+                        console.log(isoTemplateDataLocal)
+                        var url =  "{% url 'src:get-student-thumbs' '1' %}",
+                        url = url.replace('1',student_id);
+                        $.ajax({
+                            url: url,
+                            type: "GET",
+                            cache:false,
+                            success: function (data) {
+                                error = false;
+                                student_details = data.student_details
+                                var studentFinger = [student_details.finger_iso_1, student_details.finger_iso_2];
+                                var dataCnt = studentFinger.length;
+                                for(var i=0; i<dataCnt; i++){
+                                    var isoTemplateDataServer = studentFinger[i];
+                                    if(isoTemplateDataServer!=''){
+                                        var res = VerifyFinger(isoTemplateDataServer, isoTemplateDataLocal);
+                                        if (res.httpStaus) {
+                                            if (res.data.Status==true) {
+                                                // verified
+                                                error = false;
+                                                break;
+                                            }else{
+                                                // failed
+                                                error = true;
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                if(error){
+                                    $('#scanning_idle').hide();
+                                    $('#scanning_thumb').hide();
+                                    $('#scanning_success').hide();
+                                    $('#scanning_failed').show();                                    
+                                    $('#audio_source').attr('src','/media/attendance_audio/thumb_verification/error.mp3');
+                                    $('audio')[0].load();
+                                    var promise = $('audio')[0].play();
+                                    if (promise) promise.catch(error => {
+                                        console.log("error");
+                                        // Auto-play disabled show controls                                         
+                                        $('audio').attr('controls', '');
+                                    });
+                                        tmp = tmp+1;
+                                        if (tmp == 4){                                        
+                                            reset = 0; 
+                                            window.location.reload() 
+                                        }     
+
+
+                                    }else{
+                                        $('#scanning_idle').hide();
+                                        $('#scanning_thumb').hide();
+                                        $('#scanning_success').show();
+                                        $('#scanning_failed').hide();
+                                        markStudentAttendance(student_id);
+                                        window.location.reload();
+                                    }                                
+                                },
+                                error: function (jqXHR, ajaxOptions, thrownError) {
+                                    console.log(getHttpError(jqXHR));
+                                },
+                            });
+                        
+                    }
+                }
+                else {
+                    alert(res.err);
+                }
+                
+            }
+            catch (e) {
+                alert(e);
+            }
+            return false;
+        }
+    }
+    
+    function markStudentAttendance(){
+        url = "{% url 'src:attendance/mark-student-attendance'  %}";
+        $.ajax({
+            url: url,
+            type: 'POST',
+            cache:false,
+            data:{'student_id':student_id},
+            success: function (data) {
+
+                $('#qr_data').focus();
+
+                if(data.flag){
+
+
+
+                    $('#audio_source').attr('src','/media/attendance_audio/thumb_verification/success.mp3');
+                    $('audio')[0].load();
+                    var promise = $('audio')[0].play();
+                    if (promise) promise.catch(error => {
+                        // Auto-play disabled show controls
+                        console.log("Success audio play ")
+                    });
+
+                        setTimeout(function(){ 
+
+                            $('#help_section').show();
+                            is_read = 0;
+                            reset = 0;
+                            tmp = 1;
+                            $('#scanning_idle').hide();
+                            $('#scanning_thumb').show();
+                            $('#scanning_success').hide();
+                            $('#scanning_failed').hide();
+                        },3500);
+                    }else{
+                        alert(data.message);
+                        is_read = 0;
+                        reset = 0;
+                    }
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+    }
+    
+    
+    function getCourseOption(value){
+        if(value != ""){
+            url = "{% url 'src:get-college-course-options' '1' %}";
+            url = url.replace('1',value);
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    $('#filter_course').html(data.options);
+                },
+                error: function (err) {
+                    alert(err.message);
+                }
+            });
+            
+        }else{
+            $('#filter_course').html(`<option value="">View By Course</option>`);
+        }
+    }
+    function filterStudentAttendance(){
+        var loading_html =`<tr id="loading" style="display: none;">
+        <td class="text-center" colspan="8"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+        </td>
+        </tr>`;
+        $('#tablebody').html(loading_html);
+        $('#loading').show();
+        
+        var search = $('#filter_search').val();
+        var date = $('#filter_date').val();
+        var college_id = $('#filter_college_id').val();
+        var mentor = $('#filter_mentor').val();
+        var course = $('#filter_course').val();
+        var sem_year = $('#filter_sem').val();
+        var present_status = $('#filter_present_status').val();
+        
+        $.ajax({
+            url: "{% url 'src:attendance/filter-student-attendance-report' %}",
+            method: 'POST',
+            data: {
+                search:search, 
+                date:date,
+                college_id:college_id,
+                mentor:mentor,
+                course:course,
+                sem_year:sem_year,
+                present_status:present_status,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function (data) {
+                hideLoader();
+                $('#ajax-div').html(data);
+                
+                $('#addOrgTable').tablesorter({
+                    widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                    widgetOptions: {
+                        resizable_addLastColumn: true,
+                        resizable: false,
+                        resizable_widths: ["20%","15%","12%","12%","12%","12%","15%"],
+                        stickyHeaders_attachTo: ".primaryContainerBG",
+                        filter_external: '.search',
+                        filter_columnFilters: false,
+                    }
+                });
+                $("#addOrgTable tbody tr").click(function () {
+                    $(this).addClass("selected").siblings().removeClass("selected");
+                });
+                
+                $(".primaryContainerBG").scroll(function () {
+                    var divTable = $(".primaryContainerBG");
+                    $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                });
+                
+                $('#total_record').text('('+$('#total_filtered_record').val()+')');
+                
+            },
+            error: function (err) {
+                alert(err.message);
+            }
+        });
+    }
+    
+    $(document).ready(function () {
+        $("#filter_date").datepicker({  
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+0",
+            maxDate: 0,
+            dateFormat: 'dd/mm/yy' 
+        });
+        
+        
+        $('#qr_data').focus();
+        var prevTop = 0;
+        
+        $('.commonTableBg').on('scroll', function () {
+            var page = $('#page').val();
+            var totalPages = $('#total_pages').val();
+            
+            var currentTop = $(this).scrollTop();
+            if (prevTop !== currentTop) {
+                prevTop = currentTop;
+                if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+                    if(parseInt($('#page_status').val()) == 0 && parseInt(page)  <= parseInt(totalPages)){
+                        $('#loading').show(); 
+                        $('#page_status').val('1');
+                        
+                        var search = $('#filter_search').val();
+                        var date = $('#filter_date').val();
+                        var college_id = $('#filter_college_id').val();
+                        var mentor = $('#filter_mentor').val();
+                        var course = $('#filter_course').val();
+                        var sem_year = $('#filter_sem').val();
+                        var present_status = $('#filter_present_status').val();
+                        
+                        $.ajax({
+                            url: "{% url 'src:attendance/ajax-student-attendance-lists' %}",
+                            method: 'POST',
+                            data: { 
+                                page:page,
+                                search:search, 
+                                date:date,
+                                college_id:college_id,
+                                mentor:mentor,
+                                course:course,
+                                sem_year:sem_year,
+                                present_status:present_status,
+                                csrfmiddlewaretoken: '{{ csrf_token }}'
+                            },
+                            success: function (data) {
+                                setTimeout(() => {
+                                    $('#tablebody').find('tr:last').prev().after(data);
+                                    $('#page').val(parseInt(page)+1);
+                                    $('#loading').hide();
+                                    $('#page_status').val('0');
+                                    $('#addOrgTable').trigger('update');
+                                }, 2000);
+                            },
+                            error: function (err) {
+                                alert(err.message);
+                                window.location.reload();
+                            }
+                        });
+                    }
+                }
+            }
+        })
+        
+    });
+</script>
+<script>
+
+
+    function freezeColumn(id, colNo) {
+        $('#' + id).addClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function (index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter", "false");
+        });
+        $('#' + id + ' #freeze').show();
+        $('#' + id + ' #unfreeze').hide();
+    }
+    
+    function unfreezeColumn(id, colNo) {
+        $('#' + id).removeClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function (index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter");
+        });
+        $('#' + id + ' #unfreeze').show();
+        $('#' + id + ' #freeze').hide();
+    }
+    
+    function toggleFreeze(inputid, colid, colNo) {
+        var checkbox = document.getElementById(inputid);
+        
+        if (checkbox.checked == true) {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+            });
+            $('#' + colid + ' #freeze').show();
+            $('#' + colid + ' #unfreeze').hide();
+        } else {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").removeClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("sorter-false");
+            });
+            $('#' + colid + ' #unfreeze').show();
+            $('#' + colid + ' #freeze').hide();
+        }
+    }
+    
+    function showHideColumns(inputid, colNo) {
+        var checkbox_val = [];
+        var checkbox = document.getElementById(inputid);
+        if (checkbox.checked == true) {
+            $('.'+inputid).hide();
+        }else{
+            $('.'+inputid).show();
+        }
+        $("input:checkbox[class=colCheck]").each(function () {
+            if(!$(this).is(':checked')){
+                checkbox_val.push($(this).attr("id"))
+            }
+        });
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+    }
+    
+    $(document).ready(function () {
+
+
+        $('.selectField').select2();
+        
+        setHeightWidth();
+        
+        $('#addOrgTable').tablesorter({
+            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+            widgetOptions: {
+                resizable_addLastColumn: true,
+                resizable: false,
+                resizable_widths: ["20%","15%","12%","12%","12%","12%","15%"],
+                stickyHeaders_attachTo: ".primaryContainerBG",
+                filter_external: '.search',
+                filter_columnFilters: false,
+            }
+        });
+        $("#addOrgTable tbody tr").click(function () {
+            $(this).addClass("selected").siblings().removeClass("selected");
+        });
+        
+        $(".primaryContainerBG").scroll(function () {
+            var divTable = $(".primaryContainerBG");
+            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+        });
+    });
+    
+    $(document).ready(function () {
+        var checkbox_val = ["table_student_id","table_student_name","table_college","table_course","table_phone_no"];
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+        
+        $(".colCheck").change(function () {
+            if ($(".colCheck:not(:checked)").length == $(".colCheck").length) {
+                //do something
+                $(".iconHide").css("background-image", "url(/static/img/png/hide.png)");
+            } else {
+                $(".iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+            }
+        });
+        
+        $(".colFreezeCheck").change(function () {
+            if ($(".colFreezeCheck:not(:checked)").length == $(".colFreezeCheck").length) {
+                //do something
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/unfreeze.svg)");
+            } else {
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/freeze.svg)");
+            }
+        });
+    });
+    
+    $(window).resize(function () {
+        setHeightWidth();
+    });
+    
+    
+</script>
+
+<script>
+
+
+
+    function getStudentAttendanceDetail(id) {
+        $('#detailsBox').html('<div style="margin-top:40px; text-align:center"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+            //showLoader();
+            url = "{% url 'src:student-attendance-details' '1' %}";
+            url = url.replace('1',id);
+            var date = $('#filter_date').val();
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data:{date:date,csrfmiddlewaretoken: '{{ csrf_token }}'},
+                success: function (data) {
+                    //hideLoader();
+                    $('#detailsBox').html(data);
+                    
+                    
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+        
+        
+        
+        
+        function ajaxOrganizationList(page) {
+            $('#ajax-div').html('');
+            // showLoader();
+            $.ajax({
+                url: "{% url 'src:ajax-organization-list' %}",
+                method: 'GET',
+                data: { page:page },
+                success: function (data) {
+                    hideLoader();
+                    $('#ajax-div').html(data);
+                    
+                    $('#addOrgTable').tablesorter({
+                        widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                        widgetOptions: {
+                            resizable_addLastColumn: true,
+                            resizable: false,
+                            resizable_widths: ["21.5%", "21.5%", "21.5%", "21.5%", "12%"],
+                            stickyHeaders_attachTo: ".primaryContainerBG",
+                            filter_external: '.search',
+                            filter_columnFilters: false,
+                        }
+                    });
+                    $("#addOrgTable tbody tr").click(function () {
+                        $(this).addClass("selected").siblings().removeClass("selected");
+                    });
+                    $(".deptRow").click(function () {
+                        $(this).addClass("deptSelected").siblings().removeClass("deptSelected");
+                    });
+                    
+                    
+                    $(".primaryContainerBG").scroll(function () {
+                        var divTable = $(".primaryContainerBG");
+                        $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                    });
+                    
+                },
+                error: function (err) {
+                    alert(err.message);
+                    window.location.reload();
+                }
+            });
+        }
+        
+        
+        
+    </script>
+    <script>
+
+        function manualVerifyStudentThumb(student_id) {
+
+            $('#scanning_idle').hide();
+            $('#scanning_thumb').show();
+            $('#scanning_success').hide();
+            $('#scanning_failed').hide();
+            
+            
+            var quality = 60; 
+            var timeout = 10; 
+            try {
+                var resultData =1;
+                var res = CaptureFinger();
+                if (res.httpStaus) {
+                    if (res.data.ErrorCode == "0") {
+                        $('#finger_iso').attr('src',"data:image/bmp;base64," + res.data.BitmapData);
+                        var isoTemplateDataLocal =  res.data.IsoTemplate;
+                        var url =  "{% url 'src:get-student-thumbs' '1' %}",
+                        url = url.replace('1',student_id);
+                        
+                        $.ajax({
+                            url: url,
+                            type: "GET",
+                            success: function (data) {
+                                error = false;
+                                student_details = data.student_details
+                                var studentFinger = [student_details.finger_iso_1, student_details.finger_iso_2];
+                                var dataCnt = studentFinger.length;
+                                for(var i=0; i<dataCnt; i++){
+                                    var isoTemplateDataServer = studentFinger[i];
+                                    if(isoTemplateDataServer!=''){
+                                        var res = VerifyFinger(isoTemplateDataServer, isoTemplateDataLocal);
+                                        if (res.httpStaus) {
+                                            if (res.data.Status==true) {
+                                                // verified
+                                                error = false;
+                                                break;
+                                            }else{
+                                                // failed
+                                                error = true;
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                if(error){
+                                    $('#scanning_idle').hide();
+                                    $('#scanning_thumb').hide();
+                                    $('#scanning_success').hide();
+                                    $('#scanning_failed').show();
+                                    
+                                    $('#audio_source').attr('src','/media/attendance_audio/thumb_verification/error.mp3');
+                                    $('audio')[0].load();
+                                    
+                                    var promise = $('audio')[0].play();
+                                    if (promise) promise.catch(error => {
+                                        // Auto-play disabled show controls 
+                                        $('audio').attr('controls', '');
+                                    });
+
+
+                                }else{
+
+                                    $('#scanning_idle').hide();
+                                    $('#scanning_thumb').hide();
+                                    $('#scanning_success').show();
+                                    $('#scanning_failed').hide();
+                                    
+                                    manualMarkStudentAttendance(student_id);
+                                    
+                                }
+                                
+                            },
+                            error: function (jqXHR, ajaxOptions, thrownError) {
+                                console.log(getHttpError(jqXHR));
+                            },
+                        });
+                        
+                    }
+                    
+                }
+                else {
+                    alert(res.err);
+                }
+                
+            }
+            catch (e) {
+                alert(e);
+            }
+            return false;
+        } 
+        
+        function manualMarkStudentAttendance(student_id){
+            url = "{% url 'src:attendance/mark-student-attendance'  %}";
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data:{'student_id':student_id,csrfmiddlewaretoken: "{{ csrf_token }}"},
+                success: function (data) {
+                    console.log(data)
+                    if(data.flag){
+                        $('#last_punch_time').text(data.current_time);
+                        
+                        $('#audio_source').attr('src','/media/attendance_audio/thumb_verification/success.mp3');
+                        $('audio')[0].load();
+                        
+                        var promise = $('audio')[0].play();
+                        if (promise) promise.catch(error => {
+                            // Auto-play disabled show controls 
+                            $('audio').attr('controls', '');
+                        });
+
+                    }else{
+                        alert(data.message);
+                        
+                    }
+                    
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+        
+    </script>
+    
+    
+    <script src="https://www.gstatic.com/firebasejs/8.2.4/firebase.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.4/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.2.4/firebase-messaging.js"></script>
+    
+    <script>
+        // Your web app's Firebase configuration
+        // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+        var firebaseConfig = {
+            apiKey: "AIzaSyCubxF4N5V_w2c9g9obVj_U7YBzhnDD-JU",
+            authDomain: "sansthaa-20b83.firebaseapp.com",
+            projectId: "sansthaa-20b83",
+            storageBucket: "sansthaa-20b83.appspot.com",
+            messagingSenderId: "281121207327",
+            appId: "1:281121207327:web:46618196c8b1a94048112a",
+            measurementId: "G-7DMY4ZH0ER"
+        };
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        
+        var messaging = firebase.messaging();
+        
+        messaging.usePublicVapidKey("BGwPD98RUuBBoXMDUHcuOjBL1fWbRX0POUp2hfDpgNuDNaup9HtxnwRBjg40XTJoPKRF1Fy4iT7g3iXNqEz8Xyw");
+        
+        messaging.requestPermission().then(function() {
+            return messaging.getToken();
+        }).then(function(token) {
+            console.log("get token");
+            console.log(token);
+            saveWebToken(token);
+        }).catch(function(err) {
+            console.log('Permission denied', err);
+        });
+        
+        messaging.onTokenRefresh(function() {
+            messaging.getToken().then(function(refreshedToken) {
+                console.log('Token refreshed.');
+                console.log(refreshedToken);
+                saveWebToken(token);
+            }).catch(function(err) {
+                console.log('Unable to retrieve refreshed token ', err);
+            });
+        });
+        
+        messaging.onMessage(function(payload) {
+            console.log('onMessage: ', payload);
+        });
+        
+        
+        
+        function saveWebToken(token){
+            url = "{% url 'src:save-web-firebase-token' %}"
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: {csrfmiddlewaretoken: '{{ csrf_token }}',token:token },
+                success: function(data) {
+                    console.log(data);
+                },
+                error:function(err) {
+                    alert("error: " + error);
+                }
+            });
+        }
+    </script>
+    
+    {% endblock %}

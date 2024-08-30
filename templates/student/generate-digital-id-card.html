@@ -1,0 +1,140 @@
+{% load static %}
+
+<div class="md-modal centered">
+    <form name="walletForm" id="walletForm" method="POST" enctype="multipart/form-data" >
+        {% csrf_token %}
+        <input type="hidden" name="user_id" id="user_id" value="{{ user.id }}" >
+        <div class="modal-header" id="headerStep1">
+            <div class="col-12 p-0">
+                <div class="row">
+                    <div class="col-10">
+                        <h5 class="mt-md-2">{{student_details.first_name}} {% if student_details.middle_name is not None %}{{student_details.middle_name}} {% endif %}{{student_details.last_name}} ({{student_details.reg_no }})</h5>
+                    </div>
+                    <div class="col-2">
+                        <button class="btn btn-close float-right" type="button" onclick=window.location.reload();>
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+            <div class="row">
+                <div class="col-md-12 p-0 h-100 w-100" id="step1">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <a href="javascript:;" onclick="varifyStudentThumb()" class="btn btn-primary">Verify</a>
+                            <img src="{% static 'img/png/fingerprint-logo.png' %}" id="finger_iso" width="50px" height="50px" alt="">
+                        </div>
+                        <div class="col-md-8 text-left">
+                            <label for="">One Time Password</label>
+                            <br>
+                            <div class="otp_section" style="margin-top: 5px;">
+                                <input type="text" id="otp_1" size="1" style="text-align: center;" readonly>
+                                <input type="text" id="otp_2" size="1" style="text-align: center;" readonly>
+                                <input type="text" id="otp_3" size="1" style="text-align: center;" readonly>
+                                <input type="text" id="otp_4" size="1" style="text-align: center;" readonly>
+                                <input type="text" id="otp_5" size="1" style="text-align: center;" readonly>
+                                <input type="text" id="otp_6" size="1" style="text-align: center;" readonly>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<script>
+    var student_id = "{{student_details.id}}";
+    
+    function varifyStudentThumb() {
+        var quality = 60; 
+        var timeout = 10; 
+        try {
+            var resultData =1;
+            var res = CaptureFinger();
+            if (res.httpStaus) {
+                if (res.data.ErrorCode == "0") {
+                    $('#finger_iso').attr('src',"data:image/bmp;base64," + res.data.BitmapData);
+                    console.log(res.data.IsoTemplate)
+                    var isoTemplateDataLocal =  res.data.IsoTemplate;
+                    var url =  "{% url 'src:get-student-thumbs' '1' %}",
+                    url = url.replace('1',student_id);
+                    
+                    $.ajax({
+                        url: url,
+                        type: "GET",
+                        success: function (data) {
+                            error = false;
+                            student_details = data.student_details
+                            var studentFinger = [student_details.finger_iso_1, student_details.finger_iso_2];
+                            var dataCnt = studentFinger.length;
+                            for(var i=0; i<dataCnt; i++){
+                                var isoTemplateDataServer = studentFinger[i];
+                                if(isoTemplateDataServer!=''){
+                                    var res = VerifyFinger(isoTemplateDataServer, isoTemplateDataLocal);
+                                    if (res.httpStaus) {
+                                        if (res.data.Status==true) {
+                                            // verified
+                                            error = false;
+                                                break;
+                                        }else{
+                                            // failed
+                                            error = true;
+                                        }
+                                    }
+                                }
+                            }
+                            
+                            if(error){
+                                openToaster('danger','Authentication failed.');
+                            }else{
+                                generateOtp();
+                                openToaster('success','Authentication successful.');
+                            }
+                        },
+                        error: function (jqXHR, ajaxOptions, thrownError) {
+                            console.log(getHttpError(jqXHR));
+                        },
+                    });
+                    
+                }
+                
+            }
+            else {
+                alert(res.err);
+            }
+            
+        }
+        catch (e) {
+            alert(e);
+        }
+        return false;
+    }  
+    
+    
+    function generateOtp(){
+        url = "{% url 'src:generate-id-otp' '1' %}";
+        url = url.replace('1',student_id)
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+                if(data.flag){
+                    otp = data.otp.toString();
+                    for(i=0; i < otp.length; i++){
+                        $('#otp_'+(i+1)).val(otp[i]);
+                    }
+                }
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+</script>

@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+{% block content %}
+{% load static %}
+
+<head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Sansthaa ERP | Quiz</title>
+        <link href="{% static 'css/entrance-styles.css' %}" rel="stylesheet" />
+        <link rel="stylesheet" href="../unpkg.com/aos%403.0.0-beta.6/dist/aos.css" />
+        <link rel="icon" type="image/png" href="{% static 'img/favicon.ico' %}" />
+        <script src="{% static 'js/entrance-custom.js' %}"></script>
+        <script src="{% static 'js/entrance-script.js' %}"></script>
+
+        <script data-search-pseudo-elements="" defer="" src="../cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js" crossorigin="anonymous"></script>
+        <!-- <script src="../cdnjs.cloudflare.com/ajax/libs/feather-icons/4.24.1/feather.min.js" crossorigin="anonymous"></script> -->
+    <!-- <script async src='cdn-cgi/bm/cv/669835187/api.js'></script></head> -->
+    <body>
+        <div id="layoutDefault">
+            <div id="layoutDefault_content" class="pagebg">
+                <main>
+                 
+                    <!-- Page Header-->
+                    <header class="page-header-ui page-header-ui-ligt">
+                        <div class="page-header-ui-content">
+                            <div class="container px-5">
+                                <div class="row gx-5 align-items-center">
+                                    <div class="col-lg-6" data-aos="fade-up">
+                                        <div class="logosec">
+                                        <img src="{% static 'entrance-assets/img/Group 291.png' %}"/>
+                                        </div>
+                                        
+                                        <h2 class="mb-5 mt-5">Login to BIPE'S Online Quiz Platform.</h2>
+                                        <div>
+                                        <ul class="otpsec">
+                                            <li class="textsec">
+                                                <input type="text" class="form-control" placeholder="Registered Mobile No." value="" name="contact" id="contact"/>
+                                            </li>
+                                            <li class="btnsec">
+                                                <a class="btn btn-lg btn-primary fw-500 me-sm-3 mb-3 mb-sm-0 btnshow" href="javascript::void();" onclick="generateOTP()">Get OTP</a>
+                                            </li>
+                                        </ul>
+                                        </div>
+                                        <div>
+                                            <label class="error_msg float-right text-danger text-center w-100 pt-3" id="contact_error"></label>
+                                        </div>
+                                        
+                                    </div>
+                                    <div class="col-lg-6 d-none d-lg-block" data-aos="fade-up" data-aos-delay="100"><img class="img-fluid" src="{% static 'entrance-assets/img/Group 3.png' %}" alt="..." /></div>
+                                </div>
+                            </div>
+                        </div>
+                       
+                    </header>
+                    
+                </main>
+            </div>
+      
+        </div>
+        <section class="otpverfy" id="otpbox">
+            <div class="container">
+                <div class="otpformsec">
+                    <form>
+                        <div class="row">
+                            <div class="col-md-12">
+
+                                <ul class="otplist">
+                                    <li>
+                                        <div class="udesign">
+                                            <p>
+                                                <img src="{% static 'entrance-assets/img/mobile no.svg' %}"> Enter <strong>OTP</strong> send to your registered <strong>Mobile No</strong>.
+                                            </p>
+                                            <div class="fortext">
+                                                <input type="text" placeholder="Enter OTP" class="form-control" name="otp" id="otp" value="" />
+                                                <a href="#" class="">Resend OTP</a>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <label class="error_msg float-right text-danger text-center w-100 pt-3" id="otp_error"></label>
+                                    </li>
+
+                                    <li class="btlist mt-2 mb-2">
+                                        <div align="right">
+                                            <a class="btn btn-lg btn-primary fw-500 me-sm-3 mb-3 mb-sm-0" onclick="submitOTP()">Submit</a>
+                                        </div>
+                                    </li>
+                                </ul>
+
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <div class="loaderModal" id="loader">
+            <!-- <img src="{% static 'img/loader.gif' %}" class="centered loader"> -->
+            <img src="{% static 'entrance-assets/img/gif/loader.gif' %}" class="centered loader">
+        </div>
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <!-- <script src="../cdn.jsdelivr.net/npm/bootstrap%405.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script> -->
+        <script src="https://unpkg.com/aos%403.0.0-beta.6/dist/aos.js"></script>
+        <script>
+            AOS.init({
+                disable: 'mobile',
+                duration: 600,
+                once: true,
+            });
+           
+        </script>
+
+        <!-- <script src="assets.startbootstrap.com/js/sb-customizer.js"></script> -->
+        <script src="{% static 'js/entrance-custom.js' %}"></script>
+        <sb-customizer project="sb-ui-kit-pro"></sb-customizer>
+
+
+        <script>
+            function showLoader() {
+                console.log("Show Loader")
+                $("#loader").show();
+                $("#bodyContainer").addClass('isBlurred');
+            }
+
+            function hideLoader() {
+                console.log("Hide Loader")
+                $("#loader").hide();
+                $("#bodyContainer").removeClass('isBlurred');
+            }
+            $(document).ready(function(){
+                $(document).on("keydown", disableF5);                
+            });
+            
+            function disableF5(e) { if ((e.which || e.keyCode) == 116 || (e.which || e.keyCode) == 82) e.preventDefault(); };
+            
+        </script>
+        
+</body>
+{% endblock content %}
+
+</html>
+
+
+

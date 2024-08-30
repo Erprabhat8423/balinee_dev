@@ -1,0 +1,200 @@
+	<table class="table table-striped detail-table" id="table_4">
+				<thead>
+					<tr>
+						<th>Fields</th>
+						<th>Optional/Mandatory <br>
+							<div class="switch_box">
+								<input type="checkbox"  class="switch_1 check_optional_field" value="4">
+							</div>
+						</th>
+						<th>Hide/Show</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><label for="location">Institution</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="{{attribute.id}}[]" class="switch_1 optional_field"   value="location" {% if 'location' not in attribute.fields %}checked{% endif %}
+								>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_{{attribute.id}}[]"  class="switch_1"   value="location" {% if 'location' not in attribute.hidden_fields %}checked{% endif %}
+								>
+							</div>
+						</td>
+
+					</tr>
+
+					<tr>
+						<td><label for="department">Department</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="{{attribute.id}}[]" class="switch_1 optional_field"   value="department" {% if 'department' not in attribute.fields %}checked{% endif %} >
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_{{attribute.id}}[]"  class="switch_1"   value="department" {% if 'department' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+					<tr>
+						<td><label for="designation">Designation</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="{{attribute.id}}[]" class="switch_1 optional_field"   value="designation"  {% if 'designation' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_{{attribute.id}}[]"  class="switch_1"   value="designation" {% if 'designation' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+					
+					<tr>
+						<td><label for="paygrade">Grade</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="{{attribute.id}}[]" class="switch_1 optional_field"   value="paygrade" {% if 'paygrade' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_{{attribute.id}}[]"  class="switch_1"   value="paygrade" {% if 'paygrade' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+					<tr>
+						<td><label for="employment_term">Employment Term</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="{{attribute.id}}[]" class="switch_1 optional_field"   value="employment_term" {% if 'employment_term' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_{{attribute.id}}[]"  class="switch_1"   value="employment_term"  {% if 'employment_term' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+
+					<tr>
+						<td><label for="additional_responsibility">Additional Responsibilities</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="{{attribute.id}}[]" class="switch_1 optional_field"   value="additional_responsibility" {% if 'additional_responsibility' not in attribute.fields %}checked{% endif %} >
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_{{attribute.id}}[]"  class="switch_1"   value="additional_responsibility"  {% if 'additional_responsibility' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+					
+					<tr>
+						<td><label for="working_hour">Working Hour</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox"  name="{{attribute.id}}[]" class="switch_1 optional_field"   value="working_hour" {% if 'working_hour' not in attribute.fields %}checked{% endif %} >
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_{{attribute.id}}[]"  class="switch_1"   value="working_hour" {% if 'working_hour' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+
+					<tr>
+						<td><label for="date_of_joining">Date of joining</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="{{attribute.id}}[]" class="switch_1 optional_field"   value="date_of_joining" {% if 'date_of_joining' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_{{attribute.id}}[]"  class="switch_1"   value="date_of_joining"  {% if 'date_of_joining' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+
+					<tr>
+						<td><label for="previous_employer">Previous employer</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="{{attribute.id}}[]" class="switch_1 optional_field"   value="previous_employer" {% if 'previous_employer' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_{{attribute.id}}[]"  class="switch_1"   value="previous_employer" {% if 'previous_employer' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+					<tr>
+						<td><label for="experience">Year of Experience(in yrs)</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="{{attribute.id}}[]" class="switch_1 optional_field"   value="experience"  {% if 'experience' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_{{attribute.id}}[]"  class="switch_1"   value="experience" {% if 'experience' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+
+					<tr>
+						<td><label for="login_id">Login ID</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="{{attribute.id}}[]" class="switch_1 optional_field"   value="login_id" {% if 'login_id' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_{{attribute.id}}[]"  class="switch_1"   value="login_id" {% if 'login_id' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+					<tr>
+						<td><label for="password">Password</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="{{attribute.id}}[]" class="switch_1 optional_field"   value="password" {% if 'password' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_{{attribute.id}}[]"  class="switch_1"   value="password" {% if 'password' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+					
+
+				</tbody>
+			</table>
+
+
+			<input type="hidden" name="optional_{{attribute.id}}" id="optional_{{attribute.id}}" value="{% if attribute.fields %}{{attribute.fields|join:", " }}{% endif %}"> 
+			<input type="hidden" name="hidden_{{attribute.id}}" id="hidden_{{attribute.id}}" value="{% if attribute.hidden_fields %}{{attribute.hidden_fields|join:", " }}{% endif %}"> 
+
+

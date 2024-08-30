@@ -1,0 +1,625 @@
+{% load static %}
+
+<div class="modal-AddUser centered" style="overflow:scroll!important">
+    <form name="addLeavePolicyForm" id="addLeavePolicyForm" method="POST" enctype="multipart/form-data" >
+        {% csrf_token %}
+        <div class="modal-header" id="headerStep1">
+            <div class="col-12 p-0">
+                <div class="row">
+                    <div class="col-6">
+                        <h5 class="mt-md-2">Leave Policy Details &nbsp;&nbsp;</h5>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-save float-right" type="button" onclick="saveLeavePolicy()">
+                            Save
+                        </button>
+                        <button class="btn btn-close float-right" type="button" onclick="manipulateModal('addUserModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+            <div class="row">
+                <div class="col-md-12 p-0 h-100 w-100">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <div class="col-md-12 p-0">                                
+                                <img src="{% static 'img/svg/leavePolicy.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                    Leave Policy*
+                                </h6>
+                                <input class="inputField " type="text" placeholder="Leave Policy" name="leave_policy" id="leave_policy" maxlength="150">
+                                <label class="error_msg float-right"></label>
+
+                            </div>
+                            
+                        </div>
+                        <div class="col-md-3">
+                            <div class="col-md-12 p-0">                                
+                                <img src="{% static 'img/svg/leavePolicy.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                    Add Institution*
+                                </h6>
+                                <select class="inputField selectField" multiple data-live-search="true" data-placeholder="Select Institution*" name="filter_org_name[]" id="filter_org_id" onchange="role_filter_by_org()">
+                                    {% for institution_name in institution_names %}
+                                    <option value="{{institution_name.id}}">{{institution_name.organization_name|safe}}</option>
+                                    {% endfor %}
+                                </select> 
+                                <label class="error_msg float-right"></label>
+                            </div>
+                            
+                        </div>
+                        <div class="col-md-3">
+                            <div class="col-md-12 p-0">                                
+                                <img src="{% static 'img/svg/leavePolicy.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                    Add Roles*
+                                </h6>
+                                <select class="inputField selectField" multiple data-live-search="true" name="filter_role[]" id="filter_role_id" data-placeholder="Select Role*">
+                                    {% for role_name in role_names %}
+                                    <option value="{{role_name.id}}">{{role_name.role_name|safe}}</option>
+                                    {% endfor %}
+                                </select>  
+                                <label class="error_msg float-right"></label>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+                    <div class="row leave_policy_row">
+                        <div class="col-md-12">
+                            <div class="row mt-3 wrapper">
+                                <div class="col-md-3">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/leaveType.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Leave Type*
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <select class="inputField selectField" style="width: 100% !important;" name="leave_type[]" id="leave_type_0">
+                                            <option value="">Select</option>
+                                            {% for leave_type in leave_types %}
+                                            <option value="{{leave_type.id}}">{{leave_type.leave_type}}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-2">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/leaveCount.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Year Leave Count*
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField " type="text" onkeypress="return validateFloatKeyPress(this,event);" placeholder="Year Leave Count" name="year_leave_count[]" maxlength="4" >
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-3">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/leaveCount.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Month Leave Count*
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField " type="text" onkeypress="return validateFloatKeyPress(this,event);" placeholder="Month Leave Count" name="month_leave_count[]" maxlength="3" >
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-3">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/leaveCount.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Consecutive Leaves*
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField " type="text" onkeypress="return validateFloatKeyPress(this,event);" placeholder="Consecutive Leaves" name="consecutive_leave[]" maxlength="3" >
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            
+                            <div class="row mt-3 wrapper">
+                                <div class="col-md-2">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/setting.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Carry forward
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <label class="switch">
+                                            <input type="checkbox" class="checkbox" onclick="handleCarryForward(this)">
+                                            <span class="slider round" title="Enable/Disable"></span>
+                                            <input type="hidden" name="is_carry_forward[]" value="0">
+                                            <label class="error_msg float-right"></label>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-2">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/salary.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Salary affecting
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <label class="switch">
+                                            <input type="checkbox" class="checkbox" onclick="handleSalaryAffecting(this)">
+                                            <span class="slider round" title="Enable/Disable"></span>
+                                            <input type="hidden" name="is_salary_affecting[]" value="0">
+                                            <label class="error_msg float-right"></label>
+                                            
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="col-md-2">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/halfday.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Halfday Included
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <label class="switch">
+                                            <input type="checkbox" class="checkbox" onclick="handleHalfday(this)">
+                                            <span class="slider round" title="Enable/Disable"></span>
+                                            <input type="hidden" name="is_halfday_included[]" value="0">
+                                            <label class="error_msg float-right"></label>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="col-md-2">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/swipeable.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Can Swipe
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <label class="switch">
+                                            <input type="checkbox" class="checkbox" onclick="handleReversible(this)">
+                                            <span class="slider round" title="Enable/Disable"></span>
+                                            <input type="hidden" name="can_swipe[]" value="0">
+                                            <label class="error_msg float-right"></label>
+                                        </label>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-3" style="display:none;">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/leaveType.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Swipeable Leave Types*
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <select class="inputField reversible_leave_types" style="width: 100% !important;" id="swipeable_leave_types_0" name="swipeable_leave_types_0[]" multiple>
+                                            <option value="">Select</option>
+                                            {% for leave_type in leave_types %}
+                                            <option value="{{leave_type.id}}" >{{leave_type.leave_type}}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="newRows">
+
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col-md-12 text-right">
+                            <a href="javascript:;" class="btn btn-primary" onclick="addNewRow()"><i class="fa fa-plus" title="Add More Policy"></i></a>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    $(document).ready(function(){
+
+    $('#filter_role_id').on('select2:select', function(e) {
+        selected_id = e.params.data.id; 
+        if(selected_id == 'all'){
+            $('#filter_role_id').val('all').trigger('change')
+        }else{
+            selected_values = $('#filter_role_id').val()
+            if($.inArray('all',selected_values ) === -1){
+                return true;
+            }else{
+                $('#filter_role_id').val('all').trigger('change')
+                
+            }
+        }
+    })
+    })
+
+    $(document).ready(function(){
+        $(".selectField").select2();
+        $("[name='leave_type_documents_0[]']").select2({placeholder:'Select'});
+        $("[name='swipeable_leave_types_0[]']").select2({placeholder:'Select'});
+    })
+    $(document).on('select2:select','[name="leave_type[]"]',function(e){
+        value = e.params.data.id;
+        if(value !== ""){
+            // Remove this option from reversible leave types
+            reversible_leave_element = $(this).parents(':last .leave_policy_row').find('.reversible_leave_types').attr('id')
+            $("#"+reversible_leave_element+" option[value='"+value+"']").remove();
+            
+            element = $(this);
+            var temp = [];
+            $('[name="leave_type[]"]').each(function(){
+                if(element.attr('id') != $(this).attr('id')){
+                    values = $(element).val();
+                    temp.push(parseInt(values));
+                }
+            });
+            if(0 ){
+                // if($.inArray(parseInt(e.params.data.id), temp) !== -1 ){
+                    element_id = element.attr('id');
+                    $("#"+element_id+" option[value='"+e.params.data.id+"']").remove();
+                    $(element).trigger('change');
+                    
+                }
+            }
+        })
+
+    function handleCarryForward(element){
+        if($(element).is(':checked')){
+            $(element).next().next().val(1);
+        }else{
+            $(element).next().next().val(0);
+        }
+    }
+    function handleSalaryAffecting(element){
+        if($(element).is(':checked')){
+            $(element).next().next().val(1);
+        }else{
+            $(element).next().next().val(0);
+        }
+    }
+    function handleHalfday(element){
+        if($(element).is(':checked')){
+            $(element).next().next().val(1);
+        }else{
+            $(element).next().next().val(0);
+        }
+    }
+    function handleReversible(element){
+        if($(element).is(':checked')){
+            $(element).next().next().val(1);
+            $(element).parents(':last .leave_policy_row').find('.reversible_leave_types').parent().parent().show();
+        }else{
+            $(element).next().next().val(0);
+            $(element).parents(':last .leave_policy_row').find('.reversible_leave_types').parent().parent().hide();
+        }
+    }
+    function addNewRow(){
+        count = $('.leave_policy_row').length
+        new_count = count;
+        newRow = `
+        <div class="row leave_policy_row">
+        <div class="col-md-12">
+        <div class="row mt-3 wrapper">
+        <div class="col-md-3">
+        <div class="col-md-12 p-0">
+        <img src="{% static 'img/svg/leaveType.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+        <h6 class="mt-2 mb-0" style="display: inline-block;">
+        Leave Type*
+        </h6>
+        </div>
+        <div class="col-md-12 p-0 mt-2">
+        <select class="inputField selectField" style="width: 100% !important;" name="leave_type[]" id="leave_type_`+new_count+`" >
+        <option value="">Select</option>
+        {% for leave_type in leave_types %}
+        <option value="{{leave_type.id}}">{{leave_type.leave_type}}</option>
+        {% endfor %}
+        </select>
+        <label class="error_msg float-right"></label>
+        </div>
+        </div>
+
+        <div class="col-md-2">
+        <div class="col-md-12 p-0">
+        <img src="{% static 'img/svg/leaveCount.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+        <h6 class="mt-2 mb-0" style="display: inline-block;">
+        Year Leave Count*
+        </h6>
+        </div>
+        <div class="col-md-12 p-0 mt-2">
+        <input class="inputField " type="text" onkeypress="return validateFloatKeyPress(this,event);" placeholder="Year Leave Count" name="year_leave_count[]" maxlength="4" >
+        <label class="error_msg float-right"></label>
+        </div>
+        </div>
+
+        <div class="col-md-2">
+        <div class="col-md-12 p-0">
+        <img src="{% static 'img/svg/leaveCount.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+        <h6 class="mt-2 mb-0" style="display: inline-block;">
+        Month Leave Count*
+        </h6>
+        </div>
+        <div class="col-md-12 p-0 mt-2">
+        <input class="inputField " type="text" onkeypress="return validateFloatKeyPress(this,event);" placeholder="Month Leave Count" name="month_leave_count[]" maxlength="3" >
+        <label class="error_msg float-right"></label>
+        </div>
+        </div>
+
+        <div class="col-md-3">
+        <div class="col-md-12 p-0">
+        <img src="{% static 'img/svg/leaveCount.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+        <h6 class="mt-2 mb-0" style="display: inline-block;">
+        Consecutive Leaves*
+        </h6>
+        </div>
+        <div class="col-md-12 p-0 mt-2">
+        <input class="inputField " type="text" onkeypress="return validateFloatKeyPress(this,event);" placeholder="Consecutive Leaves" name="consecutive_leave[]" maxlength="3" >
+        <label class="error_msg float-right"></label>
+        </div>
+        </div>
+        </div>
+
+
+        <div class="row mt-3 wrapper">
+        <div class="col-md-2">
+        <div class="col-md-12 p-0">
+        <img src="{% static 'img/svg/setting.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+        <h6 class="mt-2 mb-0" style="display: inline-block;">
+        Carry forward
+        </h6>
+        </div>
+        <div class="col-md-12 p-0 mt-2">
+        <label class="switch">
+        <input type="checkbox" class="checkbox" onclick="handleCarryForward(this)">
+        <span class="slider round"></span>
+        <input type="hidden" name="is_carry_forward[]" value="0">
+        <label class="error_msg float-right"></label>
+        </label>
+        </div>
+        </div>
+
+        <div class="col-md-2">
+        <div class="col-md-12 p-0">
+        <img src="{% static 'img/svg/salary.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+        <h6 class="mt-2 mb-0" style="display: inline-block;">
+        Salary affecting
+        </h6>
+        </div>
+        <div class="col-md-12 p-0 mt-2">
+        <label class="switch">
+        <input type="checkbox" class="checkbox" onclick="handleSalaryAffecting(this)">
+        <span class="slider round"></span>
+        <input type="hidden" name="is_salary_affecting[]" value="0">
+        <label class="error_msg float-right"></label>
+        </label>
+        </div>
+        </div>
+
+
+        <div class="col-md-2">
+        <div class="col-md-12 p-0">
+        <img src="{% static 'img/svg/halfday.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+        <h6 class="mt-2 mb-0" style="display: inline-block;">
+        Halfday Included
+        </h6>
+        </div>
+        <div class="col-md-12 p-0 mt-2">
+        <label class="switch">
+        <input type="checkbox" class="checkbox" onclick="handleHalfday(this)">
+        <span class="slider round"></span>
+        <input type="hidden" name="is_halfday_included[]" value="0">
+        <label class="error_msg float-right"></label>
+        </label>
+        </div>
+        </div>
+
+
+        <div class="col-md-2">
+        <div class="col-md-12 p-0">
+        <img src="{% static 'img/svg/swipeable.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+        <h6 class="mt-2 mb-0" style="display: inline-block;">
+        Can Swipe
+        </h6>
+        </div>
+        <div class="col-md-12 p-0 mt-2">
+        <label class="switch">
+        <input type="checkbox" class="checkbox" onclick="handleReversible(this)">
+        <span class="slider round"></span>
+        <input type="hidden" name="can_swipe[]" value="0">
+        <label class="error_msg float-right"></label>
+        </label>
+        </div>
+        </div>
+
+        <div class="col-md-3" style="display:none;">
+        <div class="col-md-12 p-0">
+        <img src="{% static 'img/svg/leaveType.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+        <h6 class="mt-2 mb-0" style="display: inline-block;">
+        Swipeable Leave Types*
+        </h6>
+        </div>
+        <div class="col-md-12 p-0 mt-2">
+        <select class="inputField reversible_leave_types" style="width: 100% !important;" id="reversible_leave_types_`+new_count+`" name="swipeable_leave_types_`+new_count+`[]" multiple>
+        <option value="">Select</option>
+        {% for leave_type in leave_types %}
+        <option value="{{leave_type.id}}">{{leave_type.leave_type}}</option>
+        {% endfor %}
+        </select>
+        <label class="error_msg float-right"></label>
+        </div>
+        </div>
+
+        <div class="col-md-1">
+        <a href="javascript:;" class="btn btn-danger" style="margin-top: 37px;" onclick="removeRow(this)"><i class="fa fa-trash"></i></a>
+        </div>
+
+        </div>
+        </div>
+        </div>
+        `;
+
+        $('#newRows').append(newRow);
+
+        $(".selectField").select2();
+        $("[name='leave_type_documents_"+new_count+"[]']").select2({placeholder:'Select'});
+        $("[name='swipeable_leave_types_"+new_count+"[]']").select2({placeholder:'Select'});
+    }
+    function role_filter_by_org(){
+        var filter_org_id = $('#filter_org_id').val();
+        if(filter_org_id){
+            $.ajax({
+                url: "{% url 'src:filter-role-by-organization' %}",
+                type: 'POST',
+                data: {filter_org_id:filter_org_id,csrfmiddlewaretoken: '{{ csrf_token }}'},
+                success: function (response) {                        
+                    hideLoader();
+                    if (response.filter_role_option !='') {
+                        $('#filter_role_id').html(response.filter_role_option);
+                    } else {
+                        openToaster("danger", response.filter_role_option);
+                    }
+                }
+            });
+        }else{
+            $('#filter_role_id').html('');
+        }
+
+    }
+    function removeRow(element){
+        $(element).parents(':last .leave_policy_row').remove();
+        refeshNames();
+    }
+
+    function refeshNames(){
+        i=0;
+        $('.leave_policy_row').each(function(){
+            if(i>0){
+                $(this).find('.reversible_leave_types').attr('name','swipeable_leave_types_'+i+'[]');
+                $(this).find('.reversible_leave_types').attr('id','reversible_leave_types_'+i);
+                $(this).find('.leave_type_documents').attr('name','leave_type_documents_'+i+'[]');
+                $(this).find('[name="leave_type[]"]').attr('id','leave_type_'+i);
+
+            }
+            i = i + 1;
+        })
+
+    }
+
+    function saveLeavePolicy(){
+        if(validateForm()){
+            return false;
+        }else{
+            showLoader();
+            var formData = $('#addLeavePolicyForm').serialize();
+            console.log(formData);                
+            $.ajax({
+                url: "{% url 'src:add-leave-policy' %}",
+                type: 'POST',
+                data: formData,
+                success: function (response) {                        
+                    hideLoader();
+                    if (response.flag) {
+                        $('#addUserModal').html('');
+                        $('#addUserModal').hide();
+                        manipulateModal('addUserModal','close');
+                        openToaster("success", response.message);
+
+                        setInterval(function(){ window.location.reload(); }, 500);
+
+
+                    } else {
+                        openToaster("danger", response.message);
+                    }
+                }
+            });
+        }
+    }
+
+    function validateForm(){
+        var error = 0;
+        $('.error_msg ').text('');
+        $('.inputField').css("border", "");
+        $('.select2-container').css("border", "");
+
+        if($.trim($('[name="filter_org_name[]"]').val()) == ""){
+            $('[name="filter_org_name[]"]').parent().find('.error_msg').text('Please enter policy name');
+            $('[name="filter_org_name[]"]').css("border", "1px solid #db8305");
+            error = error + 1;
+            
+        }
+        if($.trim($('[name="filter_role[]"]').val()) == ""){
+            $('[name="filter_role[]"]').parent().find('.error_msg').text('Please enter policy name');
+            $('[name="filter_role[]"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        
+
+        $('.leave_policy_row').each(function(){
+
+            if ($.trim($(this).find('[name="leave_type[]"]').val()) == null || $.trim($(this).find('[name="leave_type[]"]').val()) == "") {
+                $(this).find('[name="leave_type[]"]').parent().find('.error_msg').text("Please select leave type*");
+                $(this).find('[name="leave_type[]"]').siblings(".select2-container").css("border-radius", "0.6rem").css("border", "1px solid #db8305");
+                error = error + 1;
+            }
+
+
+            if ($.trim($(this).find('[name="year_leave_count[]"]').val()) == "") {
+                error = error + 1;
+                $(this).find('[name="year_leave_count[]"]').css("border", "1px solid #db8305");
+                $(this).find('[name="year_leave_count[]"]').parent().find('.error_msg').text("Please enter year leave count*");
+            }
+
+            if ($.trim($(this).find('[name="month_leave_count[]"]').val()) == "") {
+                error = error + 1;
+                $(this).find('[name="month_leave_count[]"]').css("border", "1px solid #db8305");
+                $(this).find('[name="month_leave_count[]"]').parent().find('.error_msg').text("Please enter month leave count*");
+            }
+            if ($.trim($(this).find('[name="consecutive_leave[]"]').val()) == "") {
+                error = error + 1;
+                $(this).find('[name="consecutive_leave[]"]').css("border", "1px solid #db8305");
+                $(this).find('[name="consecutive_leave[]"]').parent().find('.error_msg').text("Please enter consecutive leave*");
+            }
+
+            if ($(this).find('[name="can_swipe[]"]').val() == "1") {
+                var reversible_leave_type_val = $(this).find('.reversible_leave_types').find('option:selected').length;
+                if (reversible_leave_type_val == 0) {
+                    error = error + 1;
+                    $(this).find('.reversible_leave_types').parent().find('.error_msg').text('Please select swipeable leave types*');
+                    $(this).find('.reversible_leave_types').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                }
+            }
+        });
+
+        if(error > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+</script>
+

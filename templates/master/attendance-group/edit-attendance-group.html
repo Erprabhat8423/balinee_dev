@@ -1,0 +1,167 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/mdtimepicker.min.css' %}">
+<div class="modal-AddOrganisation centered">
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-md-3 p-md-0" style="background-repeat: no-repeat;text-align: center;background-color: #0073e0;background-position: bottom left;background-size: 80%;">
+                <div class="transformImage">
+                    <img src="{% static 'img/svg/master/attendanceGroups.svg' %}" class="w-50" />
+                    <h4 class="modalColHead">Edit Attendance Group</h4>
+                </div>
+            </div>
+            
+            <div class="col-md-9 p-md-4">
+                <form id="updateAttendanceGroupForm" method="POST" autocomplete="off" action="" aria-label="Attendance Group">
+                    {% csrf_token %}
+                    <input type="hidden" name="attendance_group_id" value="{{attendance_group.id}}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b>Attendance Group details </b></h5>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <button class="btn btn-save float-right" type="button" onclick="updateAttendanceGroup('{{attendance_group.id}}')">
+                                Save
+                            </button>
+                            <button class="btn btn-close float-right" type="button"
+                            onclick="manipulateModal('addProductModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+                
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Attendance Group Name</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder="Attendance Group Name*" value="{{attendance_group.working_shift}}" name="attendance_group_data" maxlength="50" />
+                        <label class="error_msg float-right"></label>
+                    </div>
+                </div>
+                
+                
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Start time</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder="Start time*" value="{{attendance_group.start_timing |time:"H:i"}}" name="start_time_data" maxlength="50" readonly />
+                        <label class="error_msg float-right"></label>
+                    </div>
+                </div>
+
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>End time</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder="End time*" value="{{attendance_group.end_timing |time:"H:i"}}" name="end_time_data" id="end_time_data" maxlength="50" readonly />
+                        <label class="error_msg float-right"></label>
+                    </div>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+<!-- <script src="{% static 'js/mdtimepicker.min.js' %}"></script> -->
+<script>
+    $(document).ready(function(){
+        $("[name='start_time_data']").mdtimepicker({
+            timeFormat: 'hh:mm:ss.000',
+            format: 'hh:mm tt',     
+            theme: 'blue',       
+            readOnly: true,      
+            hourPadding: false     
+        });
+
+        $("[name='end_time_data']").mdtimepicker({
+            timeFormat: 'hh:mm:ss.000',
+            format: 'hh:mm tt',     
+            theme: 'blue',       
+            readOnly: true,      
+            hourPadding: false     
+        });
+        
+    })
+    function updateAttendanceGroup(id) {
+        showLoader();
+       
+        if(validateForm()){
+            hideLoader();
+            return false;
+        }else{
+            url = "{% url 'src:edit-attendance-group' '1' %}";
+            url = url.replace('1',id);
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: $('#updateAttendanceGroupForm').serialize(),
+                success: function (data) {
+                    hideLoader();
+                    if(data.flag){
+                        openToaster("success", data.message);
+                        manipulateModal('addProductModal','close')
+                        getList('working_shift');
+                    }else{
+                        openToaster("danger", data.message);
+                    }
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            }).always(function() {
+                // hideLoader();
+            });
+        } 
+    }
+    
+    
+    function validateForm(){
+        error = 0;
+        $('.error_msg ').text('');
+        $('.inputField').css("border", "");
+        
+        
+        if($.trim($('[name="attendance_group_data"]').val()) == ""){
+            $('[name="attendance_group_data"]').parent().find('.error_msg').text('Please enter attendance shift name');
+            $('[name="attendance_group_data"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        if($('[name="start_time_data"]').val() == ""){
+            $('[name="start_time_data"]').parent().find('.error_msg').text('Please enter start time');
+            $('[name="start_time_data"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        if($('[name="end_time_data"]').val() == ""){
+            $('[name="end_time_data"]').parent().find('.error_msg').text('Please enter end time');
+            $('[name="end_time_data"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        
+        
+        if(error > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
+</script>

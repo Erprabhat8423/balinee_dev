@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24">
+  <defs>
+    <style>
+      .cls-1 {
+        fill: #0073e0;
+        stroke: #f0f0f0;
+        stroke-width: 1px;
+        fill-rule: evenodd;
+      }
+    </style>
+  </defs>
+  <path id="mapping" class="cls-1" d="M644,158h8a1,1,0,0,1,1,1v2a1,1,0,0,1-1,1h-8a1,1,0,0,1-1-1v-2A1,1,0,0,1,644,158Zm13,0h7a1,1,0,0,1,1,1v2a1,1,0,0,1-1,1h-7a1,1,0,0,1-1-1v-2A1,1,0,0,1,657,158Zm-6-9h7a1,1,0,0,1,1,1v2a1,1,0,0,1-1,1h-7a1,1,0,0,1-1-1v-2A1,1,0,0,1,651,149Zm-4,6h14v1H647v-1Zm7-4h1v4h-1v-4Zm7,4h1v3h-1v-3Zm-15,0h1v3h-1v-3Z" transform="translate(-642 -143.5)"/>
+</svg>

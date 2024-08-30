@@ -1,0 +1,109 @@
+{% load static %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="row mb-2" id="topRow">
+            <div class="col-md-5 p-md-0">
+                <h6><b>Job Type &nbsp;&nbsp;</b></h6>
+            </div>
+            <div class="col-md-7 p-md-0">
+                <div class="row" >
+                    <div class="col-md-12 p-md-0 text-right">
+                        <input class="searchTable master_type_search" placeholder="Search" type="search" data-column="all" id="job_types_filter" onkeyup="master_search_bar(this)">
+                        <button type="button" class="btn iconBox iconAddNew" title="Add New Jobs" onclick="addMaster('job_type')">                            
+                        </button>
+                        <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                            <button class="btn iconBox iconHide" title="Hide" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                            aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="" 
+                                onclick="showHideColumns(this,'group_name',2)"
+                                />
+                                <label class="mb-0" for="group_name">Job Name</label>
+                            </a>
+                            
+                            
+                        </div>
+                    </div>
+                    
+                    <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                        <button class="btn iconBox iconUnFreeze" title="Stick" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                        aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="" id="group_name" data-id="1"
+                            onclick="toggleFreeze(this.id,'group_name',1)" />
+                            <label class="mb-0" for="group_name">Job Name</label>
+                        </a>
+                    </div>
+                </div>
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<div class="row border-redius-17 h-100" id="tableBox">
+    <div class="col-md-12 col-12 primaryContainerBG h-100 px-0" id="masterListTable">
+            <table id="addOrgTable" class="detail-table table table-borderless table-striped table-hover mt-0" >
+            <thead>
+                <tr>
+                    <th class="group_name">
+                        Job Name
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    <th class="group_name">
+                        Created On
+                    </th>
+
+                    <th data-sorter="false">Action</th>
+                </tr>
+            </thead>
+            <tbody id="tablebody">
+                {% if job_types %}
+                {% for group_type in job_types %}
+                <tr>
+                    <td class="job_name" name="contract_name" id="contract_name">{{ group_type.contract_type }}</td>
+                    <td class="job_created_on" name="created_at" id="created_at">{{ group_type.created_at |date:"SHORT_DATE_FORMAT" }}</td>
+                    <td>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <a href="javascript:void(0)"  onclick="editMaster('job_type','{{group_type.id}}')"  >
+                                    <img src="{% static 'img/svg/editcopy.svg' %}" title="Edit" />
+                                </a> 
+                            </div>
+                            <div class="col-md-5">
+                                <label class="switch">
+                                    <input type="checkbox" class="checkbox" name="group_type"
+                                    {% if group_type.status == 1 %} checked="" {% else %}
+                                    {% endif %}
+                                    onclick="changeMasterStatus('job_type', '{{ group_type.id }}')">
+                                    <span class="slider round" title="Enable/Disable"></span>
+                                </label>
+                                
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr id="loading" style="display: none;">
+                    <td class="text-center" colspan="4">
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align: center;">No Record Found...</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+</div>
+</div>

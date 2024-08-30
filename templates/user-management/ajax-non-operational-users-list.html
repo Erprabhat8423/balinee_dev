@@ -1,0 +1,27 @@
+{% load static %}
+{% for user in non_operational_users %}
+            <tr  {% if forloop.first %} class="odd" {% endif %}>
+            <td class="non_store_name" onclick="getUserShortDetails('{{ user.id }}', 'ajaxNonOperationalUserShortDetail')">{% if user.store_name %} {{ user.store_name }} {% else %} - {% endif %}</td>
+            <td class="non_role" onclick="getUserShortDetails('{{ user.id }}', 'ajaxNonOperationalUserShortDetail')">{% if user.role_name %} {{ user.role_name }} {% else %} - {% endif %}</td>
+            <td class="non_contact_person" onclick="getUserShortDetails('{{ user.id }}', 'ajaxNonOperationalUserShortDetail')">{% if user.first_name %} {{ user.first_name }} {% if user.middle_name %} {{ user.middle_name }} {% endif %} {% if user.last_name %} {{ user.last_name }} {% endif %} {% else %} - {% endif %}</td>
+            <td class="non_contact_no" onclick="getUserShortDetails('{{ user.id }}', 'ajaxNonOperationalUserShortDetail')">{% if user.primary_contact_number %} {{ user.primary_contact_number }} {% else %} - {% endif %}</td>
+            <td width="20%">
+                <div class="row">
+                    <div class="col-12 col-sm-12 col-md-12 p-0 p-sm-0">
+                        <img src="{% static 'img/svg/viewonMap.svg' %}" class="tableRowIcon" />
+                        <img src="{% static 'img/svg/permission.svg' %}" class="tableRowIcon" />
+                        <div class="labelContainerOP">
+                            <label class="switch">
+                                <input type="checkbox" class="checkbox" name="is_active"
+                                id="is_active_{{ user.id }}"
+                                {% if user.status == 1 %} checked="" {% else %}
+                                {% endif %}
+                                onclick="updateStatus('{{ user.id }}', '{{ user.status }}')">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        {% endfor %}

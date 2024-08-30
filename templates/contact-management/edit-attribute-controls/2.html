@@ -1,0 +1,674 @@
+{% load static %}
+<div class="row ">
+	
+
+	<div class="col-md-12">
+		<div class="row mt-3 wrapper">
+			{% if 'father_first_name' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/father.svg' %}" class="profileIconSize ">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Father's First name : {% if 'father_first_name' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField alpha father_first_names" type="text" placeholder="Father's First name" name="father_first_name" id="father_first_name" maxlength="50" value="{% if personal_detail.father_first_name is not None %}{{personal_detail.father_first_name}}{% endif %}">
+					<label class="error_msg float-right" id="father_first_name_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'father_last_name' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/father.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Father's Last Name : {% if 'father_last_name' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField alpha father_last_names" type="text" placeholder="Father's Last Name" name="father_last_name" id="father_last_name" maxlength="50"  value="{% if personal_detail.father_last_name is not None %}{{personal_detail.father_last_name}}{% endif %}">
+					<label class="error_msg float-right" id="father_last_name_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			
+			{% if 'mother_first_name' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Mother's First name : {% if 'mother_first_name' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField alpha mother_first_names" type="text" placeholder="Mother's First name" name="mother_first_name" id="mother_first_name" maxlength="50"  value="{% if personal_detail.mother_first_name is not None %}{{personal_detail.mother_first_name}}{% endif %}">
+					<label class="error_msg float-right" id="mother_first_name_error"></label>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+
+	<div class="col-md-12">
+		<div class="row mt-3 wrapper">
+			{% if 'mother_last_name' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Mother's Last name : {% if 'mother_last_name' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField alpha mother_last_names" type="text" placeholder="Mother's Last name" name="mother_last_name" id="mother_last_name" maxlength="50"  value="{% if personal_detail.mother_last_name is not None %}{{personal_detail.mother_last_name}}{% endif %}">
+					<label class="error_msg float-right" id="mother_last_name_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'spouse_name' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Spouse name : {% if 'spouse_name' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField alpha spouse_names" type="text" placeholder="Spouse name" name="spouse_name" id="spouse_name" maxlength="50" value="{% if personal_detail.spouse_name is not None %}{{personal_detail.spouse_name}}{% endif %}">
+					<label class="error_msg float-right" id="spouse_name_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'spouse_employer' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/org.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Spouse's Employer : {% if 'spouse_employer' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField alpha spouse_employers" type="text" placeholder="Spouse's Employer" name="spouse_employer" id="spouse_employer" maxlength="50"  value="{% if personal_detail.spouse_employer is not None %}{{personal_detail.spouse_employer}}{% endif %}">
+					<label class="error_msg float-right" id="spouse_employer_error"></label>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+
+	<div class="col-md-12">
+		<div class="row mt-3 wrapper">
+			{% if 'spouse_work_phone' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/contact.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Spouse work phone : {% if 'spouse_work_phone' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField numeric spouse_work_phones" type="text" placeholder="Spouse work phone" name="spouse_work_phone" id="spouse_work_phone" maxlength="10"  value="{% if personal_detail.spouse_work_phone is not None %}{{personal_detail.spouse_work_phone}}{% endif %}">
+					<label class="error_msg float-right" id="spouse_work_phone_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'no_of_child' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/role.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						No of Children : {% if 'no_of_child' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField numeric no_of_childs" type="text" placeholder="No of Children" name="no_of_child" id="no_of_child" maxlength="2"  value="{% if personal_detail.no_of_children is not None %}{{personal_detail.no_of_children}}{% endif %}">
+					<label class="error_msg float-right" id="no_of_child_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'gender' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/gender.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Gender : {% if 'gender' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<select class="inputField selectField genders" style="width: 100% !important;" name="gender" id="gender">
+						<option value="">Choose Gender</option>
+						<option value="Male" {% if "Male" in personal_detail.gender %} selected {% endif %}>Male</option>
+						<option value="Female" {% if "Female" in personal_detail.gender %} selected {% endif %}>Female</option>
+						<option value="Other" {% if "Other" in personal_detail.gender %} selected {% endif %}>Other</option>
+					</select>
+					<label class="error_msg float-right" id="gender_error"></label>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+
+	<div class="col-md-12">
+		<div class="row mt-3 wrapper">
+			{% if 'date_of_birth' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/dob.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Date Of birth : {% if 'date_of_birth' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField  date_of_births" type="text" placeholder="Date Of birth" name="date_of_birth" id="date_of_birth" value="{% if personal_detail.date_of_birth is not None %}{{personal_detail.date_of_birth|date:'d/m/Y'}}{% else %}{% now 'd/m/Y' %}{% endif %}">
+					<label class="error_msg float-right" id="date_of_birth_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'birth_place' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/address.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Place Of birth : {% if 'birth_place' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField alpha_numeric birth_places" type="text" placeholder="Place Of birth" name="birth_place" id="birth_place" maxlength="50"  value="{% if personal_detail.place_of_birth is not None %}{{personal_detail.place_of_birth}}{% endif %}">
+					<label class="error_msg float-right" id="birth_place_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'marital_status' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Marital Status : {% if 'marital_status' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<select class="inputField selectField marital_statuss" style="width: 100% !important;" name="marital_status" id="marital_status">
+						<option value="">Choose Marital Status</option>
+						<option value="Unmarried" {% if "Unmarried" in personal_detail.martial_status	 %} selected {% endif %}>Unmarried</option>
+						<option value="Married" {% if "Married" in personal_detail.martial_status	 %} selected {% endif %}>Married</option>
+						<option value="Widowed" {% if "Widowed" in personal_detail.martial_status	 %} selected {% endif %}>Widowed</option>
+						<option value="Divorced" {% if "Divorced" in personal_detail.martial_status	 %} selected {% endif %}>Divorced</option>
+						<option value="Separated" {% if "Separated" in personal_detail.martial_status	 %} selected {% endif %}>Separated</option>
+					</select>
+					<label class="error_msg float-right" id="marital_status_error"></label>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+
+	<div class="col-md-12">
+		<div class="row mt-3 wrapper">
+			{% if 'blood_group' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/bloodgroup.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Blood Group : {% if 'blood_group' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<select class="inputField selectField blood_groups" style="width: 100% !important;" name="blood_group" id="blood_group">
+						<option value="">Choose Blood Group</option>
+						<option value="A+" {% if "A+" in personal_detail.blood_group %} selected {% endif %}>A+</option>
+						<option value="A-" {% if "A-" in personal_detail.blood_group %} selected {% endif %}>A-</option>
+						<option value="B+" {% if "B+" in personal_detail.blood_group %} selected {% endif %}>B+</option>
+						<option value="B-" {% if "B-" in personal_detail.blood_group %} selected {% endif %}>B-</option>
+						<option value="AB+" {% if "AB+" in personal_detail.blood_group %} selected {% endif %}>AB+</option>
+						<option value="AB-" {% if "AB-" in personal_detail.blood_group %} selected {% endif %}>AB-</option>
+						<option value="O+" {% if "O+" in personal_detail.blood_group %} selected {% endif %}>O+</option>
+						<option value="O-" {% if "O-" in personal_detail.blood_group %} selected {% endif %}>O-</option>
+					</select>
+					<label class="error_msg float-right" id="blood_group_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'disability' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Disability : {% if 'disability' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField alpha disabilitys" type="text" placeholder="Disability" name="disability" id="disability" maxlength="50"  value="{% if personal_detail.disability is not None %}{{personal_detail.disability}}{% endif %}">
+					<label class="error_msg float-right" id="disability_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			
+			{% if 'identification_mark' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Identification mark(if any) : {% if 'identification_mark' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField alpha identification_marks" type="text" placeholder="Identification mark" name="identification_mark" id="identification_mark" maxlength="50"  value="{% if personal_detail.identification_mark is not None %}{{personal_detail.identification_mark}}{% endif %}">
+					<label class="error_msg float-right" id="identification_mark_error"></label>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+
+	<div class="col-md-12">
+		<div class="row mt-3 wrapper">
+			{% if 'caste_category' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Caste Category : {% if 'caste_category' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<select class="inputField selectField caste_categorys" style="width: 100% !important;" name="caste_category" id="caste_category">
+						<option value="">Choose Caste Category</option>
+						<option value="SC" {% if "SC" in personal_detail.caste_category %} selected {% endif %}>SC</option>
+						<option value="ST" {% if "ST" in personal_detail.caste_category %} selected {% endif %}>ST</option>
+						<option value="OBC" {% if "OBC" in personal_detail.caste_category %} selected {% endif %}>OBC</option>
+						<option value="General" {% if "General" in personal_detail.caste_category %} selected {% endif %}>General</option>
+					</select>
+					<label class="error_msg float-right" id="caste_category_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'income_category' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/rupee.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Income Category : {% if 'income_category' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<select class="inputField selectField income_categorys" style="width: 100% !important;" name="income_category" id="income_category">
+						<option value="">Select Income Category</option>
+						{% if income_categories %}
+						{% for income_category in income_categories %}
+						<option value="{{income_category.id}}"  {% if income_category.id == personal_detail.income_category_id %} selected {% endif %}>{{income_category.income_category}}</option>
+						{% endfor %}
+						{% endif %}
+					</select>
+					<label class="error_msg float-right" id="income_category_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			
+			{% if 'previlege_category' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Caste Privilege : {% if 'previlege_category' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<select class="inputField selectField previlege_categorys" style="width: 100% !important;" name="previlege_category" id="previlege_category">
+						<option value="">Choose Privilege category</option>
+						{% if previlege_categories %}
+						{% for previlege_category in previlege_categories %}
+						<option value="{{previlege_category.id}}"  {% if previlege_category.id == personal_detail.previlege_category_id %} selected {% endif %}>{{previlege_category.previlege_category}}</option>
+						{% endfor %}
+						{% endif %}
+					</select>
+					<label class="error_msg float-right" id="previlege_category_error"></label>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+
+	<div class="col-md-12">
+		<div class="row mt-3 wrapper">
+			{% if 'tag' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Tags : {% if 'tag' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<select name="tags[]" class="form-control" id="tags" multiple  >
+						<option value="">Choose Tags</option>
+						{% if tags %}
+						{% for tag in tags %}
+						<option value="{{tag.id}}" {% if tag.id in tag_detail_id %} selected {% endif %}>{{tag.tag}}</option>
+						{% endfor %}
+						{% endif %}
+					</select>
+					<label class="error_msg float-right" id="tags_error"></label>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+
+
+	<div class="col-md-12">
+			<h5 class="mt-md-2">Correspondence address</h5>
+			<div class="row mt-3 wrapper">
+
+			{% if 'c_country' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/address.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Country : {% if 'c_country' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<select name="c_country" class="form-control select2" id="c_country" onchange="getState(this.value, 'c_state', '', '', 'c_city')">
+						<option value="" >Choose Country</option>
+						<option value="1" selected>India</option>
+					</select>
+					<label class="error_msg float-right" id="c_country_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'c_state' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/address.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						State : {% if 'c_state' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+				<input type="hidden" id="hidden_c_state" value="{% if personal_detail.c_state is not None %}{{personal_detail.c_state}}{% endif %}">
+					<select name="c_state" class="form-control" id="c_state"  onchange="getCity(this.value, 'c_city', '')">
+						<option value="">Choose State</option>
+						{% comment %} {% if personal_detail.caste_category %} <option value="">Choose State</option> {% endif %} {% endcomment %}
+					</select>
+					<label class="error_msg float-right" id="c_state_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			
+			{% if 'c_city' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/address.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						City : {% if 'c_city' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+				<input type="hidden" id="hidden_c_city" value="{% if personal_detail.c_city is not None %}{{personal_detail.c_city}}{% endif %}">
+					<select name="c_city" class="form-control" id="c_city">
+						<option value="">Choose City</option>
+					</select>
+					<label class="error_msg float-right" id="c_city_error"></label>
+				</div>
+			</div>
+			{% endif %}
+			</div>
+			<div class="row mt-3 wrapper">
+			
+
+			{% if 'c_address_line_1' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/address.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Address Line 1 : {% if 'c_address_line_1' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField  c_address_line_1s" type="text" placeholder="Address Line 1" name="c_address_line_1" id="c_address_line_1" maxlength="100"  value="{% if personal_detail.c_address_line_1 is not None %}{{personal_detail.c_address_line_1}}{% endif %}">
+					<label class="error_msg float-right" id="c_address_line_1_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'c_address_line_2' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/address.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Address Line 2 : {% if 'c_address_line_2' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField  c_address_line_2s" type="text" placeholder="Address Line 2" name="c_address_line_2" id="c_address_line_2" maxlength="100"  value="{% if personal_detail.c_address_line_2 is not None %}{{personal_detail.c_address_line_2}}{% endif %}">
+					<label class="error_msg float-right" id="c_address_line_2_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+
+			{% if 'c_pincode' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/address.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Pincode : {% if 'c_pincode' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField numeric c_pincodes" type="text" placeholder="Address Line 2" name="c_pincode" id="c_pincode" maxlength="8"  value="{% if personal_detail.c_pincode is not None %}{{personal_detail.c_pincode}}{% endif %}">
+					<label class="error_msg float-right" id="c_pincode_error"></label>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+
+
+			
+		</div>
+	</div>
+
+	<div class="col-md-12">
+		<div class="row mt-3 wrapper">
+			<div class="col-md-12">
+				<div class="col-md-12 p-0 mt-2" style="color: red">
+					<input type="checkbox" name="both_address_same" id="addressBox" onclick="handleAddress()"> Permanent Address is same as  correspondence address?  
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="col-md-12">
+			<h5 class="mt-md-2">Permanent address</h5>
+			<div class="row mt-3 wrapper">
+
+			{% if 'p_country' not in attribute.hidden_fields %}
+			
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/address.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Country : {% if 'p_country' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<select name="p_country" class="form-control select2" id="p_country"  onchange="getState(this.value, 'p_state', '', '', 'p_city')">
+						<option value="">Choose Country</option>
+						<option value="1" selected>India</option>
+					</select>
+					<label class="error_msg float-right" id="p_country_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'p_state' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/address.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						State : {% if 'p_state' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input type="hidden" id="hidden_p_state" value="{% if personal_detail.p_state is not None %}{{personal_detail.p_state}}{% endif %}">
+					<select name="p_state" class="form-control" id="p_state"  onchange="getCity(this.value, 'p_city', '')">
+						<option value="">Choose State</option>
+					</select>
+					<label class="error_msg float-right" id="p_state_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			
+			{% if 'p_city' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/address.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						City : {% if 'p_city' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input type="hidden" id="hidden_p_city" value="{% if personal_detail.p_city is not None %}{{personal_detail.p_city}}{% endif %}">
+					<select name="p_city" class="form-control" id="p_city">
+						<option value="">Choose City</option>
+					</select>
+					<label class="error_msg float-right" id="p_city_error"></label>
+				</div>
+			</div>
+			{% endif %}
+			</div>
+			<div class="row mt-3 wrapper">
+
+
+			{% if 'p_address_line_1' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/address.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Address Line 1 : {% if 'p_address_line_1' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField  p_address_line_1s" type="text" placeholder="Address Line 1" name="p_address_line_1" id="p_address_line_1" maxlength="100"  value="{% if personal_detail.p_address_line_1 is not None %}{{personal_detail.p_address_line_1}}{% endif %}">
+					<label class="error_msg float-right" id="p_address_line_1_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'p_address_line_2' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/address.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Address Line 2 : {% if 'p_address_line_2' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField  p_address_line_2s" type="text" placeholder="Address Line 2" name="p_address_line_2" id="p_address_line_2" maxlength="100"  value="{% if personal_detail.p_address_line_2 is not None %}{{personal_detail.p_address_line_2}}{% endif %}">
+					<label class="error_msg float-right" id="p_address_line_2_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+
+			{% if 'p_pincode' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/address.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Pincode : {% if 'p_pincode' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField numeric p_pincodes" type="text" placeholder="Address Line 2" name="p_pincode" id="p_pincode" maxlength="8" value="{% if personal_detail.p_pincode is not None %}{{personal_detail.p_pincode}}{% endif %}">
+					<label class="error_msg float-right" id="p_pincode_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			
+		</div>
+	</div>
+	</div>
+
+
+
+	
+</div>
+
+<script>
+
+function handleAddress() {
+		var c_address_line_1 = document.getElementById('c_address_line_1')
+        var c_address_line_2 = document.getElementById('c_address_line_2')
+        var c_pincode = document.getElementById('c_pincode')
+        var c_state = document.getElementById('c_state').value
+        var c_country = document.getElementById('c_country').value
+        var c_city = document.getElementById('c_city').value
+        var p_address_line_1 = document.getElementById('p_address_line_1')
+        var p_address_line_2 = document.getElementById('p_address_line_2')
+        var p_pincode = document.getElementById('p_pincode')
+        var p_state = document.getElementById('p_state').value
+        var p_country = document.getElementById('p_country').value
+        var p_city = document.getElementById('p_city').value
+
+
+       
+        
+        p_address_line_1.value = c_address_line_1.value
+        p_address_line_2.value = c_address_line_2.value
+        p_pincode.value = c_pincode.value
+        
+        $('#p_country').val(c_country).trigger('change');
+        
+        if(c_country != ''){
+            getState(c_country, 'p_state', c_state, c_city, 'p_city');
+			
+        }    
+    }
+
+
+
+	function handleAddress123(){
+		if($('#addressBox').is(':checked')){
+
+			state_id = $('#c_state option:selected').val()
+			state_text = $('#c_state option:selected').text()
+			var newOption = new Option(state_text,state_id, true, true);
+			$('#p_state').append(newOption).trigger('change');
+			
+
+			city_id = $('#c_city option:selected').val()
+			city_text = $('#c_city option:selected').text()
+			var newOption = new Option(city_text,city_id, true, true);
+			$('#p_city').append(newOption).trigger('change');
+
+			$('#p_city').val($('#c_city option:selected').val()).trigger('change');
+			$('#p_address_line_1').val($('#c_address_line_1').val());
+			$('#p_address_line_2').val($('#c_address_line_2').val());
+			$('#p_pincode').val($('#c_pincode').val());
+		}else{
+			$('#p_state').val('').trigger('change');
+			$('#p_city').val('').trigger('change');
+			$('#p_address_line_1').val('');
+			$('#p_address_line_2').val('');
+			$('#p_pincode').val('');
+		}
+	}
+</script>

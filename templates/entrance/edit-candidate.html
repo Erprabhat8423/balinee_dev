@@ -1,0 +1,616 @@
+{% load static %}
+<div class="modal-AddUser centered" style="width: 50%!important;">
+    <form name="addBasicDetailsForms" id="addBasicDetailsForms" method="POST" enctype="multipart/form-data" >
+        {% csrf_token %}
+        <input type="hidden" name="page-step" id="page-step" value="1" />
+        <input type="hidden" name="last_user_id" id="last_user_id" value="{% if last_user_id %} {{ last_user_id }} {% endif %}" >
+        <input type="hidden" name="user_type" id="user_type" value="{% if user_type %} {{ user_type }} {% endif %}" >
+
+        <div class="modal-header" id="headerStep1">
+            <div class="col-12 p-0">
+                <div class="row">
+                    <div class="col-6">
+                        <h5 class="mt-md-2">Register Candidate &nbsp;&nbsp;</h5>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-save float-right" type="submit" >
+                            Save & Proceed
+                        </button>
+                        <button class="btn btn-close float-right" type="button" onclick="manipulateModal('addUserModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% if student_detail %}
+        {% for each_detail in student_detail %}
+        <div class="modal-body" id="addUserModalBody" style="width:100% !important; height: 100%; overflow: auto;">
+            <div class="row">
+                <div class="col-md-12 p-0 h-100 w-100" id="step1">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12 p-0">
+                                    <div class="row">
+                                        <div class="col-md-12 p-0 mt-2">
+                                            <div class="row">
+                                                <div class="col-md-12 p-0">
+                                                    <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                                    <h6 class="mt-2 mb-0" style="display: inline-block;">Candidate Name</h6>
+                                                    <div class="row mt-2">
+                                                        <div class="col-md-12 mr-0 px-0">
+                                                            <input class="inputField alpha" type="text" placeholder="Enter Candidate Name"
+                                                            name="candidate_name" id="candidate_name" maxlength="50" value="{% if each_detail.student_name %}{{ each_detail.student_name }}{% endif %}">
+                                                            <label class="error_msg float-right" id="candidate_name_error"></label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="contact_number_error" val="0">
+
+                            <div class="row mt-3 wrapper">
+                                <div class="col-md-12 px-0">
+                                    <img src="{% static 'img/svg/contact.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                        Candidate Number*
+                                    </h6>
+                                </div>
+                                <div class="col-md-12 mt-3 px-0">
+                                    <input class="inputField contact_no_class numeric" type="text" placeholder="Student Number" name="contact"
+                                    id="contact" maxlength="10" value="{% if each_detail.contact %}{{ each_detail.contact }}{% endif %}" />
+                                    <label class="error_msg float-right contact_no_err_class" id="contact_error"></label>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-md-6 p-0">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/father.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            House No.
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField" type="text" placeholder="Enter House Number" name="hno"
+                                        id="hno" maxlength="50" value="{% if each_detail.address_hno %}{{ each_detail.address_hno }}{% endif %}">
+                                        <label class="error_msg float-right" id="hno_error"></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 pr-0">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Locality
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField" type="text" placeholder="Enter Locality" name="locality"
+                                        id="locality" maxlength="50" value="{% if each_detail.address_locality %}{{ each_detail.address_locality }}{% endif %}">
+                                        <label class="error_msg float-right" id="locality_error"></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-md-6 p-0">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/aadhaar.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                           State
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <select class="inputField selectField" data-live-search="true" name="state_name" id="state_name" data-placeholder="Select State">
+                                            <option value="">Select State</option>
+                                            {% for state in states %}
+                                            <option value="{{state.id}}" {% if each_detail.state_id == state.id %}selected{% endif %}>{{state.state_name|safe}}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label class="error_msg float-right" id="district_name_error"></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 pr-0">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/aadhaar.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                           District
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <select class="inputField selectField" data-live-search="true" name="district_name" id="district_name" data-placeholder="Select District">
+                                            <option value="">Select District</option>
+                                            {% for district in districts %}
+                                            <option value="{{district.id}}" {%if each_detail.district_id == district.id %} selected {% endif %}>{{district.district_name|safe}}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label class="error_msg float-right" id="district_name_error"></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-md-6 p-0">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/aadhaar.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                           Tehsil
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <select class="inputField selectField" data-live-search="true" name="tehsil_name" id="tehsil_name" data-placeholder="Select Tehsil">
+                                            <option value="">Select Tehsil</option>
+                                            {% for tehsil in tehsils %}
+                                                <option value="{{tehsil.id}}" {% if each_detail.tehsil_id == tehsil.id %} selected {% endif %}>{{tehsil.tehsil_name|safe}}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label class="error_msg float-right" id="tehsil_name_error"></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-6 pr-0">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/aadhaar.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                           Village
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <select class="inputField selectField" data-live-search="true" name="village_name" id="village_name" data-placeholder="Select Village">
+                                            <option value="">Select Village</option>
+                                            {% for village in villages %}
+                                                <option value="{{village.id}}" {% if village.id == each_detail.village_id %} selected {% endif %}>{{village.village_name|safe}}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label class="error_msg float-right" id="village_name_error"></label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row mt-3">
+                                <div class="col-md-12 p-0">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/aadhaar.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                           Course
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 px-0 mt-2">
+                                        <select class="inputField selectField" data-live-search="true" name="course_id" id="course_id" data-placeholder="Select Course">
+                                            <option value="">Select Course</option>
+                                            {% for course in courses %}
+                                                <option value="{{course.id}}" {% if each_detail.course_id == course.id %} selected {% endif %}>{{course.branch|safe}}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label class="error_msg float-right" id="branch_name_error"></label>
+                                    </div>
+                                </div>
+                                
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% endif %}
+    </form>
+</div>
+
+<script>
+    $('#addBasicDetailsForms').submit(function(e){
+        var error = 0;
+        
+        var b = document.forms["addBasicDetailsForms"]["candidate_name"].value;
+        document.getElementById('candidate_name_error').innerHTML = '';
+        $('#candidate_name').css("border", "");
+        if (b == null || b == "") {
+            var error = 1;
+            document.getElementById('candidate_name_error').innerHTML = 'Please Enter Candidate Name*';
+            $('#candidate_name').css("border", "1px solid #db8305");
+        }
+
+        var c = document.forms["addBasicDetailsForms"]["contact"].value;
+        document.getElementById('contact_error').innerHTML = '';
+        $('#contact').css("border", "");
+        if (c == null || c == "") {
+            var error = 1;
+            document.getElementById('contact_error').innerHTML = 'Please Enter Mobile number*';
+            $('#contact_name').css("border", "1px solid #db8305");
+        }
+
+        if (error == 0) {
+            debugger;
+            showLoader();
+            e.preventDefault();
+            $form = $(this)
+            var formData = new FormData(this)
+            formData.append('candidate_id', '{{candidate_id}}')
+            $.ajax({
+                url: "{% url 'src:entrance/update-registration' %}",
+                type: 'POST',
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    if (response.error == true) {
+                        // location.reload();
+                        $(".error_msg").html('');
+                        var data = response.message;
+                        $.each(data, function (index, value) {
+                            $('#' + index).html(value);
+                        });
+                    } else {
+                        $('#addStudentModal').html('');
+                        location.reload();
+                    }
+                },
+                error: function (response) {
+                    hideLoader();
+                    var data = response.responseText;
+                    openToaster("danger", data);
+                }
+            });
+        } else {
+            var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+            $("#addUserModalBody").height(mch);
+            $(".selectField").select2();
+            return false;
+            
+        }
+    });
+    
+    $("#state_name").on('change', function () {
+        state_id = $("#state_name").val()
+        getDistricts(state_id, 'district_name', 'tehsil_name', 'village_name')
+    })
+
+    $("#district_name").on('change', function () {
+        district_name = $("#district_name").val()
+        getTehsils(district_name, 'tehsil_name', 'village_name')
+    });
+
+    $("#tehsil_name").on('change', function () {
+        tehsil_name = $("#tehsil_name").val()
+        getVillages(tehsil_name, 'village_name')
+    });
+
+    
+    function getState(state_id){
+        if(country_id != ""){
+            //showLoader();
+            var url = "{% url 'src:get-state-options' 1 %}";
+            url = url.replace(1,state_id)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    // hideLoader();
+                    $('[name="'+id+'"]').html(data.options)
+                    $(".selectField").select2();
+                    if(store_state_id!=''){
+                        $('#permanent_state_id').val(store_state_id).trigger('change');
+                        getCity(store_state_id, 'permanent_city_id', store_city_id); 
+                    }
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            });
+        } else {
+            $('[name="'+id+'"]').html('<option value="" selected>Select State</option>')
+            $('[name="'+permanent_city_id+'"]').html('<option value="" selected>Select City</option>')
+            $(".selectField").select2();
+        }
+        
+    }
+
+    function getDistricts(state_id, dist_id, tehsil_id, village_id){
+        if(state_id != ""){
+            showLoader();
+            var url = "{% url 'src:get-district-options' 1 %}";
+            url = url.replace(1, state_id)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    $('[name="'+dist_id+'"]').html(data.district_options)
+                    $('[name="'+tehsil_id+'"]').html(data.tehsil_options)
+                    $('[name="'+village_id+'"]').html(data.village_options)
+                    $(".selectField").select2();
+                    hideLoader();
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            });
+        }
+    }
+
+    function getTehsils(district_id, tehsil_id, village_id){
+        if(district_id != ""){
+            showLoader();
+            var url = "{% url 'src:get-tehsil-options' 1 %}";
+            url = url.replace(1,district_id)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    $('[name="'+tehsil_id+'"]').html(data.tehsil_options)
+                    $('[name="'+village_id+'"]').html(data.village_options)
+                    $(".selectField").select2();
+                    hideLoader();
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            });
+        }
+    }
+
+    function getVillages(tehsil_id, village_id){
+        if(tehsil_id != ""){
+            showLoader();
+            var url = "{% url 'src:get-village-options' 1 %}";
+            url = url.replace(1,tehsil_id)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    $('[name="'+village_id+'"]').html(data.village_options)
+                    $(".selectField").select2();
+                    hideLoader();
+                    // if(store_state_id!=''){
+                    //     $('#permanent_state_id').val(store_state_id).trigger('change');
+                    //     getCity(store_state_id, 'permanent_city_id', store_city_id); 
+                    // }
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            });
+        }
+    }
+   
+    function readURL(input, previewId) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $('#' + previewId).attr('src', e.target.result);
+            $('#' + previewId).css({ "width": "100%!important;", "transform": "translate(0,0)" });
+            $('#' + previewId).addClass('w-100 imgStyle');
+        }
+        reader.readAsDataURL(input[0]);
+    }
+    
+    function sameAbove(formtype) {
+        var store_address_line_1 = document.getElementById('store_address_line_1')
+        var store_address_line_2 = document.getElementById('store_address_line_2')
+        var store_country_id = document.getElementById('store_country_id').value
+        var store_state_id = document.getElementById('store_state_id').value
+        var store_city_id = document.getElementById('store_city_id').value
+        var store_pincode = document.getElementById('store_pincode')
+        var permanent_address_line_1 = document.getElementById('permanent_address_line_1');
+        var permanent_address_line_2 = document.getElementById('permanent_address_line_2');
+        var permanent_country_id = document.getElementById('permanent_country_id');
+        var permanent_state_id = document.getElementById('permanent_state_id');
+        var permanent_city_id = document.getElementById('permanent_city_id');
+        var permanent_pincode = document.getElementById('permanent_pincode');
+        
+        permanent_address_line_1.value = store_address_line_1.value
+        permanent_address_line_2.value = store_address_line_2.value
+        permanent_pincode.value = store_pincode.value
+        
+        $('#permanent_country_id').val(store_country_id).trigger('change');
+        
+        if(store_country_id != ''){
+            getState(store_country_id, 'permanent_state_id', store_state_id, store_city_id, 'permanent_city_id');
+        }    
+    }
+    
+    $(".add_user_contact_person").click(function(){
+        var contactNumber = `<div class="row wrappers"><div class="col-md-4 mt-3">
+            <input class="inputField alpha" type="text" placeholder="Name" name="contact_person_name[]"
+            id="contact_person_name" maxlength="50" />
+            <label class="error_msg float-right" id="otherName_error"></label>
+        </div>
+        <div class="col-md-3 mt-3 pl-0">
+            <input class="inputField alpha" type="text" placeholder="Desgination" name="designation[]"
+            id="designation" maxlength="50" />
+            <label class="error_msg float-right" id="otherDesignation_error"></label>
+        </div>
+        <div class="col-md-4 mt-3 pl-0">
+            <input class="inputField numeric" type="text" placeholder="Contact no.*" name="contact_number[]"
+            id="contact_number" maxlength="10" />
+            <label class="error_msg float-right" id="otherContact_error"></label>
+        </div>
+        <div class="col-md-1 mt-3 pl-0">
+            <button class="iconCover float-right fa fa-trash removeContactPerson" style="padding: 0.75rem;" type="button" 
+            onclick="removeTableRow("otherContactCont")">
+        </button>
+    </div></div>`;
+    
+    $("#otherContactCont").append(contactNumber);
+    $('.removeContactPerson').click(function() {
+        $(this).closest('.wrappers').remove();
+    });
+    
+});
+
+$(".add_user_contact").click(function(){
+    var length = $('.contact_no_class').length;
+    console.log(length);
+    var contactPerson = `<div class="row wrapper">
+        <div class="col-md-2 mt-3 p-0">
+            <select class="inputField selectField" style="width: 100% !important;" name="country_code[]">
+                {% for country_code in country_codes %}
+                <option value="{{country_code.country_code}}">{{country_code.country_code}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3 mt-3">
+            <input class="inputField contact_no_class numeric" type="text" placeholder="Contact Number" name="contact_no[]"
+            id="contact_no_` + length + `" maxlength="10" />
+            <label class="error_msg float-right contact_no_err_class" id="contact_no_` + length + `_error"></label>
+        </div>
+        <div class="col-md-3 mt-3 pl-0">
+            <select class="inputField contact_type" style="width: 100% !important;" name="contact_type[]" id="contact_type_` + length + `">
+                {% for contact_type in contact_types %}
+                <option value="{{contact_type.id}}">{{contact_type.contact_type}}</option>
+                {% endfor %}
+            </select>
+            <label class="error_msg float-right contact_type_err_class" id="contact_type_` + length + `_error"></label>
+        </div>
+        <div class="col-md-3 mt-3 p-0">
+            <div class="inputfield">
+                <input type="radio" class="input_class_checkbox is_primary" name="is_primary[]" id="set_as_primary_1" >
+                <input type="hidden" name="primary_contact[]" value="0">
+                <label class="mb-0" for="user_Primary_name">Set as Primary</label>
+            </div>
+        </div>
+        <div class="col-md-1 mt-3 p-0">
+            <button class="iconCover float-right fa fa-trash removeContactNumber" style="padding: 0.75rem;" type="button" >
+            </button>
+        </div></div>`;
+        
+        $("#contactNumberCont").append(contactPerson);
+        $(".selectField").select2();
+        $('.removeContactNumber').click(function() {
+            $(this).closest('.wrapper').remove();
+            resetRowIndex();
+        });
+    });
+    
+    $('.removeContactNumber').click(function() {
+        $(this).closest('.wrapper').remove();
+        resetRowIndex();
+    });
+    
+    $('.removeContactPerson').click(function() {
+        $(this).closest('.wrappers').remove();
+    });
+    
+    $(document).on('click','.is_primary',function(){
+        
+        if($(this).prop('checked')){
+            $('.is_primary').prop('checked',false);
+            $('input[name="primary_contact[]"]').val(0);
+            $(this).prop('checked',true);
+            $(this).next().val(1);
+        }
+    });
+    
+    $(document).on('click','.self_owned_val',function(){
+        if ($(this).is(':checked')) {
+            $('#self_owned').val('1');
+        } else {
+            $('#self_owned').val('0');
+        }
+    });
+    
+    $(document).ready(function () {    
+        $("input[type='radio']").click(function () {
+            if ($("input[name='user_gender']:checked")) {
+                var radioValue = $("input[name='user_gender']:checked").val();
+                $("#user_gender_" + radioValue).attr("src", "static/img/svg/" + radioValue + ".svg");
+                if (radioValue == 'male') {
+                    $("#user_gender_female").attr("src", "static/img/svg/femalegrey.svg");
+                    $("#user_gender_other").attr("src", "static/img/svg/othergrey.svg");
+                } else if (radioValue == 'female') {
+                    $("#user_gender_male").attr("src", "static/img/svg/malegrey.svg");
+                    $("#user_gender_other").attr("src", "static/img/svg/othergrey.svg");
+                } else {
+                    $("#user_gender_male").attr("src", "static/img/svg/malegrey.svg");
+                    $("#user_gender_female").attr("src", "static/img/svg/femalegrey.svg");
+                }
+            }
+        });
+    });
+    
+    function resetRowIndex(){
+        obj = $('#addUserModalBody').find('.contact_no_class');
+        $.each( obj, function( key, value ) {
+            id=value.id;
+            var sum = key;
+            $('#'+id).attr('id', 'contact_no_'+sum);
+        });
+        
+        obj = $('#addUserModalBody').find('.contact_no_err_class');
+        $.each( obj, function( key, value ) {
+            id=value.id;
+            var sum = key;
+            $('#'+id).attr('id', 'contact_no_'+sum+'_error');
+        });
+
+        obj = $('#addUserModalBody').find('.contact_type_err_class');
+        $.each( obj, function( key, value ) {
+            id=value.id;
+            var sum = key;
+            $('#'+id).attr('id', 'contact_type_'+sum+'_error');
+        });
+
+        $(document).ready(function () { 
+
+            $("#date_of_birth").datepicker({  
+				changeMonth: true,
+				changeYear: true,  
+				yearRange: "-100:+0"
+				,maxDate: 0,
+				dateFormat: 'dd/mm/yy' 
+				});
+
+            $("input[type='radio']").click(function () {
+                if ($("input[name='user_gender']:checked")) {
+                    var radioValue = $("input[name='user_gender']:checked").val();
+                    $("#user_gender_" + radioValue).attr("src", "static/img/svg/" + radioValue + ".svg");
+                    if (radioValue == 'male') {
+                        $("#user_gender_female").attr("src", "static/img/svg/femalegrey.svg");
+                        $("#user_gender_other").attr("src", "static/img/svg/othergrey.svg");
+                    } else if (radioValue == 'female') {
+                        $("#user_gender_male").attr("src", "static/img/svg/malegrey.svg");
+                        $("#user_gender_other").attr("src", "static/img/svg/othergrey.svg");
+                    } else {
+                        $("#user_gender_male").attr("src", "static/img/svg/malegrey.svg");
+                        $("#user_gender_female").attr("src", "static/img/svg/femalegrey.svg");
+                    }
+                }
+            });
+        });
+        
+        
+    }
+</script>
+
+<script>
+    function role_filter_by_org(){
+        var filter_org_id = $('#college_name').val();
+        console.log("College Name: ", filter_org_id)
+        if(filter_org_id){
+            $.ajax({
+                url: "{% url 'src:filter-by-organization' %}",
+                type: 'POST',
+                data: {filter_org_id:filter_org_id,csrfmiddlewaretoken: '{{ csrf_token }}'},
+                success: function (response) {                        
+                    hideLoader();
+                    if (response.filter_role_option !='') {
+                        $('#branch').html(response.branch_option);
+                    } else {
+                        openToaster("danger", response.filter_role_option);
+                        openToaster("danger", response.filter_role_option);
+                    }
+                }
+            });
+        }else{
+            $('#filter_role_id').html('');
+        }
+        
+    }
+</script>

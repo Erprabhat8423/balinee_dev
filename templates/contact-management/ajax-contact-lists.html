@@ -1,0 +1,45 @@
+{% load static %}
+{% for user in users %}
+            <tr >
+                <td  class="table_user_name" onclick="getUserContactRecord('{{ user.id }}')">
+                    {{user.first_name}} {{user.middle_name}} {{user.last_name}}
+                </td>
+                <td class="table_contact_number" onclick="getUserContactRecord('{{ user.id }}')">
+                    {% if user.contact_number  %}
+                    {{user.contact_number}}
+                    {% else %}
+                    N/A
+                    {% endif %}
+                </td>
+                <td class="table_email_id" onclick="getUserContactRecord('{{ user.id }}')">{{user.official_email}}</td>
+                <td class="table_organisation" onclick="getUserContactRecord('{{ user.id }}')">{{user.organization_name}}</td>
+                <td class="table_tags" onclick="getUserContactRecord('{{ user.id }}')">
+                    {% if user.tags %}
+                    {% for tags in user.tags %}
+                    <div class="sponsoredTag" >{{tags.tag}}</div>
+                    <!-- <div class="sub-spansoredTag">Sales Head</div> -->
+                    {% endfor %}
+                    {% else %}
+                    {% endif %}
+                    
+                </td>
+                <td  onclick="getUserContactRecord('{{ user.id }}')">
+                    <div class="row ">
+                        <a href="#" title="">
+                            <img src="{% static 'img/svg/editcopy.svg' %}" class="tableRowIcon" />
+                        </a> 
+                        <div class="labelContainerOP-emp">
+                            <label class="switch">
+                                <input type="checkbox" class="checkbox" name="is_active"
+                                id="is_active_{{ user.id }}"
+                                {% if user.status == 1 %} checked="" {% else %}
+                                {% endif %}
+                                onclick="updateUserStatus('{{ user.id }}', '{{ user.status }}')">
+                                <span class="slider round"></span>
+                            </label>
+                            
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            {% endfor %}

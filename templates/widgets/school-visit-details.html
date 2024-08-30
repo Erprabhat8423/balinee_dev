@@ -1,0 +1,351 @@
+{% load static %}
+<style>
+    small{
+        font-size: 11px;
+    }
+    .header{
+        background-color: #0073e0;
+        color: #ffffff;
+    }
+    .table {
+        width: 100%;
+        margin-bottom: 1rem;
+        color: #212529;
+        font-size: 0.8rem;
+    }
+</style>
+<div class="row" style="height: 85%;">
+    <div class="col-md-12 p-0">
+        <div class="row">
+            <div class="col-md-12 p-md-0">
+                <div class="row">
+                    <div class="col-md-4 ">
+                        <img src="{{school_image}}" alt="" style="height: 100px;">
+                    </div>
+                    <div class="p-1 col-md-7">
+                        <h6> <b>{{ school_data.name }}</b> </h6>
+                        <h6 class="smallText" style="color: #0052a0;">
+                            {%if visit_type == "1" %} 
+                                {{ school_data.address_hno }}, {{ school_data.address_locality }}, {{ school_data.village_name }}, {{ school_data.tehsil_name }}, {{ school_data.district_name }}, {{ school_data.state_name }} - {{ school_data.pincode }}
+                            {%elif visit_type == "2" %}
+                                {{ school_data.address_hno }},{% if school_data.address_locality != None %} {{ school_data.address_locality }}, {%endif%} {{ school_data.address_village }}, {{ school_data.address_tehsil }}, {{ school_data.address_district }}, {{ school_data.address_state }} - {{ school_data.pincode }}
+                            {%endif%}
+                        </h6>
+                        {%if school_data.guardian_name %}
+                        <h6 class="smallText"><b>Guardian Name:</b> {{ school_data.guardian_name }}</h6>
+                        {%endif%}
+                    </div>
+                </div>
+            </div>
+
+                
+                <div class="col-10 p-0 mt-4 col-md-12 p-md-0 mt-md-3">
+                    <div class="row">
+                        {% if school_data.school_contact %}
+                        <div class="col-4 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/contact.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Contact Number</h6>
+                                    <h6 class="largeText"> {{ school_data.school_contact }}</h6>
+                                </div>
+                            </div>
+                        </div>
+                        {% elif school_data.student_contact %}
+                        <div class="col-4 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/contact.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Contact Number</h6>
+                                    <h6 class="largeText"> {{ school_data.student_contact }}</h6>
+                                </div>
+                            </div>
+                        </div>
+                        {%endif%}
+
+
+
+                        {% if school_data.high_school_students %}
+                        <div class="col-4 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/order/status.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Total Strength</h6>
+                                    <h6 class="largeText">{{ school_data.high_school_students }}</h6>
+                                </div>
+                            </div>
+                        </div>
+                        {% elif school_data.highschool_in_year %}
+                        <div class="col-4 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/order/status.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">HighSchool Passing Year</h6>
+                                    <h6 class="largeText">{{ school_data.highschool_in_year }}</h6>
+                                </div>
+                            </div>
+                        </div>
+                        {%endif%}
+
+                    </div>
+                </div>
+                <div class="col-12 p-0 mt-4 col-md-12 p-md-0 mt-md-2">
+                    <div class="row">
+                        <div class="col-4 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/order/modifiedDate_time.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Visit Datetime</h6>
+                                    <h6 class="largeText"> {{ school_data.visited_datetime }} </h6>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-4 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/add-visit-plan.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Visited By</h6>
+                                    <h6 class="largeText"> {{visited_by}} </h6>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                {% if school_cont %}
+                <div class="col-12 p-0 mt-4 col-md-12 p-md-0 mt-md-2">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="header" style="width: 10%;">S.No</th>
+                                <th class="header">Contact Name</th>
+                                <th class="header">Contact Number</th>
+                                <th class="header">Contact Type</th>
+                                <th class="header">Referred By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for each_cont in school_cont %}
+                            <tr>
+                                <td><p>{{ forloop.counter }}</p> </td>
+                                <td><p>{{ each_cont.contact_name }}</p></td>
+                                <td>{{ each_cont.contact_number }}</td>
+                                <td>{{ each_cont.contact_type }}</td>
+                                <td> {% if each_cont.referred_by == None %} - {%else%} {{ each_cont.referred_by }} {%endif%}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {%endif%}
+
+                {% if visit_type == "2" %}
+
+                <div class="col-12 p-0 mt-4 col-md-12 p-md-0 mt-md-2">
+                    <div class="row">
+                        <div class="col-4 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static '/img/svg/course.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Branch Name</h6>
+                                    <h6 class="largeText"> {{ school_data.branch_name }} </h6>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-4 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/blue-clander.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Academic Year</h6>
+                                    <h6 class="largeText"> {{ school_data.year }} </h6>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-12 p-0 mt-4 col-md-12 p-md-0 mt-md-2">
+                    <div class="row">
+                        <div class="col-4 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/order/farword_b.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Referred By Teacher</h6>
+                                    <h6 class="largeText"> {{ school_data.referred_by_teacher }} </h6>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-4 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/farword_b.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Referred By Student</h6>
+                                    <h6 class="largeText"> {{ school_data.referred_by_student }} </h6>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <div class="col-12 p-0 mt-4 col-md-12 p-md-0 mt-md-2">
+                    <div class="row">
+                        <div class="col-4 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/org.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">School Name</h6>
+                                    <h6 class="largeText"> {% if school_data.school_name != "" %} {{ school_data.school_name }} {%else%} None {%endif%}</h6>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-4 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">School Address</h6>
+                                    <h6 class="largeText"> {%if school_data.school_address != "" %} {{ school_data.school_address }} {%else%} None {%endif%}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 p-0 mt-4 col-md-12 p-md-0 mt-md-2">
+                    <div class="row">
+                        <div class="col-4 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/org.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Coaching Name</h6>
+                                    <h6 class="largeText"> {% if school_data.coaching_name != "" %} {{ school_data.coaching_name }} {%else%} None {%endif%}</h6>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-4 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Coaching Address</h6>
+                                    <h6 class="largeText"> {% if school_data.coaching_address != "" %} {{ school_data.coaching_address }} {%else%} None {%endif%} </h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-12 p-0 mt-4 col-md-12 p-md-0 mt-md-2">
+                    <div class="row">
+                        <div class="col-4 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/vehicle/ownerType.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Coaching Teacher</h6>
+                                    <h6 class="largeText"> {% if school_data.coaching_teacher != "" %} {{ school_data.coaching_teacher }} {%else%} None {%endif%} </h6>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-4 p-0 col-md-6 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/add-visit-plan.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Remark</h6>
+                                    <h6 class="largeText"> {% if school_data.remark != "" %} {{ school_data.remark }} {%else%} None {%endif%} </h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {%endif%}
+
+
+                <!-- <div class="col-12 p-0 mt-4 col-md-12 p-md-0 mt-md-3">
+                    <div class="row">
+                        <div class="col-4 p-0 col-md-4 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/order/shift.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Support Staff</h6>
+                                    <div class="row" style="width: max-content !important; max-width: 400px;">
+                                        <h6 class="largeText"> 
+                                            {{ support_staff }}
+                                        </h6>
+                                    </div>
+                                    
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> -->
+
+                {% if selfie %}
+                <div class="col-12 p-0 mt-4 col-md-12 p-md-0 my-md-3 ">
+                    <div class="row">
+                        <div class="col-12 p-0 col-md-4 p-md-0">
+                            <div class="row">
+                                <div class="col-2 p-0 col-md-2 p-md-0">
+                                    <img src="{% static 'img/svg/addimageStoreBlue.svg' %}" class="profileIconSize" />
+                                </div>
+                                <div class="col-10 p-1 col-md-10">
+                                    <h6 class="smallText">Selfie</h6>
+                                </div>
+                                
+                                <div class="row">
+                                    {% for each_selfie in selfie %} 
+                                    <div class="col-md-6" style="width: 400px;">
+                                        <img class="mx-2 border" src="{{each_selfie}}" alt="">
+                                    </div>
+                                    {% endfor %}
+                                </div>
+                            
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+            </div>
+        </div>
+    </div>

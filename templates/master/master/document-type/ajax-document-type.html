@@ -1,0 +1,123 @@
+{% load static %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="row mb-2" id="topRow">
+            <div class="col-md-5 p-md-0">
+                <h6><b>Document Type &nbsp;&nbsp;</b></h6>
+            </div>
+            <div class="col-md-7 p-md-0">
+                <div class="row" >
+                    <div class="col-md-12 p-md-0 text-right">
+                        <input class="searchTable master_type_search" placeholder="Search" type="search" data-column="all" id="document_type_type_filter" onkeyup="master_search_bar(this)">
+                        <button type="button" class="btn iconBox iconAddNew" title="Add document Type" onclick="addMaster('document_type')"></button>
+                        <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                            <button class="btn iconBox iconHide" title="Hide" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                            aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="document_name" 
+                                onclick="showHideColumns(this,'document_name',2)"
+                                />
+                                <label class="mb-0" for="document_name">Document Name</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="description" 
+                                onclick="showHideColumns(this,'description',3)"
+                                />
+                                <label class="mb-0" for="description">Description</label>
+                            </a>
+                          
+                        </div>
+                    </div>
+                    
+                    <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                        <button class="btn iconBox iconUnFreeze" title="Stick" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                        aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="" id="document_name" data-id="1"
+                            onclick="toggleFreeze(this.id,'document_name',1)" />
+                            <label class="mb-0" for="document_name">Document Name</label>
+                        </a>
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="" id="description" data-id="1"
+                            onclick="toggleFreeze(this.id,'description',2)" />
+                            <label class="mb-0" for="description">Description</label>
+                        </a>
+                        
+                    </div>
+                </div>
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<div class="row border-redius-17 h-100" id="tableBox">
+    <div class="col-md-12 col-12 primaryContainerBG h-100 px-0" id="masterListTable">
+            <table id="addOrgTable" class="detail-table table table-borderless table-striped table-hover mt-0"
+            style="width: 100%;">
+            <thead>
+                <tr>
+                    <th class="document_name">
+                        Document Name
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    <th class="description">
+                        Description
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    
+                    <th data-sorter="false">Action</th>
+                </tr>
+            </thead>
+            <tbody id="tablebody">
+                {% if document_type %}
+                {% for document_type in document_type %}
+                <tr>
+                    <td class="document_name">{{ document_type.document_name }}</td>
+                    <td class="description">{{ document_type.description }}</td>
+                    <td>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <a href="javascript:void(0)"  onclick="editMaster('document_type','{{document_type.id}}')"  >
+                                    <img src="{% static 'img/svg/editcopy.svg' %}" title="Edit" />
+                                </a> 
+                            </div>
+                            {% comment %} <div class="col-md-5">
+                                <label class="switch">
+                                    <input type="checkbox" class="checkbox" name="is_active"
+                                    {% if caste_category.status == 1 %} checked="" {% else %}
+                                    {% endif %}
+                                    onclick="changeMasterStatus('document_type', '{{ document_type.id }}')">
+                                    <span class="slider round" title="Enable/Disable"></span>
+                                </label>
+                                
+                            </div> {% endcomment %}
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr id="loading" style="display: none;">
+                    <td class="text-center" colspan="3">
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="3" style="text-align: center;">No Record Found...</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+</div>
+</div> 

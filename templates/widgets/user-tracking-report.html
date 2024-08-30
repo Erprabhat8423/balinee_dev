@@ -1,0 +1,357 @@
+{% extends 'layout/layout.html' %} 
+{% load helper_tags %} 
+{% load humanize %} 
+{% block content %} 
+{% load static %} 
+
+{% block style %} 
+<style type="text/css">
+  .tg  {border-collapse:collapse;border-spacing:0;}
+  .tg td{font-family:Arial, sans-serif;font-size:14px;
+    overflow:hidden;padding:10px 5px;word-break:normal;}
+    .tg th{font-family:Arial, sans-serif;font-size:14px;
+      font-weight:normal;overflow:hidden;padding:10px 5px;word-break:normal;}
+      .tg .tg-27m9{background-color:#c0c0c0;border-color:#9b9b9b;
+        font-family:"Lucida Sans Unicode", "Lucida Grande", sans-serif !important;;text-align:left;vertical-align:top}
+        .tg .tg-fb1n{background-color:#c0c0c0;border-color:#9b9b9b;text-align:left;vertical-align:top}
+      </style>
+      <style type="text/css">
+        
+        #map_canvas {
+          width: 100%;
+          height: 100%;
+        }
+        
+        .img-circle{
+          border-radius: 50%;
+          height: 120px;
+          width: 120px;
+        }
+        .card {
+          box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+          text-align: center;
+          background-color: #444;
+          color: white;
+        }
+        .iconDate {
+          background-image: url(/static/img/svg/calander-blue.svg);
+          background-repeat: no-repeat;
+          background-position: 90% 50%;
+        }
+      </style>
+      {% endblock %}
+
+      <div class="row" id="containerHeight">
+        
+        <div class="col-sm-12 h-100">
+          
+          <div class="col-md-4 p-md-0">
+            <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+          </div>
+          
+          <div class="primaryContainer h-100 ajaxReportSection mt-4" id="mainbox">
+            <div class="row mb-2" id="topRow">
+              <div class="col-sm-8 px-0">
+                <div class="row">
+                  
+                  <div class="col-sm-3 pr-2">
+                    <select class="inputField selectField" style="width: 100% !important;" name="visit_type" id="visit_type" onchange="filterTrack()">
+                      <option value="1">School Visits</option>
+                      <option value="2">Individual Visits</option>
+                    </select>
+                  </div>
+
+                  <div class="col-sm-3 pr-2">
+                    <select class="inputField selectField" style="width: 100% !important;" name="user_id" id="user_id" onchange="filterTrack()">
+                      <option value="">Select Employee</option>
+                      {% for user in users %}
+                      <option value="{{ user.id }}">
+                        {{ user.first_name }} {% if user.middle_name is not None %}
+                        {{ user.middle_name }} {% endif %}{{ user.last_name }}
+                      </option>
+                      {% endfor %}
+                    </select>
+                  </div>
+
+                  <div class="col-sm-3 pl-0 pr-2">
+                    <input class="inputField w-100 iconDate" id="date_from" placeholder="From Date" value="" type="text" readonly onchange="filterTrack()">
+                  </div>
+                  <div class="col-sm-3 pl-0 pr-2">
+                    <input class="inputField w-100 iconDate" id="date_to" placeholder="To Date" value="" type="text" readonly onchange="filterTrack()">
+                  </div>
+
+                </div>
+              </div>
+              <div class="col-sm-4 pr-5">
+                
+                <div class="dropdown col-sm-1 float-right">
+                  <button class="btn iconBox iconExport " type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> </button>
+                  <div class="dropdown-menu dropdown-menu-right logoutContainer" aria-labelledby="dropdownMenuButton">
+                      <a class="dropdown-item" onclick="exportsInExcel()" href="javascript:void(0)">Export 
+                          <img src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons ml-1" /> 
+                      </a>
+                  </div>
+                </div>
+
+                <!-- <div class="col-sm-8 pl-0 float-right">
+                  <p class="align-middle text-right" id="all_visit_count">
+                    Total no of visits:
+                    <span><b>{{ total_school_visits }}</b></span> 
+                  </p>
+                </div> -->
+                
+              </div>
+            </div>
+
+
+            <div class="row" id="tableBox">
+              <div class="col-md-8 primaryContainerBG h-100 p-0" id="ajaxTrackingSection">
+                <div id="map_canvas"></div>
+              </div>
+
+              <div class="col-md-4 h-100">
+                <div class="primaryContainerBG h-100" id="detailsBox">
+                  <div class="row my-3">
+                    
+                    <div class="col-md-8">
+                      <img src="{% static 'img/svg/add-visit-plan.svg' %}" class="profileIconSize mr-2" />
+                      Total visits
+                    </div>
+                    <div class="col-md-4">
+                      {{ total_school_visits }}
+                    </div>
+                  </div>
+
+                  <div class="row my-3">
+                    <div class="col-md-8">
+                      
+                      <img src="{% static 'img/svg/order/status.svg' %}" class="profileIconSize mr-2" />
+                      Total high school strength
+                    </div>
+                    <div class="col-md-1">
+                      {{ total_students }}
+                    </div>
+                  </div>
+
+                  <table id="addOrgTable" class="detail-table table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+                    <thead>
+                      <tr>
+                          <th class="table_student_name">
+                              Employee Name
+                          </th>
+                          <th class="table_student_name">
+                              Total count
+                          </th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                    {% for each_faculty in all_faculty %}
+                      <tr>
+                        <td class="table_student_name">
+                          {{each_faculty.username}}
+                        </td>
+                        <td class="table_father_name">
+                          {{each_faculty.total_visits}}
+                        </td>
+                      </tr>
+                    {% endfor %}
+                    </tbody>
+                  </table>
+                </div>
+            </div>
+            </div>
+          </div>
+        </div>
+        
+      </section>
+      
+      <script type="text/javascript">
+        
+        function initialize() {
+          var map;
+          var bounds = new google.maps.LatLngBounds()
+          var mapOptions = {
+            center: new google.maps.LatLng(25.4343, 82.7851019),
+            zoom: 8,
+          };
+          var customer_icon = {
+            url: '/static/img/png/locationMarker.png',
+            scaledSize: new google.maps.Size(30, 40)
+          }
+          map = new google.maps.Map(document.getElementById("map_canvas"), mapOptions);
+          
+          var markers = [];
+          var id = [];
+          var name = [];
+          var infoWindowContent = [];
+          {% for coordinates in all_coordinates %}
+          markers.push(['{{coordinates.latitude}}', '{{coordinates.longitude}}']);
+          id.push('{{coordinates.id}}')
+          name.push('{{ coordinates.name }}')
+
+
+          img = '/static/img/png/default_app_icon.png';
+
+          {% endfor %}
+
+          var infoWindow = new google.maps.InfoWindow(), marker, i;
+
+          for( i = 0; i < markers.length; i++ ) {
+            var position = new google.maps.LatLng(markers[i][0], markers[i][1])
+            bounds.extend(position);
+
+            marker = new google.maps.Marker({
+              position: position,
+              map: map,
+              title: name[i],
+              icon: customer_icon
+            });
+
+            google.maps.event.addListener(marker, 'click', (function(marker, i) {
+              return function() {
+                viewVisitDetails(id[i])
+              }
+            })(marker, i))
+
+            map.fitBounds(bounds)
+          }
+
+          // Override our map zoom level once our fitBounds function runs (Make sure it only runs once)
+          var boundsListener = google.maps.event.addListener((map), 'bounds_changed', function(event) {
+            this.setZoom(8);
+            google.maps.event.removeListener(boundsListener)
+          });
+          
+        }
+
+        function viewVisitDetails(id){
+          user_id = $('#user_id option:selected').val();
+          visit_type = $('#visit_type option:selected').val();
+
+          var url = "{% url 'src:school-visit-details' %}";
+          $.ajax({
+          url: url,
+          method: 'POST',
+          data: { 
+              user_id: user_id,
+              id: id,
+              visit_type: visit_type,
+              csrfmiddlewaretoken: '{{ csrf_token }}'
+          },
+          success: function (data) {
+              $('#detailsBox').html('');
+              $('#detailsBox').html(data);
+          },
+          error: function (err) {
+          }
+          });
+        }
+      </script>
+
+      <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNCcTQduJoNRebWEf7zgqlpe1YJibSuGI&callback=initialize&libraries=&v=weekly"></script>
+
+        
+        {% endblock content %} 
+        {% block script %}
+        <script src="{% static 'js/jquery-confirm.min.js' %}"></script>
+        <script src="{% static 'js/mdtimepicker.min.js' %}"></script>
+
+        <script>
+          $(document).ready(function() {
+            setHeightWidth();
+            $("#date_from").datepicker({
+              weekStart: 1,
+              changeMonth: true,
+              changeYear: true,
+              yearRange: "-100:+10",
+              daysOfWeekHighlighted: "6,0",
+              autoclose: true,
+              todayHighlight: true,
+              dateFormat: 'dd/mm/yy',
+              maxDate: new Date()
+            });
+
+            $("#date_to").datepicker({
+              weekStart: 1,
+              changeMonth: true,
+              changeYear: true,
+              yearRange: "-100:+10",
+              daysOfWeekHighlighted: "6,0",
+              autoclose: true,
+              todayHighlight: true,
+              dateFormat: 'dd/mm/yy',
+              maxDate: new Date()
+            });
+            
+          });
+
+          $(window).resize(function() {
+            setHeightWidth();
+          });
+
+          function filterTrack(){
+            user_id = $('#user_id option:selected').val();
+            visit_type = $('#visit_type option:selected').val();
+            date_from = $('#date_from').val();
+            date_to = $('#date_to').val();
+            var url = "{% url 'src:ajax-user-tracking' %}";
+            $.ajax({
+              url: url,
+              method: 'POST',
+              data: { 
+                user_id: user_id,
+                date_from:date_from,
+                date_to: date_to,
+                visit_type:visit_type,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+              },
+              success: function (data) {
+                console.log("Data: ", data['total_school_visits'])
+                // $('#all_visit_count').html("");
+                $('#tableBox').html(data);
+              },
+              error: function (err) {
+              }
+            });
+          }
+
+          function exportsInExcel() {
+            var date_from = $('#date_from').val();
+            var date_to = $('#date_to').val();
+            var user_id   = $('#user_id option:selected').val();
+            var visit_type = $('#visit_type option:selected').val();
+
+            var url = "{% url 'src:export-school-visits' 'visit_type' 'user_id' 'date_from' 'date_to' %}";
+            if (visit_type) {
+              url = url.replace('visit_type', visit_type);
+
+            }
+            if (user_id != ''){
+              url = url.replace('user_id',user_id);
+            }
+            else{
+              url = url.replace('user_id', '0');
+            }
+
+            if (date_from != ''){
+              date_from = date_from.replace("/", "-")
+              date_from = date_from.replace("/", "-")
+              url = url.replace('date_from', date_from);
+            }
+            else {
+              url = url.replace('date_from', '0');
+            }
+
+            if (date_to != ''){
+              date_to = date_to.replace("/", "-")
+              date_to = date_to.replace("/", "-")
+              url = url.replace('date_to', date_to);
+            }
+            else {
+              url = url.replace('date_to', '0');
+            }
+
+            window.location.href = url;
+          }
+        </script>
+        {% endblock %}

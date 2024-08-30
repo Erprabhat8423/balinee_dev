@@ -1,0 +1,129 @@
+{% load static %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="row mb-2" id="topRow">
+            <div class="col-md-5 p-md-0">
+                <h6><b>Rack Types &nbsp;&nbsp;</b></h6>
+            </div>
+            <div class="col-md-7 p-md-0">
+                <div class="row" >
+                    <div class="col-md-12 p-md-0 text-right">
+                        <input class="searchTable master_type_search" placeholder="Search" type="search" data-column="all" id="salary_addition_types_filter" onkeyup="master_search_bar(this)">
+                        <button type="button" class="btn iconBox iconAddNew" title="Add Salary Type" onclick="addMaster('rack_type')"></button>
+                        <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                            <button class="btn iconBox iconHide" title="Hide" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                            aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="" 
+                                onclick="showHideColumns(this,'addition_type',2)"
+                                />
+                                <label class="mb-0" for="addition_type">Almirah Name</label>
+                            </a>
+                            
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="" 
+                                onclick="showHideColumns(this,'addition_type_basis',2)"
+                                />
+                                <label class="mb-0" for="addition_type_basis">Rack</label>
+                            </a>
+                            
+                          
+                        </div>
+                    </div>
+                    
+                    <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                        <button class="btn iconBox iconUnFreeze" title="Stick" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                        aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="" id="pay_band" data-id="1"
+                            onclick="toggleFreeze(this.id,'pay_band',1)" />
+                            <label class="mb-0" for="pay_band">Almirah Name</label>
+                        </a>
+                        
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="" id="addition_type_basis" data-id="1"
+                            onclick="toggleFreeze(this.id,'addition_type_basis',1)" />
+                            <label class="mb-0" for="addition_type_basis">Rack</label>
+                        </a>
+                       
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<div class="row border-redius-17 h-100" id="tableBox">
+    <div class="col-md-12 col-12 primaryContainerBG h-100 px-0" id="masterListTable">
+            <table id="addOrgTable" class="detail-table table table-borderless table-striped table-hover mt-0" >
+            <thead>
+                <tr>
+                    {% comment %} <th class="pay_band">
+                        Collage Name
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    <th class="pay_band">
+                        Room Number
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th> {% endcomment %}
+                    <th class="pay_band">
+                        Almirah Name
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    
+                    <th class="addition_type_basis">
+                        Rack
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    
+                    <th data-sorter="false">Action</th>
+                </tr>
+            </thead>
+            <tbody id="tablebody">
+                {% if rack %}
+                {% for rack in rack %}
+                <tr>
+                    {% comment %} <td class="addition_type">{{ rack.college_name }}</td>
+                    <td class="addition_type">{{ rack.room_name }}</td> {% endcomment %}
+                    <td class="addition_type">{{ rack.almira_name }}</td>
+                    <td class="addition_upper_limit">{{ rack.rack }}</td>
+                    <td>
+                        <div class="row">
+                            <div class="col-md-3">
+                                {% comment %} <a href="javascript:void(0)"  onclick="editMaster('rack_type','{{rack.id}}')"  >
+                                    <img src="{% static 'img/svg/editcopy.svg' %}" />
+                                </a>  {% endcomment %}
+                            </div>
+                           
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr id="loading" style="display: none;">
+                    <td class="text-center" colspan="6">
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center;">No Record Found...</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>

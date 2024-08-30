@@ -1,0 +1,350 @@
+{% load static %}
+<style>
+	#addPermissionModule{
+		-webkit-filter: blur(5px);
+		-moz-filter: blur(5px);
+		-ms-filter: blur(5px);
+		-o-filter: blur(5px);
+		filter: blur(5px);
+		pointer-events:none;
+	}	
+	@media screen and (max-width: 767px) {
+		.select2-container ,.inputField{
+			width:  calc(100% - 45px) !important;
+
+		}
+		
+	}
+</style>
+<div class="modal-AddOrganisation centered " style="min-height:200px;">
+    <div class="modal-body p-0" >
+        <div class="row">
+            <div class="col-sm-3 col-12 px-0 modalOrgBG">
+                <div class="transformImage" >
+                    <img src="{% static 'img/svg/addorgW.svg' %}" class="w-50" />
+                    <h4 class="modalColHead">Edit Course</h4>
+                </div>
+            </div>
+            <div class="col-sm-9 col-12 role-details-form py-3">
+                <form method="POST" id="editCourse" autocomplete="off"  aria-label="Add Role">
+					{% csrf_token %}
+					<input type="hidden" name="user_id" value="{{user.id}}">
+					
+                    <div class="row ">
+                        <div class="col-sm-5 col-7 px-0">
+                            <h5 class="d-inline-block font-wt-b">Course Details</h5>
+                        </div>
+						<div class="col-sm-7 col-5 px-0"> 
+							<button class="btn btn-close float-right ml-0 mr-0" type="button" onclick="manipulateModal('addOrganisationModal','close')">
+								<span class="mob-d-none">Close</span>
+								<i class="far fa-times-circle mob-d-block desk-d-none"></i>
+							</button>
+							<button class="btn btn-save mob-ml-16 float-right mr-2" type="button" onclick="updateCourse('{{course_id}}')">Update</button>
+						</div>
+                    </div>
+
+
+
+						
+
+				
+						<div class="row add-form-row-mrng">
+							<div class="col-sm-12 col-12 px-0">
+								<img  class="profileIconSize" />&nbsp;&nbsp;
+								<h6 class="font-wt-b d-inline-block">
+									Institution Name
+								</h6>
+							</div>
+							<div class="col-md-12 p-md-0">
+								<select class="inputField selectField" data-live-search="true" name="org_id" id="org_id" data-placeholder="Select Institution*" >
+									{% for institution_name in organizations %}
+									<option value="{{institution_name.id}}" {% if institution_name.id == course_details.college_id|add:"0" %}selected{% endif %}>{{institution_name.organization_name|safe}}</option>
+									{% endfor %}
+								</select> 
+								<label class="error_msg float-right"></label>
+							</div>
+						</div>
+
+                        <div class="row mt-md-3">
+							<div class="col-md-12">
+								<div class="row">
+									<div class="col-md-12 p-md-0">
+										<h6 style="display: inline-block;"><b>Course Type*</b></h6>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-12 p-md-0">
+								<select class="inputField selectField" data-live-search="true" name="course_type" id="course_type" data-placeholder="Select Institution*" onchange="var e = $('#course_type option:selected').attr('eligibility');$('#eligibility').val(e)" >
+									{% for course_type in course_types %}
+									<option value="{{course_type.id}}" eligibility="{{course_type.eligibility}}" {% if course_type.id == course_details.course_type_id|add:"0" %}selected{% endif %}>{{course_type.course_type|safe}}</option>
+									{% endfor %}
+								</select> 
+								<label class="error_msg float-right" id=""></label>
+							</div>
+						</div>
+						<div class="row mt-md-3">
+							<div class="col-md-12">
+								<div class="row">
+									<div class="col-md-12 p-md-0">
+										<h6 style="display: inline-block;"><b>Eligibility</b></h6>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-12 p-md-0">
+								<input type="text" class="inputField" type="text" placeholder="Eligibility Criteria*" name="eligibility" id="eligibility" value="{{course_details.eligibility}}" maxlength="500" readonly />
+								<label class="error_msg float-right" id=""></label>
+							</div>
+						</div>
+						<div class="row mt-md-3">
+							<div class="col-md-12">
+								<div class="row">
+									<div class="col-md-12 p-md-0">
+										<h6 style="display: inline-block;"><b>Course Name*</b></h6>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-12 p-md-0">
+								<input class="inputField" type="text" placeholder="Course Name*"  name="course_name" id="course_name" maxlength="50" value="{{course_details.branch}}" />
+								<label class="error_msg float-right" id=""></label>
+							</div>
+						</div>
+						<div class="row mt-md-3">
+							<div class="col-md-12">
+							<div class="row">
+								<div class="col-md-6 p-md-0" >
+									<h6 style="display: inline-block;"><b>Semester Wise*</b></h6>
+									<input class="checkbox" style="margin-left: 3%;" type="checkbox" id="sem"  name="durationWise"  value="sem" onchange="handleDuration(this.id)"/>
+									<input class="inputField" type="hidden" id="sem_wise" />
+									<label class="error_msg float-right" id=""></label>
+								</div>
+								<div class="col-md-6 p-md-0" >
+									<h6 style="display: inline-block;"><b>Year Wise*</b></h6>
+									<input class="checkbox" style="margin-left: 3%;" type="checkbox" id="year"  name="durationWise" value="year" onchange="handleDuration(this.id)"/>
+									<input class="inputField" type="hidden" id="year_wise" />
+									<label class="error_msg float-right" id=""></label>
+								</div>
+							</div>
+							</div>
+						</div>
+						<div class="row mt-md-3">
+							<div class="col-md-12">
+								<div class="row">
+									<div class="col-md-12 p-md-0">
+										<h6 style="display: inline-block;" id="course_duration_label"><b>Course Duration*</b></h6>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-12 p-md-0">
+								{% if course_details.total_year %}
+								<input class="inputField" type="text" placeholder="Course duation in years ex:1,2,3,etc."  name="course_year" id="course_year" value="{{course_details.total_year}}" maxlength="2" onkeypress="return /[0-9]/i.test(event.key)" />
+								<input type="hidden" id="status" value=1>
+								{% elif course_details.total_sem %}	
+								<input class="inputField" type="text" placeholder="Course duation in years ex:1,2,3,etc."  name="course_year" id="course_year" value="{{course_details.total_sem}}" maxlength="50" onkeypress="return /[0-9]/i.test(event.key)" />
+								<input type="hidden" id="status" value=0>
+								{%else%}
+								<input class="inputField" type="text" placeholder="Course duation in years ex:1,2,3,etc."  name="course_year" id="course_year" value="" maxlength="50" onkeypress="return /[0-9]/i.test(event.key)" />
+								{% endif %}
+								<label class="error_msg float-right" id=""></label>
+							</div>
+						</div>
+						
+						<div class="row mt-md-3">
+							<div class="col-md-12">
+								<div class="row">
+									<div class="col-md-12 p-md-0">
+										<h6 style="display: inline-block;"><b>Alias Name*</b></h6>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-12 p-md-0">
+								<input class="inputField" type="text" placeholder="Alias name for course*" name="alias_name" id="alias_name" value="{{course_details.alias}}" maxlength="50" />
+								<label class="error_msg float-right" id=""></label>
+							</div>
+						</div>
+
+							
+						<div class="row mt-md-3">
+							<div class="col-md-12">
+								<div class="row">
+									<div class="col-md-12 p-md-0">
+										<h6 style="display: inline-block;"><b>Application Form Amount*</b></h6>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-12 p-md-0">
+								<input class="inputField" type="text" placeholder="In Rupee*" name="form_amount" id="form_amount" value="{{course_details.form_amount}}" maxlength="6" />
+								<label class="error_msg float-right" id=""></label>
+							</div>
+						</div>
+						
+						
+						<div class="row mt-md-3">
+							<div class="col-md-12">
+								<div class="row">
+									<div class="col-md-12 p-md-0">
+										<h6 style="display: inline-block;"><b>Max student strength*</b></h6>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-12 p-md-0">
+								<input type="text" class="inputField" type="text" placeholder="Max Students Allowed To be enrolled*" name="max_student" id="max_student" value="{{course_details.max_student}}" maxlength="50" />
+								<label class="error_msg float-right" id=""></label>
+							</div>
+						</div>
+                        
+						<div id="newRow">
+						
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+
+function updateCourse(id) {
+		var org_id = $('#org_id').val();
+		var course_type = $('#course_type').val();
+		var course_name = $('#course_name').val();
+		var course_year = $('#course_year').val();
+		var durationWise = $('input[name="durationWise"]').val();
+		var course_year = $('input[name="course_year"]').val();
+		var alias_name = $('#alias_name').val();
+		var form_amount = $('#form_amount').val();
+		var max_student = $('#max_student').val();
+		var eligibility = $('#eligibility').val();
+        url = "{% url 'src:edit-courses' '1' %}";
+        url = url.replace('1',id)
+        
+        $('#addOrganisationModal').html('');
+        $('#addDeptModal').html('');
+        showLoader();
+        $.ajax({
+            url: url,
+            method: 'POST',
+			data:{org_id:org_id,course_type:course_type,course_name:course_name,course_year:course_year,
+			durationWise:durationWise,course_year:course_year,alias_name:alias_name,
+			form_amount:form_amount,max_student:max_student,eligibility:eligibility
+			},
+            //data: $('#editCourse').serialize(),
+            success: function (data) {
+                hideLoader();
+				if(data.flag){
+					manipulateModal('addUserModal','close');
+					openToaster("success", data.message);
+					
+					setTimeout(window.location= "",900)
+                    }
+                    else{
+                        openToaster('danger',data.message)
+                        setTimeout(window.location= "",900)
+                    }
+				window.location.reload();
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    function handleDuration(value){
+		if (value =="sem"){
+			$('#course_duration_label').text('Course Duration(Semesters)*');
+			$('#course_duration_label').attr('style','font-weight:bold;');
+		}else{
+			$('#course_duration_label').text('Course Duration(Years)*');
+			$('#course_duration_label').attr('style','font-weight:bold;');
+		}
+	}
+    $(document).ready(function(){
+		var status = $('#status').val();
+		if(status==1){
+			$("#year").prop('checked', true);
+			$('#course_duration_label').text('Course Duration(Years)*');
+			$('#course_duration_label').attr('style','font-weight:bold;');
+		}else{
+			$("#sem").prop('checked', true);
+			$('#course_duration_label').text('Course Duration(Semesters)*');
+			$('#course_duration_label').attr('style','font-weight:bold;');
+		}
+		
+  	$('input[name="durationWise"]').on('change', function() {
+  		$('input[name="durationWise"]').not(this).prop('checked', false);
+  	});
+});
+    
+    function validateForm(){
+        error = 0;
+		
+		
+        $('.error_msg ').text('');
+        $('.inputField').css("border", "");
+
+        
+        if($('#course_name').val() == ""){
+            $('#course_name').parent().find('.error_msg').text('Please Fill Course Name');
+            $('#course_name').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			document.getElementById("course_name").scrollIntoView();
+            error = error + 1;
+        }
+
+        if($('#alias_name').val() == ""){
+            $('#alias_name').parent().find('.error_msg').text('Please Fill Alias Name');
+            $('#alias_name').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			document.getElementById("alias_name").scrollIntoView();
+            error = error + 1;
+        }
+        if($('#form_amount').val() == ""){
+            $('#form_amount').parent().find('.error_msg').text('Please Fill Form Amount');
+            $('#form_amount').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			document.getElementById("form_amount").scrollIntoView();
+            error = error + 1;
+        }
+        if($('#max_student').val() == ""){
+            $('#max_student').parent().find('.error_msg').text('Please Fill Max Student');
+            $('#max_student').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			document.getElementById("max_student").scrollIntoView();
+            error = error + 1;
+        }
+        
+        if($('#course_year').val() == ""){
+            $('#course_year').parent().find('.error_msg').text('Please Fill Course Duration');
+            $('#course_year').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			document.getElementById("course_year").scrollIntoView();
+            error = error + 1;
+        } 
+        
+        if($('#course_type').val() == ""){
+            $('#course_type').parent().find('.error_msg').text('Please Fill Course Type');
+            $('#course_year').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			document.getElementById("course_type").scrollIntoView();
+            error = error + 1;
+        } 
+       	if(document.getElementById("sem").checked == false && document.getElementById("year").checked == false){
+			   console.log("not check");
+			$('#sem_wise').parent().find('.error_msg').text('Please select Semester Wise or Year Wise');
+            $('#sem_wise').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			document.getElementById("sem_wise").scrollIntoView();
+			error = error + 1;
+		   }
+        if(error > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+
+	  
+
+	function getDateFormat(date){
+        var dateTemp = date.split('/');
+        date = dateTemp[2]+'-'+dateTemp[1]+'-'+dateTemp[0]
+        return date
+    }
+
+
+
+    
+
+</script>
+						

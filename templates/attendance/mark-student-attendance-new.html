@@ -1,0 +1,519 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>Sansthaa ERP | Student Attendance</title>
+    <link rel="icon" type="image/png" href="{% static 'img/favicon_io/favicon.ico' %}"/>
+    <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet"/>
+    <link rel="stylesheet" href="{% static 'plugins/font-awesome-4.7.0/css/font-awesome.min.css' %}"/>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap-4.5.2-dist/css/bootstrap.min.css' %}"/>
+
+    <link rel="stylesheet" href="{% static 'css/global.css' %}"/>
+    <link rel="stylesheet" href="{% static 'css/student-attendance-screen.css' %}"/>
+    <link rel="stylesheet" href="/static/css/footer.css"/>
+
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="{% static 'js/Nitgen.js' %}"></script>
+    <script async src="/opencv.js" onload="openCvReady();" type="text/javascript"></script>
+    <script src="{% static 'js/utils.js' %}"></script>
+
+
+    <script type="text/javascript">
+
+        var student_id = null;
+        var attendance_type = 1;
+        var is_read = 0;
+        var reset = 1;
+        
+        function read(id){
+            student_id = id;
+            url = "{% url 'src:attendance/get-student-data' '1' %}";
+            url = url.replace('1',student_id);
+            $.ajax({
+                url: url,
+                method: 'GET',
+                cache:false,
+                success: function (data) {
+                    if(typeof data.flag !== "undefined" && !data.flag){
+                        alert(data.message);
+                        //window.location.reload();
+                    }else{
+                        var vid = document.getElementById("cam_input");
+                        vid.pause();
+
+                        student_id = data.student_id;
+                        
+                        $('#audio_source').attr('src',data.audio);
+                        $('#help_section').hide();
+                        
+                        $('#student_section').html(data.student_html);
+                        $('#student_section').show();
+                        
+                        $('audio')[0].load();
+                        
+                        var promise = $('audio')[0].play();
+                        if (promise) promise.catch(error => {
+                            // Auto-play disabled show controls
+                            $('audio').attr('controls', '');
+                        });
+                            reset =1;
+
+                        }
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+            
+            
+        }
+        
+        function verifyStudentThumb() {
+            console.log(reset);
+            if(reset == 1){
+                $('#scanning_idle').hide();
+                $('#scanning_thumb').show();
+                $('#scanning_success').hide();
+                $('#scanning_failed').hide();
+
+
+                var quality = 60;
+                var timeout = 10;
+                try {
+                    var resultData =1;
+                    var res = CaptureFinger();
+                    if (res.httpStaus) {
+                        if (res.data.ErrorCode == "0") {
+                            $('#finger_iso').attr('src',"data:image/bmp;base64," + res.data.BitmapData);
+                            var isoTemplateDataLocal =  res.data.IsoTemplate;
+                            console.log(isoTemplateDataLocal);
+                            console.log("isoTemplateDataLocal");
+                            var url =  "{% url 'src:get-student-thumbs' '1' %}",
+                            url = url.replace('1',student_id);
+
+                            $.ajax({
+                                url: url,
+                                type: "GET",
+                                cache: false,
+                                success: function (data) {
+                                    error = false;
+                                    student_details = data.student_details
+                                    var studentFinger = [student_details.finger_iso_1, student_details.finger_iso_2];
+                                    var dataCnt = studentFinger.length;
+                                    for(var i=0; i<dataCnt; i++){
+                                        var isoTemplateDataServer = studentFinger[i];
+
+                                        if(isoTemplateDataServer!=''){
+                                            var res = VerifyFinger(isoTemplateDataServer, isoTemplateDataLocal);
+                                            if (res.httpStaus) {
+                                                if (res.data.Status==true) {
+                                                // verified
+                                                error = false;
+                                                break;
+                                            }else{
+                                                // failed
+                                                error = true;
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                if(error){
+                                    $('#scanning_idle').hide();
+                                    $('#scanning_thumb').hide();
+                                    $('#scanning_success').hide();
+                                    $('#scanning_failed').show();
+                                    
+                                    $('#audio_source').attr('src','/media/attendance_audio/thumb_verification/error.mp3');
+                                    $('audio')[0].load();
+                                    
+                                    var promise = $('audio')[0].play();
+                                    if (promise) promise.catch(error => {
+                                        // Auto-play disabled show controls
+                                        $('audio').attr('controls', '');
+                                    });
+                                        $('#help_section').show();
+                                        $('#student_section').hide().html('');
+                                        // setTimeout(function(){  
+
+                                        // },3500);
+                                        is_read = 0;
+                                        reset = 0;
+                                        resetVideo();
+
+                                    // alert('Authentication failed.');
+                                    
+                                }else{
+
+                                    $('#scanning_idle').hide();
+                                    $('#scanning_thumb').hide();
+                                    $('#scanning_success').show();
+                                    $('#scanning_failed').hide();
+                                    
+                                    markStudentAttendance();
+                                    // alert('Authentication successful.');
+                                    
+                                }
+                                
+                            },
+                            error: function (jqXHR, ajaxOptions, thrownError) {
+                                console.log(getHttpError(jqXHR));
+                            },
+                        });
+
+                        }
+
+                    }
+                    else {
+                        alert(res.err);
+                    }
+
+                }
+                catch (e) {
+                    alert(e);
+                }
+                return false;
+            }
+        }
+        
+        function markStudentAttendance(){
+            url = "{% url 'src:attendance/mark-student-attendance'  %}";
+            $.ajax({
+                url: url,
+                type: 'POST',
+                cache:false,
+                data:{'student_id':student_id},
+                success: function (data) {
+                    if(data.flag){
+
+                        $('#audio_source').attr('src','/media/attendance_audio/thumb_verification/success.mp3');
+                        $('audio')[0].load();
+                        
+                        var promise = $('audio')[0].play();
+                        if (promise) promise.catch(error => {
+                            // Auto-play disabled show controls
+                            $('audio').attr('controls', '');
+                        });
+
+                            setTimeout(function(){ 
+
+                               $('#help_section').show();
+                               $('#student_section').hide().html('');
+                               
+                               is_read = 0;
+                               reset = 0;
+                               resetVideo();
+
+                               
+
+                           },3500);
+
+
+
+                        }else{
+                            alert(data.message);
+                            is_read = 0;
+                            reset = 0;
+                            resetVideo();
+
+                        }
+
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+        }
+
+
+        function resetVideo(){
+
+            let video = document.getElementById('cam_input');
+
+            navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+            .then(function (stream) {
+                video.srcObject = stream;
+                video.play();
+            })
+            .catch(function (err) {
+                console.log('An error has occured! ' + err);
+            });
+            let src = new cv.Mat(video.height, video.width, cv.CV_8UC4);
+            let gray = new cv.Mat();
+            let cap = new cv.VideoCapture(cam_input);
+            let faces = new cv.RectVector();
+            let eyes = new cv.RectVector();
+            let faceClassifier = new cv.CascadeClassifier();
+            let eyeClassifier = new cv.CascadeClassifier();
+            let utils = new Utils('errorMessage');
+            let faceCascade = "/haarcascade_frontalface_default.xml";
+
+
+            utils.createFileFromUrl(faceCascade, faceCascade, () => {
+                faceClassifier.load(faceCascade);
+            });
+
+            const FPS = 30;
+            let tmp = 1;
+            function processVideo() {
+                let begin = Date.now();
+                cap.read(src);
+
+                cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
+                try {
+                    faceClassifier.detectMultiScale(gray, faces, 1.1, 3, 0);
+                    for (let i = 0; i < faces.size(); ++i) {
+                        let face = faces.get(i);
+                        let point1 = new cv.Point(face.x, face.y);
+                        let point2 = new cv.Point(face.x + face.width, face.y + face.height);
+                        cv.rectangle(src, point1, point2, [255, 0, 0, 255]);
+                        tmp++;
+
+
+                    }
+                } catch (err) {
+                    console.log(err);
+                }
+                cv.imshow('canvas_output', src);
+                let tempCanvas = document.getElementById("canvas_output");
+                let b64image = tempCanvas.toDataURL()
+                if(tmp > 15){
+                    tmp = 0;
+                    if(is_read == 0){
+
+                        $.ajax({
+                            url: '{% url "src:match-face" %}',
+                            type: 'POST',
+                            data: {image: b64image},
+                            cache: false,
+
+                            success:function(data){
+                                if (data.flag){
+                                    is_read = 1; 
+                                    reset = 1;                                   
+                                    read(data.name);
+                                }
+                                else{
+                                    console.log('Not match');
+                                }
+                            }
+                        });
+                    }
+
+                }
+
+                let delay = 1000 / FPS - (Date.now() - begin);
+
+                setTimeout(processVideo, delay);
+            }
+            if(is_read==0){
+                setTimeout(processVideo, 500);
+            }
+        }
+
+
+        function openCvReady() {
+
+
+            cv['onRuntimeInitialized'] = () => {
+                console.log('opencv');
+                let video = document.getElementById('cam_input');
+
+                navigator.mediaDevices.getUserMedia({ video: true, audio: false })
+                .then(function (stream) {
+                    video.srcObject = stream;
+                    video.play();
+                })
+                .catch(function (err) {
+                    console.log('An error has occured! ' + err);
+                });
+                let src = new cv.Mat(video.height, video.width, cv.CV_8UC4);
+                let gray = new cv.Mat();
+                let cap = new cv.VideoCapture(cam_input);
+                let faces = new cv.RectVector();
+                let eyes = new cv.RectVector();
+                let faceClassifier = new cv.CascadeClassifier();
+                let eyeClassifier = new cv.CascadeClassifier();
+                let utils = new Utils('errorMessage');
+                let faceCascade = "/haarcascade_frontalface_default.xml";
+
+
+                utils.createFileFromUrl(faceCascade, faceCascade, () => {
+                    faceClassifier.load(faceCascade);
+                });
+
+                const FPS = 30;
+                let tmp = 1;
+                function processVideo() {
+                    let begin = Date.now();
+                    cap.read(src);
+
+                    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY, 0);
+                    try {
+                        faceClassifier.detectMultiScale(gray, faces, 1.1, 3, 0);
+                        for (let i = 0; i < faces.size(); ++i) {
+                            let face = faces.get(i);
+                            let point1 = new cv.Point(face.x, face.y);
+                            let point2 = new cv.Point(face.x + face.width, face.y + face.height);
+                            cv.rectangle(src, point1, point2, [255, 0, 0, 255]);
+                            tmp++;
+
+
+                        }
+                    } catch (err) {
+                        console.log(err);
+                    }
+                    cv.imshow('canvas_output', src);
+                    let tempCanvas = document.getElementById("canvas_output");
+                    let b64image = tempCanvas.toDataURL()
+                    if(tmp > 15){
+                        tmp = 0;
+                        if(is_read == 0){
+                            $.ajax({
+                                url: '{% url "src:match-face" %}',
+                                type: 'POST',
+                                data: {image: b64image},
+                                cache: false,
+
+                                success:function(data){
+                                    if (data.flag){
+                                        is_read = 1;
+
+                                        read(data.name);
+                                    }
+                                    else{
+                                        console.log('Not match');
+                                    }
+                                }
+                            });
+                        }
+
+
+                    }
+
+                    let delay = 1000 / FPS - (Date.now() - begin);
+
+                    setTimeout(processVideo, delay);
+                }
+                if(is_read==0){
+                    setTimeout(processVideo, 500);
+                }
+            }
+        }
+
+    </script>
+    <style>
+        .iconAlignment {
+            text-align: right;
+        }
+        .socialMediaIcon {
+            width: 1rem;
+            margin: 0 0.5rem;
+            cursor: pointer;
+        }
+        .footerText {
+            font-size: 0.85rem;
+            font-family: sans-serif;
+            font-weight: 500;
+        }
+        .lightGrey {
+            color: #727272;
+        }
+        .blackFont {
+            color: #151515;
+        }
+
+    </style>
+</head>
+<body class="comingSoon">
+
+    <audio controls onended="verifyStudentThumb()" id="audio" style="display: none;">
+        <source id="audio_source" src="/media/attendance_audio/null.mp3" type="audio/mpeg">
+        </audio>
+        <div class="mt-4 px-4">
+            <div class="row border-redius-17 box-shadow-bg" id="containerHeight">
+                <div class="col-md-6 col-12  px-0 h-100">
+                    <div class="primaryContainerBG h-100 p-4 border-r-r" id="">
+                        <video id='cam_input' height='480' width='640' style="display: none;"></video>
+                        <canvas id='canvas_output'></canvas>
+
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-12  px-0 h-100 " id="help_section">
+                    <div class="primaryContainerBG border-r-l h-100 p-3" id="">
+                        <div class="row h-100 " id=" " style="justify-content: flex-end;">
+                            <a class=" font-wt-b " title="register-new-student" href="{% url 'src:student/register-face' %}" style="font-size: 18px; font-weight: 700;">  
+                                Register New Student 
+                            </a>
+                            <div class="h-100  px-4">
+                                <img src="{% static 'img/png/HELP.png' %} " alt="" class="help_section">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 col-12  px-3 h-100 primaryContainerBG border-r-l  border-left" id="student_section"
+                style="display: none;">
+                <div class="primaryContainerBG border-r-l h-100 py-3" id="">
+                    <div class="col-12 col-sm-12 px-0 border-left">
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+    <footer class="footer footer-bottom" id="footer">
+        <div class="row">
+            <div class="col-sm-10  pr-0">
+                <div class="row">
+                    <span class="footerText lightGrey">©copyright</span>
+                    <span class="footerText">
+                         2020 - {% now 'Y' %}. <span class="blackFont">A Product of </span>
+                        <a href="https://sortstring.com">Sort String </a>
+                        <span class="blackFont">Solutions LLP </span>
+                        <a href="https://sortstring.com/privacy-policy" target="_blank">
+                            <span class="footerText lightGrey">- Privacy Poilcy</span>
+                        </a>
+                        <a href="https://sortstring.com/contact" target="_blank">
+                            <span class="footerText lightGrey">- Help</span>
+                        </a>
+                    </span>
+
+                </div>
+            </div>
+
+            <div class="col-sm-2 iconAlignment">
+                <a href="https://www.facebook.com/sortstringsolutions/" target="_blank"><img
+                    src="/static/img/svg/Facebook.svg" class="socialMediaIcon"></a>
+                    <a href="https://www.linkedin.com/company/sortstring-solutions/" target="_blank"><img
+                        src="/static/img/svg/Instagram.svg" class="socialMediaIcon"></a>
+                        <a href="https://twitter.com/sort_string" target="_blank"><img src="/static/img/svg/Twitter.svg"
+                           class="socialMediaIcon"></a>
+                       </div>
+                   </div>
+               </footer>
+
+
+               <script>
+                $(document).ready(function(){
+                    setHeightWidth();
+                });
+                function setHeightWidth() {
+                    var containerHeight =
+                    window.innerHeight - 80;
+                    $("#containerHeight").height(containerHeight);
+                }
+
+
+            </script>
+
+
+        </body>
+        </html>

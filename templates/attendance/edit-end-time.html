@@ -1,0 +1,330 @@
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/mdtimepicker.min.css' %}">
+
+<style>
+
+    .ui-widget.ui-widget-content{
+        z-index: 999999999!important;
+    }
+    .ui-datepicker-prev span,
+    .ui-datepicker-next span {
+        background-image: none !important;
+    }
+    
+    .ui-datepicker-prev:before,
+    .ui-datepicker-next:before {
+        font-family: FontAwesome;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: flex;
+        font-weight: normal;
+        align-items: center;
+        justify-content: center;
+        z-index: 999999999!important;
+    }
+    
+    .ui-datepicker-prev:before {
+        content: "\f100";
+    }
+    
+    .ui-datepicker-next:before {
+        content: "\f101";
+    }
+	#addPermissionModule{
+		-webkit-filter: blur(5px);
+		-moz-filter: blur(5px);
+		-ms-filter: blur(5px);
+		-o-filter: blur(5px);
+		filter: blur(5px);
+		pointer-events:none;
+	}	
+	@media screen and (max-width: 767px) {
+		.select2-container ,.inputField{
+			width:  calc(100% - 45px) !important;
+
+		}
+		
+    {% comment %} #ui-datepicker-div {
+        position:relative;
+        z-index:999999;
+    } {% endcomment %}
+	}
+</style>
+<div class="modal-AddOrganisation centered ">
+    <div class="modal-body p-0" >
+        <div class="row">
+            <div class="col-sm-3 col-12 px-0 modalOrgBG">
+                <div class="transformImage">
+                    <img src="{% static 'img/svg/addorgW.svg' %}" class="w-50" />
+                    <h4 class="modalColHead">Update DayOut</h4>
+                </div>
+            </div>
+            <div class="col-sm-9 col-12 role-details-form py-3">
+                <form method="POST" id="addRoleForm" name = "addRoleForm" autocomplete="off" action="" aria-label="Add Role">
+					{% csrf_token %}
+					
+                    <div class="row ">
+                        <div class="col-sm-5 col-7 px-0">
+                            <h5 class="d-inline-block font-wt-b">Attendance Details</h5>
+                        </div>
+						<div class="col-sm-7 col-5 px-0"> 
+							<button class="btn btn-close float-right ml-0 mr-0" type="button" onclick="manipulateModal('addOrganisationModal','close')">
+								<span class="mob-d-none">Close</span>
+								<i class="far fa-times-circle mob-d-block desk-d-none"></i>
+							</button>
+							<button class="btn btn-save mob-ml-16 float-right mr-2" type="button" onclick="saveAttendance()">Save</button>
+						</div>
+                    </div>
+
+                    <div class="row mt-3">
+                        <div class="col-md-12 p-0">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/profile.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="font-wt-b d-inline-block">
+									Attendance Date
+								</h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <input class="inputField alpha" type="text" placeholder="Choose From Date" name="att_date" onchange="filterAttendance(this.value,'employee')"
+                                id="att_date" maxlength="50">
+                                <label class="error_msg float-right" id="att_date_error"></label>
+                            </div>
+                        </div>
+					</div> 
+                    <div class="row mt-3">
+                        <div class="col-md-12 p-0">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/profile.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="font-wt-b d-inline-block">
+									Employee Name
+								</h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <select class="inputField selectField" name="employee" id="employee" style="width: 100%;">
+									{% comment %} <option value="">Select Employee Name</option>
+									{% for employee in employee %}
+									<option value="{{employee.id}}">{{employee.first_name}}{{employee.middle_name}}{{employee.last_name}}</option>
+									{% endfor %} {% endcomment %}
+                                    <option value="">Select Employee</option>
+								</select>
+								<label class="error_msg float-right" id = "employee_name_error"></label>
+                            </div>
+                        </div>
+					</div>
+					
+{% comment %} 					
+                    <div class="row mt-3">
+                        <div class="col-md-12 p-0">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/profile.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="font-wt-b d-inline-block">
+									Start Time
+								</h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <input class="inputField alpha" type="text" placeholder="Choose Start Time" name="start_time"
+                                id="start_time" maxlength="50">
+                                <label class="error_msg float-right" id="start_time_error"></label>
+                            </div>
+                        </div>
+					</div> {% endcomment %}
+                    <div class="row mt-3">
+                        <div class="col-md-12 p-0">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/profile.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="font-wt-b d-inline-block">
+									End Time
+								</h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <input class="inputField alpha" type="text" placeholder="Choose End Time" name="end_time"
+                                id="end_time" maxlength="50">
+                                <label class="error_msg float-right" id="end_time_error"></label>
+                            </div>
+                        </div> 
+					</div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="{% static 'js/mdtimepicker.min.js' %}"></script>
+<script>
+    $(document).ready(function () {
+    
+        $("#att_date").datepicker({
+            weekStart: 1,
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+0",
+            daysOfWeekHighlighted: "6,0",
+            autoclose: true,
+            todayHighlight: true,
+            dateFormat: 'dd/mm/yy',
+        });
+
+        $("[name='start_time']").mdtimepicker({
+            timeFormat: 'hh:mm:ss.000',
+            format: 'hh:mm tt',     
+            theme: 'blue',       
+            readOnly: true,      
+            hourPadding: false    
+        });
+        
+        $("[name='end_time']").mdtimepicker({
+            timeFormat: 'hh:mm:ss.000',
+            format: 'hh:mm tt',     
+            theme: 'blue',       
+            readOnly: true,      
+            hourPadding: false   
+        });
+
+        
+    })
+
+
+    function saveAttendance() {
+        
+        var error = 0;
+        var employee = document.forms["addRoleForm"]["employee"].value;
+        document.getElementById('employee_name_error').innerHTML = '';
+        if (employee.trim() == null || employee.trim() == "") {
+            var error = 1;
+            document.getElementById('employee_name_error').innerHTML = 'Please select employee*';
+            $('#employee').css("border", "1px solid #db8305");
+        } else {
+            $('#employee').css("border", "1px solid lightgrey");
+        } 
+
+        var att_date = document.forms["addRoleForm"]["att_date"].value;
+        document.getElementById('att_date_error').innerHTML = '';
+        if (att_date.trim() == null || att_date.trim() == "") {
+            var error = 1;
+            document.getElementById('att_date_error').innerHTML = 'Please choose Date*';
+            $('#att_date').css("border", "1px solid #db8305");
+        } else {
+            $('#att_date').css("border", "1px solid lightgrey");
+        } 
+        var end_time = document.forms["addRoleForm"]["end_time"].value;
+        document.getElementById('end_time_error').innerHTML = '';
+        if (end_time.trim() == null || end_time.trim() == "") {
+            var error = 1;
+            document.getElementById('end_time_error').innerHTML = 'Please choose end time*';
+            $('#end_time').css("border", "1px solid #db8305");
+        } else {
+            $('#end_time').css("border", "1px solid lightgrey");
+        } 
+        
+        $('.error_msg').css("margin-bottom", "0rem");
+
+        if (error == 0) {
+            $.ajax({
+                url: "{% url 'src:update-end-time' %}",
+                method: 'POST',
+                data: {
+                    employee: $('#employee').val(),
+                    att_date: $('#att_date').val(),
+                    end_time: $('#end_time').val(),
+                    csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()
+                },
+                success: function (response) {
+                    if (response.flag == false) {
+                        $("#addOrganisationModal").hide();
+                        $("body").removeClass("modal-open");
+                        $(".modal-backdrop").remove();
+                        openToaster("success", response.message);
+                        window.location.reload()
+                    } else {
+                        openToaster("danger", response.message);
+                        $(".text-danger").html('');
+                        var data = data.message;
+                        $.each(data, function (index, value) {
+                            $('#' + index).html(value);
+                        });
+                       
+                    }
+                },
+                error: function (err) {
+                    alert(err.message);
+                    window.location.reload();
+                }
+            });
+        }
+
+    }
+
+    function filterAttendance(att_date,employee ){
+      
+        if(att_date != ""){
+            if (att_date) {
+                att_date = att_date.split('/');
+                att_date = att_date[2] + '-' + att_date[1] + '-' + att_date[0]
+            }
+    
+            var url = "{% url 'src:get-employee-options' 1 %}";
+            url = url.replace(1,att_date)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    $('[name="'+employee+'"]').html(data.options)
+                    $(".selectField").select2();
+                  
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            });
+        } 
+    }
+    
+
+    {% comment %} function filterStaffAttendance(){
+        var date = $('#filter_date').val();
+        if(date != ""){
+           
+            $('#addOrgTable').html(loading_html);
+            $('#loading').show();
+            
+            $.ajax({
+                url: "{% url 'src:get-employee-list' %}",
+                method: 'GET',
+                data: {
+                    date:date,
+                },
+                success: function (data) {
+                    hideLoader();
+                    $('#ajax-div').html(data);
+                    $('#addOrgTable').tablesorter({
+                        theme: "blue",
+                        widgets: ["stickyHeaders"],
+                        widgetOptions: {
+                            stickyHeaders_attachTo: ".primaryContainerBG",
+                        }
+                    });
+                    $("#addOrgTable tbody tr").click(function () {
+                        $(this).addClass("selected").siblings().removeClass("selected");
+                    });
+                    
+                    $(".primaryContainerBG").scroll(function () {
+                        var divTable = $(".primaryContainerBG");
+                        $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                    });
+                    
+                    
+                },
+                error: function (err) {
+                    alert(err.message);
+                }
+            });
+        }else {
+            $('[name="'+id+'"]').html('<option value="" selected>Select Employee</option>')
+            $(".selectField").select2();
+        }
+    } {% endcomment %}
+
+</script>

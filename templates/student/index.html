@@ -1,0 +1,1284 @@
+{% extends 'layout/layout.html' %}
+
+{% block title %}
+{{page_title}} 
+{% endblock %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} 
+<link rel="stylesheet" href="{% static 'css/jquery-confirm.min.css' %}">
+<style type="text/css">
+    #ajax_map {
+      width: 100%;
+      height: 100%;
+    }
+</style>
+{% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-8 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-5 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;({{totalStudent}})</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+            
+            <div class="col-md-7 p-md-0">
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-12 p-md-0 text-right" id="listToolbar" style="display: block;">
+                            <input class="searchTable" placeholder="Search" type="search" id="filter_search" data-column="all" onkeyup="filterStudent()">
+                            <button type="button" class="btn border border-primary py-0 pt-1" style="max-height: 50px; color: #007bff;" onclick="addUser()">Add Students <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize mb-1" /></button>
+                           
+                            
+                                <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                                    <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                    <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                    aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="table_student_name" id="table_student_name" data-id="1"
+                                        onclick="showHideColumns(this.id,2)"
+                                        />
+                                        <label class="mb-0" for="table_student_name">Student Name</label>
+                                    </a>
+                                    
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="table_course_name" id="table_course_name" data-id="2"
+                                        onclick="showHideColumns(this.id,2)"
+                                        />
+                                        <label class="mb-0" for="table_course_name">Course</label>
+                                    </a>
+                                    
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="table_branch_name" id="table_branch_name" data-id="3"
+                                        onclick="showHideColumns(this.id, 3)"
+                                        />
+                                        <label class="mb-0" for="table_college">Branch</label>
+                                    </a>
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="table_Semester" id="table_Semester" data-id="3"
+                                        onclick="showHideColumns(this.id, 4)"
+                                        />
+                                        <label class="mb-0" for="table_college">Semester</label>
+                                    </a>
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="table_session" id="table_session" data-id="4"
+                                        onclick="showHideColumns(this.id, 5)"
+                                        />
+                                        <label class="mb-0" for="table_course">Session</label>
+                                    </a>
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="table_phone_no" id="table_phone_no" data-id="5"
+                                        onclick="showHideColumns(this.id, 6)"
+                                        />
+                                        <label class="mb-0" for="table_phone_no">Phone No.</label>
+                                    </a>
+                                    
+                                </div>
+                            </div>
+                            
+                            <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                                <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="table_student_name" id="lock_table_student_name" data-id="1"
+                                    onclick="toggleFreeze(this.id,'table_student_name',1)" />
+                                    <label class="mb-0" for="lock_table_student_name">Student Name</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="table_course_name" id="lock_table_course_name" data-id="2"
+                                    onclick="toggleFreeze(this.id,'table_course_name',2)" />
+                                    <label class="mb-0" for="lock_table_course_name">Course</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="table_branch_name"
+                                    id="lock_table_Branch" data-id="3"  
+                                    onclick="toggleFreeze(this.id,'table_branch_name',3)" />
+                                    <label class="mb-0" for="lock_table_Branch">Branch</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="table_Semester"
+                                    id="lock_table_Semester" data-id="4"  
+                                    onclick="toggleFreeze(this.id,'table_Semester',4)" />
+                                    <label class="mb-0" for="lock_table_Semester">Semester</label>
+                                </a>
+                               
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="table_session"
+                                    id="lock_table_session" data-id="5" 
+                                    onclick="toggleFreeze(this.id,'table_session',5)" />
+                                    <label class="mb-0" for="lock_table_session">Session</label>
+                                </a>
+                                
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="table_phone_no" id="lock_table_phone_no" data-id="6"
+                                    onclick="toggleFreeze(this.id,'table_phone_no',6)" />
+                                    <label class="mb-0" for="lock_table_phone_no">Phone No.</label>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0 text-right" id="chartToolbar" style="display: none;">
+                        <input class="search searchTable search" placeholder="Search" type="search" data-column="all">
+                    </div>
+                </div>
+        </div>
+        </div>
+        <div class="row mb-2" id="topRow">
+            
+            <div class="col-sm-12 px-0 my-2">
+                <form name="studentFilterData" id="studentFilterData" method="POST" enctype="multipart/form-data" >
+                    {% csrf_token %}
+              <div class="row">
+                <div class="col-sm-3 pl-0 pr-2">
+                    <select class="inputField selectField" style="width: 100% !important;" name="filter_branch" id="filter_branch" onchange="getAllBranch(this.value); filterStudentlist(0)">
+                      <option value="">Select Course</option>
+                      {% for allbranch in allbranch%}
+                      <option value="{{allbranch.id}}">{{allbranch.course_type}}</option>
+                      {%endfor%}
+                    </select>
+                  </div>
+                <div class="col-sm-3 pl-0 pr-2">
+                    <select class="inputField selectField" style="width: 100% !important;" name="filter_course" id="filter_course" onchange="selectBranchSemYear(this.value); filterStudentlist(0)">
+                      <option value="">Select Course</option>
+                    </select>
+                  </div>
+                  
+                  <div class="col-sm-3 pl-0 pr-2">
+                    <select class="inputField selectField" style="width: 100% !important;" name="filter_semester" id="filter_semester" onchange="filterStudentlist(0)">
+                      <option value="">Select Semester</option>
+                    </select>
+                  </div>
+                <div class="col-sm-3 pl-0 pr-2">
+                  <select class="inputField selectField" style="width: 100% !important;" name="filter_session" id="filter_session" onchange="filterStudentlist(0)">
+                    <option value="">Select Session</option>
+                    
+                    {% for allCollegeSession in allCollegeSession%}
+                      <option value="{{allCollegeSession.id}}">{{allCollegeSession.session}}</option>
+                      {%endfor%}
+                  </select>
+                </div>
+  
+  
+              </div>
+            </form>
+            </div>
+       
+          </div>
+        <div class="row" id="tableBox">
+            <div class="col-md-12 primaryContainerBG h-100 p-0 commonTableBg" id="ajax-div" style="">
+                <input type="hidden" name="page" id="page" value="2" />
+                <input type="hidden" name="page_status" id="page_status" value="0" />
+                <input type="hidden" name="total_pages" id="total_pages" value="{{ total_pages }}" />
+                <table id="addEmployeeTable" class="detail-table table table-borderless table-striped table-hover mt-0"
+                style="width: 100%;">
+                 <thead>
+                    <tr>
+                        <th class="table_student_name" id="table_student_name">
+                            Name
+                            <i class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        
+                    
+                        <th class="table_course_name" id="table_course_name">Course<i
+                            class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="table_branch_name" id="table_branch_name">Branch<i
+                            class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="table_Semester" id="table_Semester">
+                            Semester
+                            <i class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="table_session" id="table_session">Session<i
+                            class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        
+                        <th class="table_phone_no" id="table_phone_no">Phone No.<i class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody id="tablebody">
+                    {% if students %}
+                    {% for student in students %}
+                    <tr  {% if forloop.first %} class="odd selected" {% endif %}>
+                        <td class="table_student_name" onclick="getStudentDetail('{{ student.id }}')">
+                            <div class="row">
+                                <span class="col-sm-10 col-10 pl-0 pr-2"> {{ student.first_name | title }} {% if student.middle_name is not None%}{{ student.middle_name | title }} {% endif %}{{ student.last_name | title }}</span> 
+                              
+                            </div>
+                        </td>
+                        <td class="table_course_name" onclick="getStudentDetail('{{ student.id }}')">
+                            {{ student.course | title }}
+                        </td>
+                        <td class="table_branch_name" onclick="getStudentDetail('{{ student.id }}')">
+                            {{ student.branch | title }}
+                        </td>
+                        <td class="table_Semester" onclick="getStudentDetail('{{ student.id }}')">
+                            {{ student.semester |safe }}
+                        </td>
+                       
+                        <td class="table_session" onclick="getStudentDetail('{{ student.id }}')">
+                            <span class="mr-2">{{student.admissionsession}}</span>
+                           
+                        </td>
+                        <td class="table_phone_no" onclick="getStudentDetail('{{ student.id }}')">
+                            <div class="row">
+                                <span class="col-sm-10 col-10 pl-0 pr-2">
+                                    {% if student.primary_contact_no %}
+                                    {{ student.primary_contact_no }}
+                                    {%else%}
+                                    --
+                                    {%endif%}
+                                </span>
+                               
+                            </div>
+                        </td>
+                        <td>
+                            <div class="row">
+                                    {% if student.latitude %}
+                                    <a href="javascript:void(0)" onclick="showMapView('{{ student.id  }}')" data-toggle="modal" data-target="#addCoordinates" title="View Coordinates">
+                                        <img src="{% static 'img/svg/viewonMap.svg' %}" class="tableRowIcon" />
+                                    </a>
+                                    {% else %}
+                                    <a href="javascript:void(0)" onclick="showMapView('{{ student.id  }}')" data-toggle="modal" data-target="#addCoordinates" title="Add Coordinates">
+                                        <img src="{% static 'img/svg/viewonmapgray.svg' %}" class="tableRowIcon" />
+                                    </a>
+                                    {% endif %}
+
+                                    {% if student.primary_contact_no %}
+                                        <a href="javascript:void(0)"
+                                        onclick="generateDigitalIdCard('{{ student.id }}')" data-toggle="modal"
+                                        data-target="#addOrganisationModal" title="Generate Digital Id Card">
+                                        {% if student.id_card_pin is None %}
+                                        <img src="{% static 'img/svg/IDCardPIN.svg' %}" width="25" />
+                                        {% else %}
+                                        <img src="{% static 'img/svg/regenIDCard.svg' %}" width="25" />
+                                        {% endif %}
+                                    {% endif %}
+                                </a> 
+                                <label class="switch" style="margin-top: 5px;">
+                                    <input type="checkbox" class="checkbox" name="is_active"
+                                    id="is_active_{{ student.id }}"
+                                    {% if student.status == 1 %} checked="" {% else %}
+                                    {% endif %}
+                                    onclick="updateStudentStatus('{{ student.id }}', '{{ student.status }}')">
+                                    <span class="slider round"></span>
+                                </label>
+                                <a href="javascript:void(0)" onclick="perviousPage('{{ student.id }}', '1')"><img src="{% static 'img/svg/editcopy.svg' %}" class="tableRowIcon" /></a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr id="loading" style="display: none;">
+                    <td class="text-center" colspan="7"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="7" style="text-align: center;">No Record Found...</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</div>
+</div>
+<div class="col-md-4 h-100">
+    <div class="primaryContainerBG h-100" id="detailsBox">
+        {% if student_details %}
+        
+        <div class="row" style="height: 85%;">
+            <div class="col-md-12 p-0">
+                
+                <div class="row">
+                    <div class="col-md-2 p-md-0">
+                      
+                        {% if student_details.profile_image is not None %}
+                        <img src="{{ student_details.profile_image }}" style="height: 120px;
+                        max-height: 130px;
+                        width: 214px;
+                        transform: scale(1) !important;
+                        border-radius: 5%;">
+                        {% else %}
+                        <img src="{% static 'img/png/default_icon.png' %}" style="width: 100%;">
+                        {% endif %}
+                    </div>
+                    <div class="col-md-10 p-md-0">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h6><b>{{student_details.first_name}} {% if student_details.middle_name is not None %}{{student_details.middle_name}} {% endif %}{{student_details.last_name}} </b></h6>
+                                <h6 class="smallText"><span style="color: #0052a0;">SBAT Id - {% if student_details.sbat_id %}
+                                    {{student_details.sbat_id}}
+                                    {%else%}
+                                    --
+                                    {%endif%}</span>
+                                
+                                </h6>
+                            </div>
+                            <div class="col-md-4 p-md-0 text-right">
+                                <h5>{% if user.last_login is not None %}{% if user.auth_token is None %}WEB{% else %}APP{% endif %}{% endif %}&nbsp;&nbsp;<img src="{% static 'img/svg/web.svg' %}"></h5>
+                                {% if first_employee.last_ip %}{{first_employee.last_ip}}{% endif %}
+                            </div>
+                        </div>
+                        <br clear="all">
+                        <div class="row">
+                            <div class="col-md-1 p-md-0">
+                                <img src="{% static 'img/svg/contactNo.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-4 p-md-0">
+                                <h6 class="smallText">Contact No.</h6>
+                                <h6 class="largeText">
+                                    {% if student_details.primary_contact_no %}
+                                    {{student_details.primary_contact_no}}</h6>
+                                    {%else%}
+                                    --
+                                    {%endif%}
+                            </div>
+                            <div class="col-md-3 p-md-0">
+                                <h6 class="smallText">Percentage</h6>
+                                <h6 class="largeText"> 
+                                    {% if student_details.sbat_percentage %}
+                                    {{student_details.sbat_percentage}}
+                                    {%else%}
+                                    --
+                                    {%endif%}
+                                </h6>
+                            </div>
+                            <div class="col-md-4 p-md-0">
+                                <h6 class="smallText">Registration Id</h6>
+                                <h6 class="largeText"> 
+                                    {% if student_details.reg_no %}
+                                    {{student_details.reg_no}}
+                                    {%else%}
+                                    --
+                                    {%endif%}
+                                </h6>
+
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0 mt-md-3">
+                        <div class="row mb-md-2">
+                            <div class="col-md-3 p-md-0">
+                                <div class="row">
+                                    <div class="col-md-2 p-md-0">
+                                        <img src="{% static 'img/svg/gender.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-10 p-md-10">
+                                        <h6 class="smallText">Gender</h6>
+                                        <h6 class="largeText">{{student_details.gender}}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-5 p-md-0">
+                                <div class="row">
+                                    <div class="col-2 p-0">
+                                        <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-10 p-md-0">
+                                        <h6 class="smallText">Email ID(Official)</h6>
+                                        <h6 class="largeText">{{ student_details.email }}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 p-md-0">
+                                <div class="row">
+                                    <div class="col-2 p-0">
+                                        <img src="{% static 'img/svg/bloodgroup.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-10 p-md-0">
+                                        <h6 class="smallText">Blood Group</h6>
+                                        <h6 class="largeText">{% if student_details.blood_group %}{{student_details.blood_group}}{% else %}-{% endif %}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                            
+
+                            <div class="col-md-3 p-md-0">
+                                <div class="row">
+                                    <div class="col-2 p-0">
+                                        <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-10 p-md-0">
+                                        <h6 class="smallText">Cast Category</h6>
+                                        <h6 class="largeText">{% if student_details.caste_category %}{{student_details.caste_category}}{% else %}-{% endif %}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-5 p-md-0">
+                                <div class="row">
+                                    <div class="col-2 p-0">
+                                        <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-10 p-md-0">
+                                        <h6 class="smallText">Income Category</h6>
+                                        <h6 class="largeText">{% if student_details.income_category %}{{student_details.income_category}}{% else %}-{% endif %}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4 p-md-0">
+                                <div class="row">
+                                    <div class="col-2 p-0">
+                                        <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-10 p-md-0">
+                                        <h6 class="smallText">Session</h6>
+                                        <h6 class="largeText">{% if student_details.session %}{{student_details.session}}{% else %}-{% endif %}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mb-md-2">
+                            <div class="col-md-12 p-md-0">
+                                <div class="row">
+                                    <div class="col-1 p-0 mt-1 mb-2">
+                                        <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-11 p-md-0">
+                                        <h6 class="smallText">Correspondance Address</h6>
+                                        <h6 class="largeText">{% if student_details.address_hno %} {{student_details.address_hno}}{%endif%}
+                                            {% if student_details.address_locality %} {{student_details.address_locality}}{%endif%}
+                                            {% if student_details.tehsil_name %}, {{student_details.tehsil_name}},{% endif %} 
+                                            {% if student_details.state_name %}{{student_details.state_name}}{%endif%}
+                                            {% if student_details.country_name %}{{student_details.country_name}}{%endif%}
+                                            {% if student_details.cros_pincode %}{{student_details.cros_pincode}}{%endif%}
+                                        </h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-md-2">
+                            <div class="col-md-12 p-md-0">
+                                <div class="row">
+                                    <div class="col-1 p-0 mt-1 mb-2">
+                                        <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-11 p-md-0">
+                                        <h6 class="smallText">Permanent Address</h6>
+                                        <h6 class="largeText">{% if student_details.per_address_hno %} {{student_details.per_address_hno}}{%endif%}
+                                            {% if student_details.per_address_locality %} {{student_details.per_address_locality}}{%endif%}
+                                            {% if student_details.per_tehsil_name %}, {{student_details.per_tehsil_name}},{% endif %} 
+                                            {% if student_details.per_state_name %}{{student_details.per_state_name}},{% endif %} 
+                                            {% if student_details.per_country_name %}{{student_details.per_country_name}},{% endif %} 
+                                            {% if student_details.per_pincode %}{{student_details.per_pincode}}{%endif%}
+                                        </h6>
+                                        </h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="dropdown-divider"></div>
+                        <div class="row mb-md-2">
+                            <div class="col-md-6 p-md-0">
+                                <div class="row">
+                                    <div class="col-2 p-0">
+                                        <img src="{% static 'img/svg/org.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-10 p-md-0">
+                                        <h6 class="smallText">College</h6>
+                                        <h6 class="largeText">{{student_details.college_name|safe }}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 p-md-0">
+                                <div class="row">
+                                    <div class="col-2 p-0">
+                                        <img src="{% static 'img/svg/depart_no.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-10 p-md-0">
+                                        <h6 class="smallText">Course</h6>
+                                        <h6 class="largeText">{{student_details.course_type_name }}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-md-2">
+                            <div class="col-md-6 p-md-0">
+                                <div class="row">
+                                    <div class="col-2 p-0">
+                                        <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-10 p-md-0">
+                                        <h6 class="smallText">Branch</h6>
+                                        <h6 class="largeText">{{student_details.branch_name }}</h6>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 p-md-0">
+                                <div class="row">
+                                    <div class="col-2 p-0">
+                                        <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-10 p-md-0">
+                                        <h6 class="smallText">Semester</h6>
+                                        <h6 class="largeText"> {% if semester %}{{semester}} {%elif year %} {{year}} {%else%} -- {%endif%}</h6>
+                                    </div>
+                                </div>
+                            </div>
+        
+                            <div class="col-md-6 p-md-0">
+                                <div class="row">
+                                    <div class="col-2 p-0">
+                                        <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-10 p-md-0">
+                                        <h6 class="smallText">Section</h6>
+                                        <h6 class="largeText">
+                                            {%if student_details.section_name%}
+                                            {{student_details.section_name}}
+                                            {%else%}
+                                             --
+                                            {%endif%}
+                                          
+                                        </h6>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 p-md-0">
+                                <div class="row">
+                                    <div class="col-2 p-0">
+                                        <img src="{% static 'img/svg/dob.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-10 p-md-0">
+                                        <h6 class="smallText">Date Of Birth</h6>
+                                        <h6 class="largeText">
+                                            {%if student_details.dob%}
+                                            {{student_details.dob}}
+                                            {%else%}
+                                             --
+                                            {%endif%}
+                                           
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 p-md-0">
+                                <div class="row">
+                                    <div class="col-2 p-0">
+                                        <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-10 p-md-0">
+                                        <h6 class="smallText">Admission Form No.</h6>
+                                        <h6 class="largeText">
+                                            {%if student_details.form_no%}
+                                            {{student_details.form_no}}
+                                            {%else%}
+                                             --
+                                            {%endif%}
+                                           
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        No Record Found
+        {% endif %}
+        
+    </div>
+</div>
+
+</div>
+</div>
+
+<!-- *************************************Modal********************************** -->
+<div class="overlayModal" id="addUserModal" data-keyboard="false" data-backdrop="static">  
+</div>
+
+<div class="overlayModal" id="addOrganisationModal" data-keyboard="false" data-backdrop="static">    
+</div>
+
+<div class="overlayModal" id="addDeptModal" data-keyboard="false" data-backdrop="static">    
+</div>
+
+
+
+<div class="overlayModal" id="addCoordinates"  data-backdrop="static"> 
+
+</div>
+<div class="overlayModal" id="addNewFolder"  style="display: none;"> 
+
+</div>
+<div class="overlayModal" id="createNewFile"  style="display: none;"> 
+
+</div>
+
+<!-- *************************************Modal********************************** -->
+{% endblock content %}
+{% block script %}
+<script src="{% static 'js/jquery-confirm.min.js' %}"></script>
+<script src="{% static 'js/Nitgen.js' %}"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var prevTop = 0;
+        
+        $('.commonTableBg').on('scroll', function () {
+            var page = $('#page').val();
+            var totalPages = $('#total_pages').val();
+            
+            var currentTop = $(this).scrollTop();
+            if (prevTop !== currentTop) {
+                prevTop = currentTop;
+                if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+                    if(parseInt($('#page_status').val()) == 0 && parseInt(page)  <= parseInt(totalPages)){
+                        $('#loading').show(); 
+                        $('#page_status').val('1');
+                        $.ajax({
+                            url: "{% url 'src:ajax-student-lists' %}",
+                            method: 'GET',
+                            data: { page:page },
+                            success: function (data) {
+                                setTimeout(() => {
+                                    $('#tablebody').find('tr:last').prev().after(data);
+                                    $('#page').val(parseInt(page)+1);
+                                    $('#loading').hide();
+                                    $('#page_status').val('0');
+                                    $('#addOrgTable').trigger('update');
+                                }, 2000);
+                            },
+                            error: function (err) {
+                                alert(err.message);
+                                window.location.reload();
+                            }
+                        });
+                    }
+                }
+            }
+        })
+        
+    });
+</script>
+
+<script>
+    function manipulateFolder(){
+        $('#addNewFolder').hide();
+    }
+    function manipulateFile(){
+        $('#createNewFile').hide();
+    }
+    function filterStudent(){
+        var loading_html =`<tr id="loading" style="display: none;">
+            <td class="text-center" colspan="8"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+            </td>
+        </tr>`;
+        $('#tablebody').html(loading_html);
+        $('#loading').show();
+        
+        var search = $('#filter_search').val();
+        $.ajax({
+            url: "{% url 'src:filter-student' %}",
+            method: 'POST',
+            data: {
+                search:search, 
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function (data) {
+                hideLoader();
+                $('#ajax-div').html(data);
+                
+                $('#addOrgTable').tablesorter({
+                    widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                    widgetOptions: {
+                        resizable_addLastColumn: true,
+                        resizable: false,
+                        resizable_widths: ["15%", "18%", "13%", "15%", "15%", "15%", "12%", "15%"],
+                        stickyHeaders_attachTo: ".primaryContainerBG",
+                        filter_external: '.search',
+                        filter_columnFilters: false,
+                    }
+                });
+                $("#addOrgTable tbody tr").click(function () {
+                    $(this).addClass("selected").siblings().removeClass("selected");
+                });
+                
+                $(".primaryContainerBG").scroll(function () {
+                    var divTable = $(".primaryContainerBG");
+                    $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                });
+                
+            },
+            error: function (err) {
+                alert(err.message);
+            }
+        });
+    }
+
+    function exports(type){
+        var columns = $('#show_columns').val();
+        if(columns == ''){
+            openToaster("danger", "Please select at-least one column");
+        } else {
+            if(type == 'excel'){
+                var url = "{% url 'src:export-organizations-to-xlsx' 'columns' %}";
+                url = url.replace('columns',columns);
+                window.location.href = url;
+            } else {
+                var url = "{% url 'src:export-organizations-to-pdf' 'columns' %}";
+                url = url.replace('columns',columns);
+                window.location.href = url;
+            }
+        }
+        
+    }
+
+    function freezeColumn(id, colNo) {
+        $('#' + id).addClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function (index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter", "false");
+        });
+        $('#' + id + ' #freeze').show();
+        $('#' + id + ' #unfreeze').hide();
+    }
+    
+    function unfreezeColumn(id, colNo) {
+        $('#' + id).removeClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function (index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter");
+        });
+        $('#' + id + ' #unfreeze').show();
+        $('#' + id + ' #freeze').hide();
+    }
+    
+    function toggleFreeze(inputid, colid, colNo) {
+        var checkbox = document.getElementById(inputid);
+        
+        if (checkbox.checked == true) {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+            });
+            $('#' + colid + ' #freeze').show();
+            $('#' + colid + ' #unfreeze').hide();
+        } else {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").removeClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("sorter-false");
+            });
+            $('#' + colid + ' #unfreeze').show();
+            $('#' + colid + ' #freeze').hide();
+        }
+    }
+    
+    function showHideColumns(inputid, colNo) {
+        var checkbox_val = [];
+        var checkbox = document.getElementById(inputid);
+        if (checkbox.checked == true) {
+            $('.'+inputid).hide();
+        }else{
+            $('.'+inputid).show();
+        }
+        $("input:checkbox[class=colCheck]").each(function () {
+            if(!$(this).is(':checked')){
+                checkbox_val.push($(this).attr("id"))
+            }
+        });
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+    }
+    
+    $(document).ready(function () {
+        setHeightWidth();
+        
+        $('#addOrgTable').tablesorter({
+            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+            widgetOptions: {
+                resizable_addLastColumn: true,
+                resizable: false,
+                resizable_widths: ["20%", "20%", "20%", "15%", "15%","20%"],
+                stickyHeaders_attachTo: ".primaryContainerBG",
+                filter_external: '.search',
+                filter_columnFilters: false,
+            }
+        });
+        $("#addOrgTable tbody tr").click(function () {
+            $(this).addClass("selected").siblings().removeClass("selected");
+        });
+        
+        $(".primaryContainerBG").scroll(function () {
+            var divTable = $(".primaryContainerBG");
+            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+        });
+    });
+    
+    $(document).ready(function () {
+        var checkbox_val = ["table_student_name","table_college","table_course","table_phone_no"];
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+        
+        $(".colCheck").change(function () {
+            if ($(".colCheck:not(:checked)").length == $(".colCheck").length) {
+                //do something
+                $(".iconHide").css("background-image", "url(/static/img/png/hide.png)");
+            } else {
+                $(".iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+            }
+        });
+        
+        $(".colFreezeCheck").change(function () {
+            if ($(".colFreezeCheck:not(:checked)").length == $(".colFreezeCheck").length) {
+                //do something
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/unfreeze.svg)");
+            } else {
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/freeze.svg)");
+            }
+        });
+    });
+    
+    $(window).resize(function () {
+        setHeightWidth();
+    });
+    
+    $(document).on('click', '.pagination a', function (event) {
+        event.preventDefault();
+        var page = $(this).attr('href').split('page=')[1];
+        
+        $('li').removeClass('active');
+        $(this).parent().addClass('active');
+        ajaxOrganizationList(page);
+    });
+</script>
+
+<script>
+    function addOrganization() {
+        $('#addOrganisationModal').html('');
+        $('#addDeptModal').html('');
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:add-organization' %}",
+            method: 'GET',
+            data: {},
+            success: function (data) {
+                hideLoader();
+                $("#addOrganisationModal").show();
+                $('#addOrganisationModal').html(data);
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    function generateDigitalIdCard(id) {
+        $('#addOrganisationModal').html('');
+        showLoader();
+        url = "{% url 'src:generate-digital-id-card' '1' %}";
+        url = url.replace('1',id)
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+                hideLoader();
+                $("#addOrganisationModal").show();
+                $('#addOrganisationModal').html(data);
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    
+    function getStudentDetail(id) {
+        $('#detailsBox').html('<div style="margin-top:40px; text-align:center"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+            //showLoader();
+            url = "{% url 'src:student-short-details' '1' %}";
+            url = url.replace('1',id)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    //hideLoader();
+                    $('#detailsBox').html(data);
+                    $('#addOrgTable').tablesorter({
+                        widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                        widgetOptions: {
+                            resizable_addLastColumn: true,
+                            resizable: false,
+                            resizable_widths: ["20%", "20%", "20%", "15%", "15%","20%"],
+                            stickyHeaders_attachTo: ".primaryContainerBG",
+                            filter_external: '.search',
+                            filter_columnFilters: false,
+                        }
+                    });
+                    $("#addOrgTable tbody tr").click(function () {
+                        $(this).addClass("selected").siblings().removeClass("selected");
+                    });
+                    $(".deptRow").click(function () {
+                        $(this).addClass("deptSelected").siblings().removeClass("deptSelected");
+                    });
+                    
+                    
+                    $(".primaryContainerBG").scroll(function () {
+                        var divTable = $(".primaryContainerBG");
+                        $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                    });
+                    
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+        
+        function updateStudentStatus(id, active_status) {
+            if ($('#is_active_' + id).prop("checked") == true) {
+                is_active = 1;
+                status = 'Unblock';
+            } else {
+                is_active = 0;  
+                status = 'Block';
+            }
+            
+            //showLoader();
+            $.ajax({
+                url: "{% url 'src:update-student-status' %}",
+                method: 'POST',
+                data: {
+                    id: id,
+                    is_active: is_active,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data.error == false) {
+                        hideLoader();
+                        openToaster("success", data.message);
+                        
+                    }
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+        
+        
+        function ajaxOrganizationList(page) {
+            $('#ajax-div').html('');
+            // showLoader();
+            $.ajax({
+                url: "{% url 'src:ajax-organization-list' %}",
+                method: 'GET',
+                data: { page:page },
+                success: function (data) {
+                    hideLoader();
+                    $('#ajax-div').html(data);
+                    
+                    $('#addOrgTable').tablesorter({
+                        widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                        widgetOptions: {
+                            resizable_addLastColumn: true,
+                            resizable: false,
+                            resizable_widths: ["21.5%", "21.5%", "21.5%", "21.5%", "12%"],
+                            stickyHeaders_attachTo: ".primaryContainerBG",
+                            filter_external: '.search',
+                            filter_columnFilters: false,
+                        }
+                    });
+                    $("#addOrgTable tbody tr").click(function () {
+                        $(this).addClass("selected").siblings().removeClass("selected");
+                    });
+                    $(".deptRow").click(function () {
+                        $(this).addClass("deptSelected").siblings().removeClass("deptSelected");
+                    });
+                    
+                    
+                    $(".primaryContainerBG").scroll(function () {
+                        var divTable = $(".primaryContainerBG");
+                        $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                    });
+                    
+                },
+                error: function (err) {
+                    alert(err.message);
+                    window.location.reload();
+                }
+            });
+        }
+        
+</script>
+
+<script>
+function addUser(user_type) {
+    $('#addUserModal').html('');
+    showLoader();
+    $.ajax({
+        url: "{% url 'src:add-student-basic-details' %}",
+        method: 'GET',
+        data: {user_type:user_type},
+        success: function (data) {
+            hideLoader();
+            $("#addUserModal").show();
+            $('#addUserModal').html(data);
+            
+            var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+            $("#addUserModalBody").height(mch);
+            $(".selectField").select2();
+            
+            $("#date_of_birth").datepicker({  
+                changeMonth: true,
+                changeYear: true,  
+                yearRange: "-100:+0"
+                ,maxDate: 0,
+                dateFormat: 'dd/mm/yy' 
+            });
+            
+        },
+        error: function (err) {
+            console.log(err)
+        }
+    });
+}
+$(document).ready(function(){
+    $("#addCoordinates").hide()
+})
+
+function showMapView(student_id) {
+    console.log("Student ID: ", student_id)
+    $.ajax({
+        url: "{%url 'src:show-maps-view' %}",
+        method: 'GET',
+        data: {student_id: student_id},
+        success: function(data) {
+            $("#addCoordinates").show()
+            $("#addCoordinates").html(data)
+        }
+    })
+};
+
+function perviousPage(last_user_id, page) {
+                
+    $('#addUserModal').html('');
+    showLoader();
+    if(page == 1){
+        var url = "{% url 'src:edit-student-basic-details' %}";
+    } else if(page == 2){
+        var url = "{% url 'src:edit-student-biometric-details' %}";
+    } else {
+        var url = "{% url 'src:edit-user-product-detail' %}";
+    }
+    $.ajax({
+        url: url,
+        method: 'GET',
+        data: {last_user_id, last_user_id},
+        success: function (data) {
+            hideLoader();
+            $("#addUserModal").show();
+            $('#addUserModal').html(data);
+            
+            var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+            $("#addUserModalBody").height(mch);
+            $(".selectField").select2();
+            
+            $("#date_of_birth").datepicker({  
+                changeMonth: true,
+                changeYear: true,  
+                yearRange: "-100:+0"
+                ,maxDate: 0,
+                dateFormat: 'dd/mm/yy' 
+            });
+            
+        },
+        error: function (err) {
+            console.log(err)
+        }
+    });
+};
+
+function makeNewFile(document_id, id, type, student_id, college_id, master_name, room_id, room_name, almira_id, almira_name, rack_id, rack_name, student_id) {
+        $('#createNewFile').html('');
+        $('#docname').html('');
+       
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:add-new-file' %}",
+            method: 'GET',
+            data: {document_id:document_id,id:id,type:type,student_id:student_id, college_id:college_id,master_name:master_name,room_id:room_id,room_name:room_name,almira_id:almira_id,almira_name:almira_name, rack_id:rack_id, rack_name:rack_name},
+            success: function (data) {
+                hideLoader();
+                $("#createNewFile").show();
+                $('#createNewFile').html(data);
+                
+                var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+                $("#addUserModalBody").height(mch);
+                $(".selectField").select2();
+                
+                $("#date_of_birth").datepicker({  
+                    changeMonth: true,
+                    changeYear: true,  
+                    yearRange: "-100:+0"
+                    ,maxDate: 0,
+                    dateFormat: 'dd/mm/yy' 
+                });
+                
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    } 
+    function addFolder(student_id, room_id, almira_id, rack_id) {
+        $('#addNewFolder').html('');
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:add-new-folder' %}",
+            method: 'GET',
+            data: {student_id:student_id, room_id:room_id, almira_id:almira_id, rack_id:rack_id},
+            success: function (data) {
+                hideLoader();
+                $("#addNewFolder").show();
+                $('#addNewFolder').html(data);
+                
+                var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+                $("#addUserModalBody").height(mch);
+                $(".selectField").select2();
+                
+                $("#date_of_birth").datepicker({  
+                    changeMonth: true,
+                    changeYear: true,  
+                    yearRange: "-100:+0"
+                    ,maxDate: 0,
+                    dateFormat: 'dd/mm/yy' 
+                });
+                
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+ 
+     function filterStudentlist(){
+        
+        var filter_branch = $('#filter_branch').val();
+        if(filter_branch != ""){
+            var loading_html =`<tr id="loading" style="display: none;">
+                <td class="text-center" colspan="8"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                </td>
+            </tr>`;
+            $('#addOrgTable').html(loading_html);
+            $('#loading').show();
+            var filter_branch = $('#filter_branch').val();
+            var filter_course = $('#filter_course').val();
+            var filter_semester = $('#filter_semester').val();
+            var filter_session = $('#filter_session').val();
+            $.ajax({
+                url: "{% url 'src:student/filter-student-list' %}",
+                method: 'GET',
+                data: {
+                    filter_course:filter_course,
+                    filter_branch:filter_branch,
+                    filter_semester:filter_semester,
+                    filter_session:filter_session
+                    
+                },
+                success: function (data) {
+                    hideLoader();
+                    $('#ajax-div').html(data);
+                    console.log(data);
+                    $('#addEmployeeTable').tablesorter({
+                        widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                        widgetOptions: {
+                            resizable_addLastColumn: true,
+                            resizable: false,
+                            resizable_widths: ["15.5%", "23.5%", "16.5%", "10.5%", "15%"],
+                            stickyHeaders_attachTo: ".employeeprimaryContainerBG",
+                            filter_external: '.search',
+                            filter_columnFilters: false,
+                        }
+                    });
+                    $("#addEmployeeTable tbody tr").click(function () {
+                        $(this).addClass("selected").siblings().removeClass("selected");
+                    });
+                    
+                    $(".deptRow").click(function () {
+                        $(this).addClass("deptSelected").siblings().removeClass("deptSelected");
+                    });
+                    $(".employeeprimaryContainerBG").scroll(function () {
+                        var divTable = $(".employeeprimaryContainerBG");
+                        $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                    });
+                    
+                },
+                error: function (err) {
+                    alert(err.message);
+                }
+            });
+        }
+    }
+   function getAllBranch(val){
+        $('[name="filter_course"]').html('<select>Select course</select>');
+        if(val != ""){
+            $.ajax({
+                url: "{% url 'src:get-all-branch-list' %}",
+                method: 'POST',
+                data:{val:val, csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+                success: function (data) {
+                    $('[name="filter_course"]').html(data.options)
+                    $(".selectField").select2();
+                    console.log(data.options)
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        } else {
+            $('[name="filter_course"]').html('<select>Select Branch</select>');
+            $('[name="filter_semester"]').html('<select>Select Year/Sem</select>');
+            
+            
+        }
+    };
+    function selectBranchSemYear(val){
+        $('[name="filter_semester"]').html('<select>Select Year/Sem</select>');
+        
+        if(val != ""){
+            $.ajax({
+                url: "{% url 'src:get-branch-sem-year-list' %}",
+                method: 'POST',
+                data:{val:val, csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+                success: function (data) {
+                    $('[name="filter_semester"]').html(data.options)
+                    $(".selectField").select2();
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        } else {
+            $('[name="filter_semester"]').html('<select>Select Year/Sem</select>');
+            $('[name="filter_session"]').html('<select>Select session</select>');
+        }
+    };
+</script>
+
+{% endblock %}

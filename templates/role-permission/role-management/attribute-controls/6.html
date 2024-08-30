@@ -1,0 +1,141 @@
+
+			<table class="table table-striped detail-table" id="table_6">
+				<thead>
+					<tr>
+						<th>Fields</th>
+						<th>Optional/Mandatory <br>
+							<div class="switch_box">
+								<input type="checkbox"  class="switch_1 check_optional_field" value="6">
+							</div>
+						</th>
+						<th>Hide/Show</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><label for="vehicle_type">Vehicle type</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="6[]" class="switch_1 optional_field"   value="vehicle_type" {% if 'vehicle_type' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox"  name="hidden_attr_6[]" class="switch_1"   value="vehicle_type" {% if 'vehicle_type' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+
+					<tr>
+						<td><label for="fuel_type">Fuel type</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="6[]" class="switch_1 optional_field"   value="fuel_type" {% if 'fuel_type' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox"  name="hidden_attr_6[]" class="switch_1"   value="fuel_type" {% if 'fuel_type' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+
+					<tr>
+						<td><label for="vehicle_no">Vehicle No</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="6[]" class="switch_1 optional_field"   value="vehicle_no" {% if 'vehicle_no' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox"  name="hidden_attr_6[]" class="switch_1"   value="vehicle_no"  {% if 'vehicle_no' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+					<tr>
+						<td><label for="chessis_no">Chassis No</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="6[]" class="switch_1 optional_field"   value="chessis_no" {% if 'chessis_no' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox"  name="hidden_attr_6[]" class="switch_1"   value="chessis_no" {% if 'chessis_no' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+
+					<tr>
+						<td><label for="engine_no">Engine No</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="6[]" class="switch_1 optional_field"   value="engine_no" {% if 'engine_no' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox"  name="hidden_attr_6[]" class="switch_1"   value="engine_no" {% if 'engine_no' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+
+					<tr>
+						<td><label for="dl_no">DL No</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="6[]" class="switch_1 optional_field"   value="dl_no" {% if 'dl_no' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox"  name="hidden_attr_6[]" class="switch_1"   value="dl_no" {% if 'dl_no' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+
+
+					<tr>
+						<td><label for="dl_expiry">Expiry date</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="6[]" class="switch_1 optional_field"   value="dl_expiry" {% if 'dl_expiry' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox"  name="hidden_attr_6[]" class="switch_1"   value="dl_expiry" {% if 'dl_expiry' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+
+					<tr>
+						<td><label for="seating_capacity_no">Seating Capacity</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="6[]" class="switch_1 optional_field"   value="seating_capacity_no" {% if 'seating_capacity_no' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox"  name="hidden_attr_6[]" class="switch_1"   value="seating_capacity_no" {% if 'seating_capacity_no' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+
+				</tbody>
+			</table>
+
+			<input type="hidden" name="optional_{{attribute.id}}" id="optional_{{attribute.id}}" value="{% if attribute.fields %}{{attribute.fields|join:", " }}{% endif %}"> 
+			<input type="hidden" name="hidden_{{attribute.id}}" id="hidden_{{attribute.id}}" value="{% if attribute.hidden_fields %}{{attribute.hidden_fields|join:", " }}{% endif %}"> 
+
+

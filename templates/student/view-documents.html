@@ -1,0 +1,207 @@
+{% extends 'layout/layout.html' %}
+
+{% block title %}
+{{page_title}} 
+{% endblock %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} 
+<link rel="stylesheet" href="{% static 'css/jquery-confirm.min.css' %}">
+<style type="text/css">
+    #ajax_map {
+      width: 100%;
+      height: 100%;
+    }
+</style>
+{% endblock %}
+
+<div class="row" id="containerHeight">
+    
+        <div class="row" id="tableBox">
+            <div class="col-md-12 primaryContainerBG h-100 p-0 commonTableBg" id="ajax-div" style="">
+                <div class="mt-3 p-2 bgdoccontainer" id="document_div_id">
+                    <div class="groupsec">
+                        <button class="backicon" type="button">
+                            <img src="{% static 'img/svg/backarrow.svg' %}" style="width: 1rem" />
+                        </button>
+                        <div class="adsadd">
+                            <div class="addressec">
+                             
+                              <div id="address_div"> &nbsp;</div>
+                            </div>                                                                    
+                        </div>
+                    </div>
+                 
+           
+                        <div class="row">
+                              <div class="col-md-12 pt-2 pb-0">
+                                <div id="master_div">
+                                  <div id="college" draggable="false">
+                                      
+                                    <div class="row"><div class="col-md-12 pt-2 pb-0"><h6>College</h6></div></div>
+                                    
+                                    <ul class="documentsec">
+                                      {% for oganization in all_institution %}
+                                        <li>
+                                        <div class="collegesec" id="college{{oganization.id}}" onclick="getMasterData('{{ oganization.id }}', '{{oganization.organization_name}}', 'room_list', '{{oganization.id}}',)"><img src="/static/img/svg/college.svg"><div class="titletext">{{oganization.organization_name}}</div> </div>
+                                        
+                                        </li> 
+                                        {% endfor %}
+                                       
+                                    </ul>
+                                    </div>
+                                  </div>         
+                            </div>
+                            <div class="docsec">
+                              <div class="" id="detailsdoc">
+
+                              </div>
+                            </div>
+                        </div>
+                        
+                            
+                   
+                        
+                    </div>
+                        
+                       
+                    </div>
+                    </div>
+                    
+                   
+                    
+                </div>
+                
+    </div>
+                
+    </div>
+</div>
+</div>
+</div>
+
+
+</div>
+</div>
+
+<script>
+  $('#almiras').hide();
+  $('#racks').hide();
+  $('#newfolder').hide();
+  $('#getfiles').hide();
+  $('#getfiles').hide();
+  $('.docsec').hide();
+function getMasterData(id, master_name, type, college_id){
+  $.ajax({
+    url : "{% url 'src:get-all-documents' %}",
+    method: 'POST',
+          data: {id:id,college_id:college_id,type:type,master_name:master_name, csrfmiddlewaretoken: '{{ csrf_token }}'},
+          success: function (data) {
+            $('#master_div').html(data);
+                 // $('#master_div').html(data);
+            
+              
+          },
+          error: function (err) {
+              console.log(err)
+          }
+  });
+}  
+  function removesec(){
+      $('.docsec').fadeOut(200);
+  }
+/*function getMasterData(id, master_name, type, college_id, div_type=0){
+    $.ajax({
+          url: "{% url 'src:get-all-documents' %}",
+          method: 'POST',
+          data: {id:id, type:type, college_id:college_id, master_name:master_name, csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+          success: function (data) {
+              if(div_type == 1){
+                  $('#getfiles').html(data);
+              } else {
+                  $('#master_div').html(data);
+              }
+              
+          },
+          error: function (err) {
+              console.log(err)
+          }
+      });
+}*/
+function removeAlmira(){
+ $("#folderpath").find("a:last").remove();
+  $('#rooms').show(); 
+ $('#almiras').hide(); 
+ $('#racks').hide(); 
+ $('#almiras').hide();  
+ $('#newfolder').hide();
+ $('#getfiles').hide();
+}
+function getRacks(e){
+  var id = e;
+  //alert(id);
+  var curentpath = id;
+ $('#folderpath').append('<a onclick=removeRacks() href="#">'+curentpath+'/</a>');
+ $('#rooms').hide(); 
+ $('#almiras').hide(); 
+ $('#racks').show(); 
+}
+function removeRacks(){
+  $("#folderpath").find("a:last").remove();
+  $('#rooms').hide(); 
+ $('#almiras').hide(); 
+ $('#racks').hide(); 
+ $('#almiras').show();  
+ $('#newfolder').hide();
+ $('#getfiles').hide();
+}
+function getfolder(e){
+  var id = e;
+  //alert(id);
+  var curentpath = id;
+$('#folderpath').append('<a onclick=removeFolder() href="#">'+curentpath+'/</a>');
+ $('#rooms').hide();  
+ $('#almiras').hide(); 
+ $('#racks').hide(); 
+ $('#newfolder').show();
+}
+function removeFolder(){
+  $("#folderpath").find("a:last").remove();
+  $('#rooms').hide(); 
+ $('#almiras').hide(); 
+ $('#racks').show();   
+ $('#newfolder').hide();
+ $('#getfiles').hide();
+}
+
+function viewfolder(e){
+  var id = e;
+  //alert(id);
+  var curentpath = id;
+ $('#folderpath').append('<a onclick=backFolder() href="#">'+curentpath+'/</a>');
+ $('#rooms').hide();  
+ $('#almiras').hide(); 
+ $('#racks').hide(); 
+ $('#newfolder').hide();
+ $('#foldername').text(id)
+ $('#getfiles').show();
+}
+function backFolder(){
+  $("#folderpath").find("a:last").remove();
+  $('#rooms').hide(); 
+ $('#almiras').hide(); 
+ $('#racks').hide();   
+ $('#newfolder').hide();
+ $('#getfiles').show();
+}
+</script>
+{% endblock content %}
+{% block script %}
+<script src="{% static 'js/jquery-confirm.min.js' %}"></script>
+<script src="{% static 'js/Nitgen.js' %}"></script>
+
+{% endblock %}

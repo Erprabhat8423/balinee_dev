@@ -1,0 +1,817 @@
+{% extends 'layout/layout.html' %}
+
+{% block title %}
+{{page_title}}
+{% endblock %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/tablesorter.theme.blue.min.css' %}">
+<link rel="stylesheet" href="src/styles.css" />
+<style>
+
+    #ui-datepicker-div{
+        z-index: 999 !important;
+    }
+    .sunday{
+        background-color:#fd8823;
+        border-radius: 1.5px;
+        vertical-align: middle;
+        padding: 0.3em 0.6em 0.3em;
+        margin-top: 2%;
+        text-align: center;
+    }
+    .holiday{
+        background-color:#c7fd2370;
+        border-radius: 1.5px;
+        vertical-align: middle;
+        padding: 0.3em 0.6em 0.3em;
+        margin-top: 2%;
+        text-align: center;
+    }
+    .present{
+        background-color:#7EC857;
+        border-radius: 1.5px;
+        vertical-align: middle;
+        padding: 0.3em 0.6em 0.3em;
+        margin-top: 2%;
+        text-align: center;
+    }
+    .absent{
+        background-color:#FF4859; 
+        border-radius: 1.5px; 
+        vertical-align: middle; 
+        padding: 0.3em 0.6em 0.3em; 
+        margin-top: 2%; 
+        text-align: center;
+    }
+
+    .fixed{
+        position : fixed;
+        top:0;left:0;
+        width:100;
+    }
+
+
+
+</style>
+{% endblock %}
+
+
+<div class="row" id="containerHeight">
+    <div class="col-md-12 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            {% csrf_token %}
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-4 p-md-0">
+                    <h1 class="page-main-heading">{{page_title}}</b><span class="mx-3 fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h1>
+                </div>
+                <div class="col-md-8 p-md-0">
+                    
+                    
+                </div>
+            </div>
+
+
+            <div class="row py-2" style="width: 100%;">
+                <div class="col-md-6 px-0">
+                        <input type="hidden" name="check" value="{{check}}">
+                    <div class="row mb-2" id="secondRow"> 
+                        <div class="col-md-3 pl-0 pr-1">   
+                            <select class="selectField" style="width:100%;" multiple data-live-search="true"  name="course[]" id="course" data-placeholder="Select branch" onchange="checked();">
+                                <option value="all" selected>All Branch</option>
+                                {% for branch in branch %}
+                                <option value="{{branch.id}}">{{branch.abbr|safe}}</option>>
+                                {% endfor %}
+                            </select>
+                            <label class="error_msg float-right" id=""></label>  
+                        </div>
+                        <div class="col-md-3 px-0" style="float: left;">   
+                            <select class="selectField" style="width:100%;" multiple data-live-search="true" name="filter_sem[]" id="filter_sem" data-placeholder="Select semester" onchange="checked1();" >
+                                <option value="all" selected>All Semester</option>
+                                {% for semester in semester1 %}
+                                <option value="{{semester.semester_id}}">{{semester.sem_name}}</option>
+                                {% endfor %}
+                            </select>
+                            <label class="error_msg float-right" id=""></label>  
+                        </div>
+
+                        <div class="col-md-2" style ="padding:0 5px;"> 
+                            <input id="from_date" name="from_date" class="searchTable w-100 " placeholder="Date From" value="{{from_date}}" onchange="filterRegistration()" type="text" readonly >
+                            <label class="error_msg float-right" id="address_error"></label>
+                        </div>
+
+                        <div class="col-md-2" style ="padding:0 5px;">
+                            <input id="to_date" name="to_date" class="searchTable w-100 " placeholder="Date To" value="{{to_date}}" onchange="filterRegistration()" type="text" readonly >
+                            <label class="error_msg float-right" id="address_error"></label>
+                        </div>
+
+                        <div class="dropdown float-right col-md-1 ">
+                            <button class="btn iconBox iconExport " type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> </button>
+                        
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer" aria-labelledby="dropdownMenuButton">
+                                <input type="hidden" name="show_columns" id="show_columns" value="" >
+                                <a class="dropdown-item" style="" onclick="exportsInExcel()" href="javascript:void(0)">Export Attendance Stats Excel 
+                                    <img src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons ml-1" /> 
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+
+
+
+
+
+            <div class="row" id="secondRow" style="width: 100%;">
+           
+                <div class="col-md-6 bg-white pt-3" id = "attendanceView">
+                    <h1 class="h4 font-weight-bold d-flex justify-content-center">Registration Stats</h1>
+                    <table id="" class="detail-table table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th class="table_student_name" id="">
+                                    Annotation
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th class="table_student_name" id="table_father_name">
+                                    Number of Students
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablebody">
+
+                            <tr id="reg_list" class="odd selected" onclick="getRegistrationZone('0','Registered Students');">
+                                <td class="table_student_name">
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">Registered Students</span> 
+                                    </div>
+                                </td>
+                                <td id="total_registered" class="table_father_name">{{total_registered}}</td>
+                            </tr>
+
+                            <tr class="" onclick="getRegistrationZone('1','Unregistered Students');">
+                                <td class="table_student_name">
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">Unregistered Students</span> 
+                                    </div>
+                                </td>
+                                <td id="total_unregistered" class="table_father_name">{{total_unregistered}}</td>
+                            </tr>
+
+                            <tr class="odd" onclick="getRegistrationZone('2','Today Registration');">
+                                <td class="table_student_name">
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">Today's Registration</span> 
+                                    </div>
+                                </td>
+                                <td id="today_registered" class="table_father_name">{{today_registered}}</td>
+                            </tr>
+
+                        </tbody>
+                    </table>
+                    <h1 class="h4 font-weight-bold d-flex justify-content-center">Attendance Stats</h1>
+                    <table id="attendanceZoneTable" class="detail-table table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th class="table_student_name" id="table_student_name">
+                                    Attendance Zone
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th class="table_student_name" id="table_father_name">
+                                    Number of Students
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th class="table_college" id="table_college">
+                                    Percentage
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablebody">
+
+                            <tr class="odd selected" onclick="getAttendanceZone('3', 'First time');">
+                                <td class="table_student_name">
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">First time (0%)</span> 
+                                    </div>
+                                </td>
+                                <td class="table_father_name">
+                                    {{first_time}}
+                                </td>
+                                <td class="table_college">
+                                    {{first_time_percent}}%
+                                </td>
+                            </tr>
+
+                            <tr onclick="getAttendanceZone('4', 'Very Poor' );">
+                                <td class="table_student_name">
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">Very Poor (0-30%)</span> 
+                                    </div>
+                                </td>
+                                <td class="table_father_name">
+                                    {{very_poor}}
+                                </td>
+                                <td class="table_college">
+                                    {{very_poor_percent}}%
+                                </td>
+                            </tr>
+
+                            <tr class="odd" onclick="getAttendanceZone('5','Poor');">
+                                <td class="table_student_name">
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">Poor (31-50%)</span> 
+                                    </div>
+                                </td>
+                                <td class="table_father_name">
+                                    {{poor}}
+                                </td>
+                                <td class="table_college">
+                                    {{poor_percent}}%
+                                </td>
+                            </tr>
+
+                            <tr class="odd" onclick="getAttendanceZone('6' , 'Moderate');">
+                                <td class="table_student_name">
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">Moderate (51-80%)</span> 
+                                    </div>
+                                </td>
+                                <td class="table_father_name">
+                                    {{moderate}}
+                                </td>
+                                <td class="table_college">
+                                    {{moderate_percent}}%
+                                </td>
+                            </tr>
+
+                            <tr class="" onclick="getAttendanceZone('7','Good');">
+                                <td class="table_student_name">
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">Good (81-90%)</span> 
+                                    </div>
+                                </td>
+                                <td class="table_father_name">
+                                    {{good}}
+                                </td>
+                                <td class="table_college">
+                                    {{good_percent}}%
+                                </td>
+                            </tr>
+
+                            <tr class="odd" onclick="getAttendanceZone('8','Excellent');">
+                                <td class="table_student_name">
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">Excellent (90%+)</span> 
+                                        <!-- <div class="col-sm-2 col-2 px-0"> 
+                                        </div> -->
+                                    </div>
+                                </td>
+                                <td class="table_father_name">
+                                    {{excellent}}
+                                </td>
+                                <td class="table_college">
+                                    {{excellent_percent}}%
+                                </td>
+                            </tr>
+                            <tr class="odd selected" onclick="getAttendanceZone('9', 'Never Attended');">
+                                <td class="table_student_name">
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">Registered yet not attended</span> 
+                                    </div>
+                                </td>
+                                <td class="table_father_name">
+                                    {{zero_attendance}}
+                                </td>
+                                <td class="table_college">
+                                    {{zero_percent}}%
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+
+                <div class="col-md-6" id ='studentView'>
+                    <div class="primaryContainer h-100" id="mainbox">
+
+                        
+                    <div class="row" id="tableBox" >
+                        <div class="col-md-12 primaryContainerBG p-0 commonTableBg" id="ajax-div" style="height: 75vh;">
+                            <input type="hidden" name="page" id="page" value="2" />
+                            <input type="hidden" name="page_status" id="page_status" value="0" />
+                            <input type="hidden" name="total_pages" id="total_pages" value="{{ total_pages }}" />
+                        <table id="addOrgTable" class="detail-table table table-borderless table-striped table-hover mt-0 " style="width: 100%;">
+                            <thead id ="tbl_head" style="background-color:  #F5F5F5; z-index:1">
+                                <tr class="tablesorter-stickyHeader" style="position: sticky; top:0">
+                                    <th class="s_no" id="s_no">
+                                        S.No
+                                        <i class="fa fa-fw fa-sort float-right"></i>
+                                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                    </th>
+                                    <th class="name" id="name">
+                                        Name
+                                        <i class="fa fa-fw fa-sort float-right"></i>
+                                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                    </th>
+                                    <th class="regs_no" id="regs_no">
+                                        Registration number
+                                        <i class="fa fa-fw fa-sort float-right"></i>
+                                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                    </th>
+                                    <th class="branch" id="branch">
+                                        Branch
+                                        <i class="fa fa-fw fa-sort float-right"></i>
+                                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                    </th>
+                                    <th class="semester" id="semester">
+                                        Semester
+                                        <i class="fa fa-fw fa-sort float-right"></i>
+                                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                    </th>
+                                    <!-- <th class="start_datetime" id="start_datetime">
+                                        Start Datetime
+                                        <i class="fa fa-fw fa-sort float-right"></i>
+                                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                    </th>
+                                    <th class="end_datetime" id="end_datetime">
+                                        End Datetime
+                                        <i class="fa fa-fw fa-sort float-right"></i>
+                                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                    </th> -->
+                                </tr>
+                            </thead>
+                            <tbody id="registrationDetails" >
+                                {% if registered_student1 %}
+                                {% for regs in registered_student1 %}
+                                <tr  {% if forloop.first %} class="odd selected" {% endif %}>
+                                    <td class="table_student_name" >
+                                            <span class="col-sm-10 col-10 pl-0 pr-2">{{forloop.counter}}</span> 
+                                    </td>
+                                    <td class="first_name">
+                                        <span class="mr-2">{{regs.full_name}}</span>
+                                    </td>
+                                    <td class="regs_no">
+                                        {{regs.reg_no}}
+                                    </td>
+                                    {% comment %} {% for attendance in attendance %}
+                                    {% if   regs.id ==  attendance.student_id %}
+                                    <td class="table_course" >
+                                    {{attendance.start_datetime}}
+                                    </td>
+                                    <td class="table_course">
+                                    {{attendance.end_datetime}}
+                                    </td>
+                                     {% endif %}
+                                    {% endfor %}  {% endcomment %}
+
+
+                                    {% for branch  in branch %}
+                                    {% if regs.branch_id == branch.id|slugify %}
+                                    <td class="branch">
+                                       
+                                            <span class="col-sm-10 col-10 pl-0 pr-2">
+                                                {{branch.abbr}}
+                                            </span>
+                                    
+                                    </td>
+                                    {% endif %}
+                                    {% endfor %}
+
+                                    {% for semester in semester %}
+                                    {% if regs.semester_id == semester.semester_id %}
+                                    <td class="semester" >
+                                        
+                                            <span class="col-sm-10 col-10 pl-0 pr-2">
+                                                {{semester.sem_name}}
+                                            </span>
+                                      
+                                    </td>
+                                    {% endif %}
+                                    {% endfor %}        
+                            </tr>
+                            {% endfor %}
+                            <tr id="loading" style="display: none;">
+                                <td class="text-center" colspan="6"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" style="text-align: center;">No Record Found...</td>
+                            </tr>
+                            {% endif %}
+                        </tbody> 
+                    </table>
+                </div>
+            </div>
+            </div>
+            </div> 
+            
+            
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block script %}
+
+<script>
+    $(document).ready(function () {
+        $("#reg_list").click()
+    })
+
+    function filterStudentAttendance(){
+        if($('#to_date').val() || $('#from_date').val()){
+            var loading_html =`<tr id="loading" style="display: none;">
+                <td class="text-center" colspan="8"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                </td>
+            </tr>`;
+            
+            $('#attendanceZoneTable').html(loading_html)
+            $('#loading').show();
+
+            var college_id = 1;
+            var from_date = $('#from_date').val();
+            var to_date = $('#to_date').val();
+            var branch = $('[name="course[]"]').val();
+            var semester = $('[name="filter_sem[]"]').val();
+            $.ajax({
+                url: "{% url 'src:attendance/ajax-attendance-stats' %}",
+                method: 'POST',
+                data: {
+                    from_date:from_date,
+                    to_date:to_date,
+                    branch:branch,
+                    semester:semester,
+                    college_id:college_id,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    // $('body').html('');
+                    hideLoader();
+                    // $('html').html('');
+                    $('#attendanceView').html(data);
+                },
+                error: function (err) {
+                    alert(err.message);
+                }
+            });
+        }
+    }
+
+    function getAttendanceZone(check, table_head){
+        var loading_html =`<tr id="loading" style="display: none;">
+            <td class="text-center" colspan="8"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+            </td>
+        </tr>`;
+        $('#registrationDetails').html(loading_html);
+        $('#loading').show();
+        
+        var college_id = 1;
+        var from_date = $('#from_date').val();
+        var to_date  = $('#to_date').val();
+        var branch   = $('[name="course[]"]').val();
+        var semester = $('[name="filter_sem[]"]').val();
+        console.log(table_head)
+        $.ajax({
+            url: "{% url 'src:attendance/get-attendance-zone' %}",
+            method: 'GET',
+            data: {
+                from_date:from_date,
+                to_date:to_date,
+                branch:branch,
+                semester:semester,
+                college_id:college_id,
+                check:check,
+                table_head: table_head
+                //csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function (data) {
+                hideLoader();
+                $('#ajax-div').html(data);
+                
+                $('#addOrgTable').tablesorter({
+                    widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                    widgetOptions: {
+                        resizable_addLastColumn: true,
+                        resizable: true,
+                        resizable_widths: ["15%","20%","25%","20%","20%"],
+                        stickyHeaders_attachTo: ".sticky_section",
+                        stickyHeaders: "tablesorter-stickyHeader",
+                        filter_external: '.search',
+                        filter_columnFilters: false,
+                        stickyHeaders_addResizeEvent : true,
+                        
+                    }
+                });
+                $("#registrationDetails tbody tr").click(function () {
+                    $(this).addClass("selected").siblings().removeClass("selected");
+                });
+                
+                $(".primaryContainerBG").scroll(function () {
+                    var divTable = $(".primaryContainerBG");
+                    $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                });
+                
+            },
+            error: function (err) {
+                alert(err.message);
+            }
+        });
+    }
+
+    function getRegistrationZone(check,table_head){
+        var loading_html =`<tr id="loading" style="display: none;">
+            <td class="text-center" colspan="8"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+            </td>
+        </tr>`;
+        $('#registrationDetails').html(loading_html);
+        $('#loading').show();
+        
+        var college_id = 1;
+        var from_date = $('#from_date').val();
+        var to_date = $('#to_date').val();
+        var branch = $('[name="course[]"]').val();
+        var semester = $('[name="filter_sem[]"]').val();
+        $.ajax({
+            url: "{% url 'src:attendance/get-register-zone' %}",
+            method: 'GET',
+            data: {
+                from_date:from_date,
+                to_date:to_date,
+                branch:branch,
+                semester:semester,
+                // college_id:college_id,
+                college_id:college_id,
+                check:check,
+                table_head:table_head
+            },
+            success: function (data) {
+                hideLoader();
+                $('#ajax-div').html(data);
+                
+                $('#addOrgTable').tablesorter({
+                    widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                    widgetOptions: {
+                        resizable_addLastColumn: true,
+                        resizable: true,
+                        resizable_widths: ["15%","20%","25%","20%","20%"],
+                        stickyHeaders_attachTo: ".sticky_section",
+                        filter_external: '.search',
+                        filter_columnFilters: false,
+                        stickyHeaders_addResizeEvent : true,
+                        stickyHeaders: "tablesorter-stickyHeader",
+                    }
+                });
+                $("#registrationDetails tbody tr").click(function () {
+                    $(this).addClass("selected").siblings().removeClass("selected");
+                });
+                
+                $(".primaryContainerBG").scroll(function () {
+                    var divTable = $(".primaryContainerBG");
+                    $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                });
+                
+            },
+            error: function (err) {
+                alert(err.message);
+            }
+        });
+    }
+
+    function filterRegistration(){
+        var loading_html =`<tr id="loading" style="display: none;">
+        <td class="text-center" colspan="8"><i  class="fa fa-spinner fa-spin" style="font-size:2rem; "></i>
+        </td>
+        </tr>`;
+        $('#attendanceView').html(loading_html);
+        $('#loading').show();
+        //showLoader();
+       
+        var branch = $('[name="course[]"]').val();
+        var semester = $('[name="filter_sem[]"]').val();
+        var from_date = $('#from_date').val();
+        var to_date = $('#to_date').val();
+
+    
+        $.ajax({
+            url: "{% url 'src:attendance/filter-register-report' %}",
+            method: 'GET',
+            data: {
+                branch:branch,
+                semester:semester,
+                // csrfmiddlewaretoken: '{{ csrf_token }}',
+                from_date:from_date,
+                to_date:to_date,
+                college_id:1,
+            },
+            success: function (data) {
+                hideLoader();
+                $('#attendanceView').html(data); 
+                // $('#attendanceView').html(data);
+                $('#addOrgTable').tablesorter({
+                    widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                    widgetOptions: {
+                        resizable_addLastColumn: true,
+                        resizable: true,
+                        resizable_widths: ["15%","20%","25%","20%","20%"],
+                        stickyHeaders_attachTo: ".primaryContainerBG",
+                        filter_external: '.search',
+                        filter_columnFilters: false,
+                        stickyHeaders_addResizeEvent : true,
+                        stickyHeaders: "tablesorter-stickyHeader",
+                    }
+                });
+                $("#attendanceView tbody tr").click(function () {
+                    $(this).addClass("selected").siblings().removeClass("selected");
+                });
+                
+                $(".primaryContainerBG").scroll(function () {
+                    var divTable = $(".primaryContainerBG");
+                    $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                });
+                
+                $('#total_record').text('('+$('#total_filtered_record').val()+')');
+                
+            },
+            error: function (err) {
+                alert(err.message);
+            }
+        });
+    }
+
+    // function getDateFormat(date){
+    // var dateTemp = date.split('-');
+    // date = dateTemp[0]+'-'+dateTemp[1]+'-'+dateTemp[2]
+    // return date
+    // }
+
+
+
+    // function validateDateRange(){
+    // to_date = new Date(getDateFormat($("[name='to_date']").val()));
+    // from_date = new Date(getDateFormat($("[name='from_date']").val()));
+    // $('.error_msg').text('');
+    // $("[name='from_date']").css("border", "");
+    // $("[name='to_date']").css("border", "");
+    
+    // if(from_date > to_date ){
+    //     $("[name='from_date']").parent().find('.error_msg').text('Start date must be less then or equal to end date');
+    //     $("[name='from_date']").css("border", "1px solid #db8305");
+    //     $("[name='from_date']").val('')
+    //     return false;
+    // }
+    // }
+
+
+     
+
+    $(document).ready(function () {
+        $("[name='from_date']").datepicker({  
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-2:+0",
+            //minDate: '-1m',
+            maxDate: 0,
+            dateFormat: 'dd-mm-yy'
+            // onSelect: function () {
+            // validateDateRange();
+            // } 
+             
+        });
+
+
+        $("[name='to_date']").datepicker({  
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-2:+0",
+            //minDate: '-1m',
+            maxDate: 0,
+            dateFormat: 'dd-mm-yy'
+            // onSelect: function () {
+            // validateDateRange();
+            // } 
+            
+        });
+    });
+
+
+
+    function exportsInExcel(){
+        console.log("Export Function hit")
+        var from_date = $('#from_date').val();
+        var to_date = $('#to_date').val();
+        var branch   = $('[name="course[]"]').val();
+        branch = JSON.stringify(branch);
+        var semester = $('[name="filter_sem[]"]').val();
+        semester = JSON.stringify(semester);
+        //semester = JSON.stringify(semester);
+        //console.log("DateTime: ", date)
+        var currentdate = new Date(); 
+        var datetime = currentdate.getDate() + "-" + (currentdate.getMonth()+1)  + "-" + currentdate.getFullYear()
+        var previousdate = new Date();
+        var previousdatetime = currentdate.getDate() + "-" + (currentdate.getMonth())  + "-" + currentdate.getFullYear()
+        url = "{% url 'src:attendance/export-attendance-stats' 'from_date' 'to_date' 'branch'  'semester' %}"
+        if (branch != ''){
+            url= url.replace('branch',branch);
+        }
+        else{
+            url= url.replace('branch', 0 );
+        }
+        if(semester != ''){
+            url = url.replace('semester',semester);
+        }
+        else{
+            url=url.replace('semester',0);
+        }
+
+        if (from_date != ''){
+            url = url.replace('from_date', from_date);
+        }
+        else {
+            url = url.replace('from_date', previousdatetime);
+        }
+        //console.log("url:" ,url )
+        if (to_date != ''){
+            url = url.replace('to_date', to_date);
+        }
+        else {
+            url = url.replace('to_date', datetime);
+        }
+        console.log("URL: ", url)
+        window.location.href = url;      
+    }
+
+    function updateTableSorter(){
+        $('#addOrgTable').tablesorter({
+            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+            widgetOptions: {
+                resizable_addLastColumn: true,
+                resizable: true,
+                resizable_widths: ["15%","20%","25%","20%","20%"],
+                filter_external: '.search',
+                filter_columnFilters: false,
+                stickyHeaders_addResizeEvent : true,
+                stickyHeaders_attachTo: ".primaryContainerBG",
+                stickyHeaders: "tablesorter-stickyHeader"
+                
+            }
+        });
+    }
+
+    function checked() {
+        $("#course option[value='all']").remove();
+        var options = $('#course > option:selected');
+         if(options.length == 0){
+            $("#course").append('<option value="all" selected>All Branch</option>');
+            filterRegistration()
+         }else{
+            filterRegistration()
+            }
+         }
+
+
+    function checked1() {
+        $("#filter_sem option[value='all']").remove();
+        var options = $('#filter_sem > option:selected');
+        if(options.length == 0){
+            $("#filter_sem").append('<option value="all" selected>All Semester</option>');
+            filterRegistration()
+        }else{
+            filterRegistration()
+            }
+        }
+
+    
+</script>
+
+
+{% endblock %}

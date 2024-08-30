@@ -1,0 +1,114 @@
+<style>
+    .header-title h2,
+    .header-title h3 {
+        display: inline-block;
+    }
+    h3 {
+        font-size: 18px;
+        text-align: center;
+        padding: 15px 0px 0px 0px;
+        margin: 0px;
+    }
+    
+    table {
+        width: 750px;
+        border-collapse: collapse;
+        margin: 0px auto;
+    }
+    
+    /* Zebra striping */
+    tr:nth-of-type(odd) {
+        background: #eee;
+    }
+    
+    th {
+        background: #3498db;
+        color: #000000;
+        font-weight: bold;
+    }
+    
+    th {
+        padding: 2px;
+        border: 1px solid #ccc;
+        text-align: left;
+        font-size: 9px;
+    }
+    
+    td {
+        padding: 2px;
+        border: 1px solid #ccc;
+        text-align: left;
+        font-size: 9px;
+    }
+    
+    @page {
+        size: letter portrait;
+        margin: 1cm;
+    }
+    .header tr th{
+        border: none;
+    }
+    .header tr td{
+        border: none;
+    }
+</style>
+
+{% if user_list %}
+{% for user in user_list %}
+<div class="col-md-12" style="padding: 10px; border: 1px solid #cccccc;">
+    <div class="col-md-12" style="text-align: center; font-size:14px; text-decoration: underline;">Stock Transfer/Delivery Challan</div>
+    
+    <table id="addOrgTable" class="table table-bordered mt-0" style="width: 100%; float: right;">
+        <thead>
+            <tr>
+                <th colspan="5">
+                    <table style="width: 30%; float: left; border: none" class="header">
+                        <tr><th>Shipment: </th><td>{{ forloop.counter }}</td></tr>
+                        <tr><th>Buyer Name: </th><td>{{ user.user_name }}</td></tr>
+                        <tr><th>Address: </th><td>{{ user.address }}</td></tr>
+                    </table>
+                </th>
+                <th colspan="5">
+                    <table style="width: 30%; float: right; border: none;" class="header">
+                        <tr><th>Date: </th><td colspan="3">{{ today_date }}</td></tr>
+                        <tr><th>Route Name: </th><td colspan="3">{{ user.route_name }}</td></tr>
+                        <tr><th>GST No.: </th><td colspan="3">{{ user.gstin }}</td></tr>
+                        <tr><th>CIN No.: </th><td colspan="3">{{ user.cin }}</td></tr>
+                        
+                    </table>
+                </th>
+            </tr>
+            <tr>
+                <th>Sr. No. </th>
+                <th>HSN Code </th>
+                <th>Material Description </th>
+                <th>Qunatity(IN CRATE) </th>
+                <th>Qunatity(IN EA)</th>
+                <th>Price/Crate</th>
+                <th>SS Margin</th>
+                <th>Transport Cost</th>
+                <th>Net Price/Crate</th>
+                <th>Billing Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for order in user.orders %}
+            <tr>
+                <td align="center">{{ forloop.counter }}.</td>
+                <td>{{ order.hsn_code }}</td>
+                <td>{{ order.product_variant_name }} </td>
+                <td>{{ order.quantity }} </td>
+                <td>{{ order.no_of_pouches }}</td>
+                <td>{{ order.rate }}</td>
+                <td>0.00</td>
+                <td>0.00</td>
+                <td>{{ order.rate }}</td>
+                <td>{{ order.amount }}</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+</div>
+{% endfor %}
+{% endif %}

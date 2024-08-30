@@ -1,0 +1,1158 @@
+{% load static %}
+
+<div class="modal-AddUser centered" style="overflow:scroll!important">
+    <form method="POST" id="saveContact1" autocomplete="off" action="{% url 'src:save-contact' %}" aria-label="Save Contact" enctype="multipart/form-data">
+        
+        {% csrf_token %}
+        <div class="modal-header" id="headerStep1">
+            <div class="col-12 p-0">
+                <div class="row">
+                    <div class="col-6">
+                        <h5 class="mt-md-2">Create Contact Card &nbsp;&nbsp;</h5>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-save float-right" type="button"onclick="saveContact()">
+                            Save
+                        </button>
+                        <button class="btn btn-close float-right" type="button" onclick="manipulateModal('addContactCardModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-body" id="addUserModalBody" style="">
+            <div class="row">
+                <div class="col-md-12 p-0 h-100 w-100">
+                    
+                    <h5 class="mt-md-2">Basic Details &nbsp;&nbsp;</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-2 text-right">
+                            <div class="user_ProfileImg" onclick="openImageSelector('file-upload_Emp')">
+                                <img id="previewEmpProfile" src="{% static 'img/svg/uploadProfile.svg' %}" class="imgStyleRound">
+                            </div>
+                            <input id="file-upload_Emp" name="profile_image" type="file" accept="image/*"
+                            style="display: none;" onchange="fileUploader(this.id,'previewEmpProfile','Profile Image')" />
+                            <label class="error_msg " id="profile_image_error" style="text-align:left"></label>
+                        </div>
+                        
+                        
+                        <div class="col-md-3">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                    Role 
+                                </h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <select class="inputField selectField" style="width: 100% !important;" name="role_id" id="role_id"  onchange="getEntityTypeAttributesForm(this.value);getEntityTypeAttributes(this.value);getRoleOrganizationOption(this.value); ">
+                                    <option value="">Select</option>
+                                    {% if roles %}
+                                    {% for role in roles %}
+                                    <option value="{{role.id}}">{{role.role_name}}</option>
+                                    {% endfor %}
+                                    {% endif %}
+                                    
+                                </select>
+                                <label class="error_msg float-right" id="role_id_error"></label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                    Institution
+                                </h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <select class="inputField selectField" style="width: 100% !important;" name="locations_list" id="locations_list">
+                                    <option value="">Select</option>
+                                    {% if organizations %}
+                                    {% for organization in organizations %}
+                                    <option value="{{organization.id}}">{{organization.organization_name}}</option>
+                                    {% endfor %}
+                                    {% endif %}
+                                    
+                                </select>
+                                <label class="error_msg float-right" id="locations_list_error"></label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3" id="isOutsider" style="display: none;">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/org.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                    Organisation
+                                </h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <input class="inputField alpha" type="text" placeholder="Organisation" name="organisation_id" name="organisation_id" maxlength="100">
+                                <label class="error_msg float-right" id="organisation_id_error"></label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row" style="display: none;">
+                        <div class="col-md-12 col-sm-12  form-group">
+                            <label for="attribute_id">Attributes</label>
+                            <select name="attribute_id[]" data-placeholder="Select attribute" id="attribute_id" class="form-control select2" multiple="" readonly="readonly">
+                            </select>
+                            <span class="label error_label" id="error_attribute_id"></span>
+                            
+                        </div>
+                    </div>
+                    
+                    
+                    
+                    
+                    <div class="row ">
+                        <div class="col-md-12">
+                            
+                            <div class="row mt-3 wrapper">
+                                
+                                <div class="col-md-2">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Salutation
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <select class="inputField selectField" style="width: 100% !important;" name="salutation_id" id="salutation_id">
+                                            <option value="Shri">Shri</option>
+                                            <option value="Mr.">Mr.</option>
+                                            <option value="Miss">Miss</option>
+                                            <option value="Mrs">Mrs</option>
+                                            <option value="Master">Master</option>
+                                            <option value="Other">Other</option>
+                                        </select>
+                                        <label class="error_msg float-right" id="salutation_id"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-2">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            First Name
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField alpha" type="text" placeholder="First Name" name="first_name" id="first_name" maxlength="50">
+                                        <label class="error_msg float-right" id="first_name_error"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-2">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Middle Name
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField alpha" type="text" placeholder="Middle Name" name="middle_name" id="middle_name"  maxlength="50">
+                                        <label class="error_msg float-right" id="middle_name_error"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-2">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Last Name
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField alpha" type="text" placeholder="Last Name" name="last_name" id="last_name" maxlength="50">
+                                        <label class="error_msg float-right" id="last_name_error"></label>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row ">
+                        <div class="col-md-12">
+                            <div class="row mt-3 wrapper">
+                                <div class="col-md-4">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Name Alias
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField alpha" type="text" placeholder="Name Alias" name="alias_name" id="alias_name" maxlength="50">
+                                        <label class="error_msg float-right" id="alias_name_error"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Email
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField validateEmail" type="text" placeholder="Email" name="email" id="email" >
+                                        <label class="error_msg float-right" id="email_error" maxlength="50" ></label>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row contact_detail_row">
+                        <div class="col-md-12">
+                            
+                            
+                            <div class="row mt-3 wrapper">
+                                <div class="col-md-3">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/contact.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Contact No
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField numeric contact_numbers" type="text" placeholder="Contact No" name="contact_number[]" id="contact_number_0" maxlength="10" required="required">
+                                        <label class="error_msg float-right" id="contact_number_error"></label> 
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-2">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/contact.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Contact Type
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <select class="inputField selectField contact_types" style="width: 100% !important;" name="contact_type[]" id="contact_type_0" required>
+                                            <option value="">Select</option>
+                                            {% if contact_types %}
+                                            {% for contact_type in contact_types %}
+                                            <option value="{{contact_type.id}}" {% if contact_type.id == 3 %} selected {% endif %}>{{contact_type.contact_type}}</option>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </select>
+                                        <label class="error_msg float-right" id="contact_type_error"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="col-md-2">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            primary contact ?
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <label class="switch">
+                                            <input type="checkbox" class="checkbox is_primary_contact" name="primaryContact" checked>
+                                            <span class="slider round" title="Enable/Disable"></span>
+                                            <input type="hidden" name="primary_contact[]" value="0">
+                                            
+                                        </label>
+                                        <label class="error_msg float-right" id="primary_contact_error"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div id="newRows">
+                        
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-8 text-right">
+                            <a href="javascript:;" class="btn btn-primary" onclick="addNewRow()"><i class="fa fa-plus" title="Add Contact Details"></i></a>
+                        </div>
+                    </div>
+                    
+                    
+                    <h5 class="mt-md-2 business_contact_section" style="display: none;">Business Contact Details  &nbsp;&nbsp;</h5>
+                    <div class="row business_contact_section" style="display: none;">
+                        <div class="col-md-12">
+                            <div class="row mt-3 wrapper">
+                                <div class="col-md-3">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/org.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Choose Business Type
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <select class="inputField selectField" style="width: 100% !important;" name="business_type" id="business_type"  onchange="handleBusiness(this.value)">
+                                            <option value="">Select</option>
+                                            {% if business_types %} 
+                                            {% for business_type in business_types %}
+                                            <option value="{{business_type.id}}">{{business_type.business_type}}</option>
+                                            {% endfor %}
+                                            {% endif %}
+                                        </select>
+                                        <label class="error_msg float-right" id="business_type_error"></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-2 text-right" style="margin-top: 23px;"  >
+                                    <a href="javascript:;" class="btn btn-primary" onclick="addNewBusinessRow()"><i class="fa fa-plus" title="Add More Policy"></i></a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="newBusinessRows" class="business_contact_section"></div>
+                    <br>
+                    <div class="row">
+                        <div class="col-md-12" id="entity_type_attributes">
+                            
+                        </div>
+                    </div>
+                    
+                </div>
+                
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    
+    
+    
+    function saveContact(){
+        
+        $('.error_msg ').text('');
+        
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:save-contact' %}",
+            method: 'POST',
+            
+            // data: $('#saveContact').serialize(),
+            data: new FormData(document.getElementById('saveContact1')),
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                hideLoader();
+                if(data.flag){
+                    $('#addContactCardModal').hide()
+                    openToaster("success", data.message);
+                    window.location.reload();
+                }else{
+                    if(typeof data.errors !== "undefined"){
+                        $.each(data.errors,function(index,value){
+                            $('#'+value.name+'_error').text(value.message);
+                        })
+                    }else{
+                        openToaster("danger", data.message);
+                    }
+                }
+            },
+            error: function (err) {
+                hideLoader();
+                console.log(err)
+            }
+        }).always(function() {
+            hideLoader();
+        });
+    }
+    
+    function getState(country_id, id, store_state_id, store_city_id, permanent_city_id){
+        if(country_id != ""){
+            //showLoader();
+            var url = "{% url 'src:get-state-options' 1 %}";
+            url = url.replace(1,country_id)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    // hideLoader();
+                    $('[name="'+id+'"]').html(data.options)
+                    $(".selectField").select2();
+                    if(store_state_id!=''){
+                        $('#c_state').val(store_state_id).trigger('change');
+                        getCity(store_state_id, 'c_city', store_city_id); 
+                    }
+                },
+                
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            });
+        } else {
+            $('[name="'+id+'"]').html('<option value="" selected>Select State</option>')
+            $('[name="'+permanent_city_id+'"]').html('<option value="" selected>Select City</option>')
+            $(".selectField").select2();
+        }
+        
+    }
+    
+    function getCity(state_id, id, store_city_id){
+        if(state_id != ""){
+            //showLoader();
+            var url = "{% url 'src:get-city-options' 1 %}";
+            url = url.replace(1,state_id)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    // hideLoader();
+                    $('[name="'+id+'"]').html(data.options)
+                    $(".selectField").select2();
+                    if(store_city_id!=''){
+                        $('#permanent_city_id').val(store_city_id).trigger('change');
+                    }
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            });
+        } else {
+            $('[name="'+id+'"]').html('<option value="" selected>Select City</option>')
+            $(".selectField").select2();
+        }
+        
+    }
+    
+    function admissionProcedureDetails(id){
+        if(id != ""){
+            var url = "{% url 'src:admission-procedures-details' 'admissionPro_id' %}";
+            url = url.replace('admissionPro_id', id);
+            //alert(url)
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success:function(data){
+                    $('#branch').html(data.options);
+                    
+                }
+            });
+            
+        }
+    }
+    
+    function getCourseOption(value){
+        if(value != ""){
+            url = "{% url 'src:get-college-course-options' '1' %}";
+            url = url.replace('1',value);
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    $('#branch').html(data.options);
+                },
+                error: function (err) {
+                    alert(err.message);
+                }
+            });
+            
+        }else{
+            $('#branch').html(`<option value="">View By Course</option>`);
+        }
+    }
+    
+    function getRoleOrganizationOption(role_id){
+        if(role_id == ""){
+            $('#locations_list').html('');
+        }else{
+            var url = "{% url 'src:get-role-organization-option' 'tmp' %}";
+            url = url.replace('tmp', role_id);
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success:function(data){
+                    $('#locations_list').html(data.options);
+                    if(data.role.is_outsider){
+                        $('.business_contact_section').show();
+                    }else{
+                        $('.business_contact_section').hide();
+                    }
+                }
+            });
+        }
+        
+    }
+    
+    function getEntityTypeAttributesForm(entity_type){
+        //alert(entity_type)
+        if(entity_type != ""){
+            url = "{% url 'src:get-role-type-attributes-form' 'attr_id' %}";
+            url = url.replace('attr_id', entity_type);
+            //alert(url)
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success:function(data){
+                    $('#entity_type_attributes').html(data);
+                    $('#vehicle_type').select2();
+                    $('#fuel_type').select2();
+                    
+                    $('#marital_status').select2();
+                    $('#gender').select2();
+                    $('#blood_group').select2();
+                    $('#caste_category').select2();
+                    $('#income_category').select2();
+                    $('#previlege_category').select2();
+                    $('#tags').select2();
+                    
+                    $('#c_country').select2();
+                    $('#c_state').select2();
+                    $('#c_city').select2();
+                    
+                    $('#p_country').select2();
+                    $('#p_state').select2();
+                    $('#p_city').select2();
+                    
+                    
+                    $('#admission_procedure').select2();
+                    $('#student_location').select2();
+                    $('#branch').select2();
+                    $('#year').select2();
+                    $('#teacher_gaurdian_name').select2();
+                    
+                    $('#location').select2();
+                    $('#department').select2();
+                    $('#paygrade').select2();
+                    
+                    
+                    
+                    $('#bank_0').select2();
+                    $('#pay_grade').select2();
+                    $('#employment_term').select2();
+                    $('#additional_responsibility').select2();
+                    $('#working_hour').select2();
+                    
+                    /*-----------------enable datepicker-------------------*/
+                    
+                    $('#date_of_joining').datepicker({  
+                        changeMonth: true,
+                        changeYear: true,  
+                        yearRange: "-100:+0",
+                        maxDate: 0,
+                        dateFormat: 'mm/yy'  
+                    });
+                    
+                    $('#date_of_admission').datepicker({  
+                        changeMonth: true,
+                        changeYear: true,  
+                        yearRange: "-100:+0",
+                        maxDate: 0,
+                        dateFormat: 'mm/yy'  
+                    });
+                    $('#date_of_birth').datepicker({  
+                        changeMonth: true,
+                        changeYear: true,  
+                        yearRange: "-100:+0",
+                        maxDate: 0,
+                        dateFormat: 'mm/yy'  
+                    });
+                    $('#dl_expiry').datepicker({  minDate: 0 });
+                    /*-----------------enable datepicker-------------------*/
+                    
+                    $('#designation').select2({
+                        placeholder:'Choose Designation',
+                        ajax: {
+                            url : '{% url "src:search-roles"  %}',
+                            dataType: 'json',
+                            delay: 0,
+                            data: function (params) {
+                                return {
+                                    keyword: params.term,
+                                    department: $('#department option:selected').val(), 
+                                };
+                            },
+                            processResults: function (data) {
+                                return {
+                                    results: data.results
+                                };
+                            },
+                            cache: false
+                        },
+                    });
+                    
+                }
+            });
+            
+        }
+    }
+    
+    function getEntityTypeAttributes(role_id){
+        //alert(role_id)
+        if(role_id != ""){
+            url = "{% url 'src:get-role-type-attributes' 'attr_id' %}";
+            url = url.replace('attr_id', role_id);
+            //alert(url)
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success:function(data){
+                    $('#attribute_id').html(data.options);
+                    
+                }
+            });
+            
+        }
+    }
+    
+    function searchDepartments(location_id){
+        //alert(location_id)
+        if(location_id != ""){
+            url = "{% url 'src:search-departments' 'location_id' %}";
+            url = url.replace('location_id', location_id);
+            //alert(url)
+            $.ajax({
+                url: url,
+                type: 'GET',
+                success:function(data){
+                    $('#department').html(data.options);
+                    
+                }
+            });
+            
+        }
+    }
+    
+    $(document).on('click','.is_primary_contact',function(){
+        if($(this).prop('checked')){
+            $('.is_primary_contact').prop('checked',false);
+            $('input[name="primary_contact[]"]').val(0);
+            $(this).prop('checked',true);
+            $(this).next().next().val(1);
+        }else{
+            $(this).next().next().val(0);
+            
+        }
+    });
+    
+    function handleBusiness(value){
+        next = $('.BusinessContactRow').length + 1;
+        if(value != ""){
+            html = `<div class="row BusinessContactRow business_contact_section">
+                <div class="col-md-12">
+                    <div class="row mt-3 wrapper">
+                        <div class="col-md-3">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                    Contact Person's First Name
+                                </h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <input class="inputField contactPersonFirstName " type="text" placeholder="First Name" name="contact_person_first_name[]" id="contact_person_first_name_0" >
+                                <label class="error_msg float-right" id="contact_person_first_name_error"></label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                    Contact Person's Middle Name
+                                </h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <input class="inputField contactPersonMiddleName" type="text" placeholder="Middle Name" name="contact_person_middle_name[]" id="contact_person_middle_name_0" >
+                                <label class="error_msg float-right"></label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                    Contact Person's Last Name
+                                </h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <input class="inputField contactPersonLastName" type="text" placeholder="Last Name" name="contact_person_last_name[]" id="contact_person_last_name_0" >
+                                <label class="error_msg float-right" id="contact_person_last_name_error"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="row mt-3 wrapper">
+                        <div class="col-md-3">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/contact.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                    Contact Person's Phone Number
+                                </h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <input class="inputField numeric contactPersonMobile" type="text" placeholder="Phone Number" name="contact_person_mobile[]" id="contact_person_mobile_0" maxlength="10" >
+                                <label class="error_msg float-right" id="contact_person_mobile_error"></label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                    Contact Person's Email
+                                </h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <input class="inputField  contactPersonEmail" type="text" placeholder="Email" name="contact_person_email[]" id="contact_person_email_0"  >
+                                <label class="error_msg float-right" id="contact_person_email_error"></label>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                    Contact Person's Designation
+                                </h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <input class="inputField  contactPersonDesignation" type="text" placeholder="Designation" name="contact_person_designation[]" id="contact_person_designation_0" >
+                                <label class="error_msg float-right" id="contact_person_designation_error"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-1">
+                            <a href="javascript:;" class="btn btn-danger" style="margin-top: 37px;" onclick="removeBusinessRow(this)"><i class="fa fa-trash"></i></a>
+                        </div>
+                    </div>
+                </div>
+            </div> 
+        </div>
+    </div>
+</div>`
+$('#newBusinessRows').html(html);
+}else{
+    $('#newBusinessRows').html('');
+}
+}
+
+function addNewBusinessRow(){
+    if($('#business_type option:selected').val() != ""){
+        count = $('.BusinessContactRow').length
+        new_count = count;
+        newRow = `<hr>
+        <div class="row BusinessContactRow business_contact_section">
+            <div class="col-md-12">
+                <div class="row mt-3 wrapper">
+                    <div class="col-md-3">
+                        <div class="col-md-12 p-0">
+                            <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                            <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                Contact Person's First Name
+                            </h6>
+                        </div>
+                        <div class="col-md-12 p-0 mt-2">
+                            <input class="inputField contactPersonFirstName " type="text" placeholder="First Name" name="contact_person_first_name[]" id="contact_person_first_name_`+new_count+`" >
+                            <label class="error_msg float-right" id="contact_person_first_name_error"></label>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="col-md-12 p-0">
+                            <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                            <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                Contact Person's Middle Name
+                            </h6>
+                        </div>
+                        <div class="col-md-12 p-0 mt-2">
+                            <input class="inputField contactPersonMiddleName" type="text" placeholder="Middle Name" name="contact_person_middle_name[]" id="contact_person_middle_name_`+new_count+`" >
+                            <label class="error_msg float-right"></label>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="col-md-12 p-0">
+                            <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                            <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                Contact Person's Last Name
+                            </h6>
+                        </div>
+                        <div class="col-md-12 p-0 mt-2">
+                            <input class="inputField contactPersonLastName" type="text" placeholder="Last Name" name="contact_person_last_name[]" id="contact_person_last_name_`+new_count+`" >
+                            <label class="error_msg float-right" id="contact_person_last_name_error"></label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12">
+                <div class="row mt-3 wrapper">
+                    <div class="col-md-3">
+                        <div class="col-md-12 p-0">
+                            <img src="{% static 'img/svg/contact.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                            <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                Contact Person's Phone Number
+                            </h6>
+                        </div>
+                        <div class="col-md-12 p-0 mt-2">
+                            <input class="inputField numeric contactPersonMobile" type="text" placeholder="Phone Number" name="contact_person_mobile[]" id="contact_person_mobile_`+new_count+`" maxlength="10" >
+                            <label class="error_msg float-right" id="contact_person_mobile_error"></label>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="col-md-12 p-0">
+                            <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                            <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                Contact Person's Email
+                            </h6>
+                        </div>
+                        <div class="col-md-12 p-0 mt-2">
+                            <input class="inputField  contactPersonEmail" type="text" placeholder="Email" name="contact_person_email[]" id="contact_person_email_`+new_count+`"  >
+                            <label class="error_msg float-right" id="contact_person_email_error"></label>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="col-md-12 p-0">
+                            <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                            <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                Contact Person's Designation
+                            </h6>
+                        </div>
+                        <div class="col-md-12 p-0 mt-2">
+                            <input class="inputField  contactPersonDesignation " type="text" placeholder="Designation" name="contact_person_designation[]" id="contact_person_designation_`+new_count+`" >
+                            <label class="error_msg float-right" id="contact_person_designation_error"></label>
+                        </div>
+                    </div>
+                    <div class="col-md-1">
+                        <a href="javascript:;" class="btn btn-danger" style="margin-top: 37px;" onclick="removeBusinessRow(this)"><i class="fa fa-trash"></i></a>
+                    </div>
+                </div>
+            </div>
+        </div> 
+    </div>
+</div>
+</div>
+`;
+
+$('#newBusinessRows').append(newRow);
+$(".selectField").select2();
+$("[name='contact_type_"+new_count+"[]']").select2({placeholder:'Select'});
+}
+}
+
+function removeBusinessRow(element){
+    $(element).parents(':last .BusinessContactRow').remove();
+    refeshBusinessNames();
+}
+
+function refeshBusinessNames(){
+    i=0;
+    $('.BusinessContactRow').each(function(){
+        if(i>=0){
+            $(this).find('.contactPersonFirstName').attr('id','contact_person_first_name_'+i);
+            $(this).find('.contactPersonMiddleName').attr('id','contact_person_middle_name_'+i);
+            $(this).find('.contactPersonLastName').attr('id','contact_person_last_name_'+i);
+            $(this).find('.contactPersonMobile').attr('id','contact_person_mobile_'+i);
+            $(this).find('.contactPersonEmail').attr('id','contact_person_email_'+i);
+            $(this).find('.contactPersonDesignation').attr('id','contact_person_designation_'+i);
+            
+        }
+        i = i + 1;
+    })
+    
+}
+
+
+
+function addNewRow(){
+    count = $('.contact_detail_row').length
+    new_count = count;
+    newRow = `
+    <div class="row contact_detail_row">
+        <div class="col-md-12">
+            
+            
+            <div class="row mt-3 wrapper">
+                <div class="col-md-3">
+                    <div class="col-md-12 p-0">
+                        <img src="{% static 'img/svg/contact.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                            Contact No
+                        </h6>
+                    </div>
+                    <div class="col-md-12 p-0 mt-2">
+                        <input class="inputField numeric contact_numbers" type="text" placeholder="Contact Type" name="contact_number[]" maxlength="10" id="contact_number_`+new_count+`">
+                        <label class="error_msg float-right"></label>
+                    </div>
+                </div>
+                
+                <div class="col-md-2">
+                    <div class="col-md-12 p-0">
+                        <img src="{% static 'img/svg/contact.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                            Contact Type
+                        </h6>
+                    </div>
+                    <div class="col-md-12 p-0 mt-2">
+                        <select class="inputField selectField contact_types" style="width: 100% !important;" name="contact_type[]" id="contact_type_`+new_count+`">
+                            <option value="">Select</option>
+                            {% if contact_types %}
+                            {% for contact_type in contact_types %}
+                            <option value="{{contact_type.id}}">{{contact_type.contact_type}}</option>
+                            {% endfor %}
+                            {% endif %}
+                        </select>
+                        <label class="error_msg float-right"></label>
+                    </div>
+                </div>
+                
+                
+                <div class="col-md-2">
+                    <div class="col-md-12 p-0">
+                        <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                            primary contact ?
+                        </h6>
+                    </div>
+                    <div class="col-md-12 p-0 mt-2">
+                        <label class="switch">
+                            <input type="checkbox" class="checkbox is_primary_contact" name="primaryContact">
+                            <span class="slider round"></span>
+                            <input type="hidden" name="primary_contact[]" value="0">
+                            <label class="error_msg float-right"></label>
+                        </label>
+                    </div>
+                </div>
+                
+                
+                
+                <div class="col-md-1 text-right">
+                    <a href="javascript:;" class="btn btn-danger" style="margin-top: 37px;" onclick="removeRow(this)"><i class="fa fa-trash"></i></a>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    `;
+    
+    $('#newRows').append(newRow);
+    
+    $(".selectField").select2();
+    $("[name='contact_type_"+new_count+"[]']").select2({placeholder:'Select'});
+    // $("[name='swipeable_leave_types_"+new_count+"[]']").select2({placeholder:'Select'});
+}
+
+function removeRow(element){
+    $(element).parents(':last .contact_detail_row').remove();
+    refeshNames();
+}
+
+function checkNameAlias(value){
+    
+}
+
+function refeshNames(){
+    i=0;
+    $('.contact_detail_row').each(function(){
+        if(i>0){
+            $(this).find('.contact_numbers').attr('id','contact_number_'+i);
+            $(this).find('.contact_types').attr('id','contact_type_'+i);
+            
+        }
+        i = i + 1;
+    })
+    
+}
+
+
+function validateForm(){
+    var error = 0;
+    $('.error_msg ').text('');
+    $('.inputField').css("border", "");
+    $('.select2-container').css("border", "");
+    
+    if($.trim($('[name="leave_policy"]').val()) == ""){
+        $('[name="leave_policy"]').parent().find('.error_msg').text('Please enter policy name');
+        $('[name="leave_policy"]').css("border", "1px solid #db8305");
+        error = error + 1;
+    }
+    
+    $('.contact_detail_row').each(function(){
+        
+        if ($.trim($(this).find('[name="leave_type[]"]').val()) == null || $.trim($(this).find('[name="leave_type[]"]').val()) == "") {
+            $(this).find('[name="leave_type[]"]').parent().find('.error_msg').text("Please select leave type*");
+            $(this).find('[name="leave_type[]"]').siblings(".select2-container").css("border-radius", "0.6rem").css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        
+        
+        if ($.trim($(this).find('[name="year_leave_count[]"]').val()) == "") {
+            error = error + 1;
+            $(this).find('[name="year_leave_count[]"]').css("border", "1px solid #db8305");
+            $(this).find('[name="year_leave_count[]"]').parent().find('.error_msg').text("Please enter year leave count*");
+        }
+        
+        if ($.trim($(this).find('[name="month_leave_count[]"]').val()) == "") {
+            error = error + 1;
+            $(this).find('[name="month_leave_count[]"]').css("border", "1px solid #db8305");
+            $(this).find('[name="month_leave_count[]"]').parent().find('.error_msg').text("Please enter month leave count*");
+        }
+        if ($.trim($(this).find('[name="consecutive_leave[]"]').val()) == "") {
+            error = error + 1;
+            $(this).find('[name="consecutive_leave[]"]').css("border", "1px solid #db8305");
+            $(this).find('[name="consecutive_leave[]"]').parent().find('.error_msg').text("Please enter consecutive leave*");
+        }
+        
+        if ($(this).find('[name="can_swipe[]"]').val() == "1") {
+            var reversible_leave_type_val = $(this).find('.reversible_leave_types').find('option:selected').length;
+            if (reversible_leave_type_val == 0) {
+                error = error + 1;
+                $(this).find('.reversible_leave_types').parent().find('.error_msg').text('Please select swipeable leave types*');
+                $(this).find('.reversible_leave_types').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            }
+        }
+    });
+    
+    if(error > 0){
+        return true;
+    }else{
+        return false;
+    }
+}
+
+$(document).on('keypress', '.alpha', function (e) {
+    return validateAlpha(e) ;
+});
+$(document).on('keypress', '.alpha_numeric', function (e) {
+    return validateAlphaNum(e) ;
+});
+$(document).on('keypress', '.numeric', function (e) {
+    return validateNum(e) ;
+});
+$(document).on('focusout', '.email', function (e) {
+    if(!validateEmail($(this).val())){
+        new PNotify({
+            title: 'Error',
+            text: "Invalid Email",
+            type: 'error',
+            styling: 'bootstrap3'
+        });
+        
+        $(this).val('');
+    }
+});
+
+
+
+function validateAlphaNum(e) {
+    
+    var specialKeys = new Array();
+    specialKeys.push(8);  //Backspace
+    specialKeys.push(9);  //Tab
+    specialKeys.push(46); //Delete
+    specialKeys.push(36); //Home
+    specialKeys.push(35); //End
+    specialKeys.push(37); //Left
+    specialKeys.push(39); //Right
+    var keyCode = e.keyCode == 0 ? e.charCode : e.keyCode;
+    var ret = ((keyCode >= 48 && keyCode <= 57) || (keyCode >= 65 && keyCode <= 90) || keyCode == 32 || (keyCode >= 97 && keyCode <= 122) || (specialKeys.indexOf(e.keyCode) != -1 && e.charCode != e.keyCode));
+    return ret;
+}
+
+function validateAlpha(e) {
+    console.log(e.keyCode)
+    var specialKeys = new Array();
+    specialKeys.push(8);  //Backspace
+    specialKeys.push(9);  //Tab
+    specialKeys.push(46); //Delete
+    specialKeys.push(36); //Home
+    specialKeys.push(35); //End
+    specialKeys.push(37); //Left
+    specialKeys.push(39); //Right
+    var keyCode = e.keyCode == 0 ? e.charCode : e.keyCode;
+    var ret = ((keyCode >= 65 && keyCode <= 90) || keyCode == 32 || (keyCode >= 97 && keyCode <= 122) || (specialKeys.indexOf(e.keyCode) != -1 && e.charCode != e.keyCode));
+    return ret;
+}
+
+function validateNum(e) {
+    
+    var specialKeys = new Array();
+    specialKeys.push(8);  //Backspace
+    specialKeys.push(9);  //Tab
+    specialKeys.push(46); //Delete
+    specialKeys.push(36); //Home
+    specialKeys.push(35); //End
+    specialKeys.push(37); //Left
+    specialKeys.push(39); //Right
+    var keyCode = e.keyCode == 0 ? e.charCode : e.keyCode;
+    var ret = ((keyCode >= 48 && keyCode <= 57) || (specialKeys.indexOf(e.keyCode) != -1 && e.charCode != e.keyCode));
+    return ret;
+}
+
+function validateEmail(email){
+    var regex = /^([a-zA-Z0-9_\.\-\+])+\@(([a-zA-Z0-9\-])+\.)+([a-zA-Z0-9]{2,4})+$/;
+    if(!regex.test(email)) {
+        return false;
+    }else{
+        return true;
+    }
+}
+/*---------------------Validation end----------------*/
+function openImageSelector(fileUploadID) {
+    $("#" + fileUploadID).click();
+}
+
+
+function fileUploader(id, previewId, fileType) {
+    for (var i = 0; i < $("#"+id).get(0).files.length; ++i) {
+        var file1=$("#"+id).get(0).files[i].name;
+        var error = 0;
+        document.getElementById('profile_image_error').innerHTML = '';
+        if(file1){                     
+            var ext = file1.split('.').pop().toLowerCase(); 
+            if($.inArray(ext,['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'])===-1){
+                error = 1;   
+                
+                document.getElementById('profile_image_error').innerHTML = ''+fileType+' should be jpg or png*';
+                $("#"+previewId).attr("src", "static/img/png/bannerBG.png");
+                $("#"+id).val('');
+            }else{
+                error = 0;
+                if(file1){                        
+                    var file_size=$("#"+id).get(0).files[i].size;
+                    file_size = Math.round((file_size / 1024));
+                    if(file_size>2048){
+                        error = 1;
+                        document.getElementById('profile_image_error').innerHTML = ''+fileType+' should be upto 2MB*';
+                        $("#"+previewId).attr("src", "static/img/png/bannerBG.png");
+                        $("#"+id).val('');
+                    }else{
+                        error = 0;
+                    }                        
+                } else {
+                    error = 0; 
+                }
+            }                        
+        } else {
+            error = 0;
+        }
+    }
+    if(error == 0){
+        var i = $('#' + id).prev("label").clone();
+        var temp = $('#' + id)[0].files;
+        var file = temp[0].name;
+        $('#' + id).prev("label").text(file);
+        readURL(temp, previewId);
+    }
+}
+function readURL(input, previewId) {
+    var reader = new FileReader();
+    reader.onload = function (e) {
+        $('#' + previewId).attr('src', e.target.result);
+        $('#' + previewId).css({ "width": "100%!important;", "transform": "translate(0,0)" });
+        $('#' + previewId).addClass('w-100 imgStyle');
+    }
+    reader.readAsDataURL(input[0]);
+}
+
+</script>
+

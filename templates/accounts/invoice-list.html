@@ -1,0 +1,96 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} {% endblock %}
+<style>
+    #addOrgTable thead th{
+        border:1px solid #e7e7e7!important;
+    }
+    #addOrgTable td{
+        border:1px solid #e7e7e7!important;
+    }
+</style>
+<div class="row" id="containerHeight">
+    <div class="col-md-12 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-5 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-7 p-md-0">
+                    
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-12 p-md-0 text-right">
+                            <input class="inputField" placeholder="Order Date" name="order_date" id="order_datepicker" value="{{ today_date }}" style="width: 25%; padding: 0.3rem;" onchange="getIndentReport()" readonly>
+                            {% if today_order_status > 0 and order_regenerate_status > 0 %}
+                            
+                            {% elif today_order_status == 0 %}
+                            
+                            {% elif today_order_status > 0 %}
+                            <a onclick="exportsInExcel()" href="javascript:void(0)" id="order_export" class="btn iconBox col-md-6 p-md-0 iconExports" style="width: 200px; margin-right: 220px; padding:0.1rem!important"></a>
+                            {% endif %}
+                            <a onclick="exportsInExcel()" href="javascript:void(0)" id="order_exports" class="btn iconBox col-md-6 p-md-0 iconExports" style="width: 200px; margin-right: 220px; padding:0.1rem!important; display: none;"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row" id="tableBox">
+                <div class="col-md-12 primaryContainerBG h-100 p-10 commonTableBg" id="ajax-div" >
+                        <table id="addOrgTable" class="table table-bordered mt-0" style="width: 100%; float: right;">
+                            <thead>
+                                <tr>
+                                    <th>Sr. No. </th>
+                                    <th>Distributor/SS Name </th>
+                                    <th>Address </th>
+                                    <th>Route </th>
+                                    <th>CIN</th>
+                                    <th>GST</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if user_list %}
+                                {% for user in user_list %}
+                                <tr>
+                                    <td align="center">{{ forloop.counter }}.</td>
+                                    <td>{{ user.user_name }}</td>
+                                    <td>{{ user.address }} </td>
+                                    <td>{{ user.route_name }} </td>
+                                    <td>{{ user.gstin }}</td>
+                                    <td>{{ user.cin }}</td>
+                                    <td><a href="{% url 'src:print-invoice' user.id %}" target="_blank" >Download</a></td>
+                                </tr>
+                                {% endfor %}
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    
+                </div>
+            </div>
+        </div>
+        
+    </div>
+</div>
+
+
+{% endblock content %}
+{% block script %}
+<script>
+    
+        $(document).ready(function () {
+            $("#order_datepicker").datepicker({  
+                changeMonth: true,
+                changeYear: true,  
+                yearRange: "-100:+0"
+                ,maxDate: 0,
+                dateFormat: 'dd/mm/yy' 
+            });
+        });
+        
+    </script>
+    {% endblock %}

@@ -1,0 +1,75 @@
+{% load static %}
+<style>
+    .header{
+        background-color: #0073e0;
+        color: #ffffff;
+    }
+</style>
+<div class="modal-AddUser centered" style="width: 65%!important;">
+    <form name="addBasicDetailsForms" id="addBasicDetailsForms" method="POST" enctype="multipart/form-data" >
+        {% csrf_token %}
+         <div class="modal-header" id="headerStep1">
+            <div class="col-12 p-0">
+                <div class="row">
+                    <div class="col-8">
+                        <h5 class="mt-md-2"><strong>{{ order_details.user_name }} - {{ order_details.order_code }}</strong>(<small>{{ order_details.order_date  | date:"d/m/Y h:i A" }}</small>)</h5>
+                    </div>
+                    <div class="col-4">
+                        <button class="btn btn-save float-right" type="submit" >
+                            Update
+                        </button>
+                        <button class="btn btn-close float-right" type="button" onclick="manipulateModal('addUserModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+            <div class="row">
+                <div class="col-md-12 p-0 h-100 w-100" id="step1">
+                    <div class="row">
+                        <div class="col-md-12 p-md-0 text-right">
+                            <img src="{% static 'img/svg/rupee.svg' %}" class="profileIconSize">&nbsp;&nbsp;<span
+                            style="font-size: 1.2rem;">{{ order_details.user_details.outstanding_amount }}</span>
+                            <h6 class="smalltext lightGrey">Outstanding Amt.</h6>
+                        </div>
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="header">Product</th>
+                                    <th class="header">Variant</th>
+                                    <th class="header">Quantity</th>
+                                    <th class="header">Rate</th>
+                                    <th class="header">Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if order_item_list %}
+                                {% for order_item in order_item_list %}
+                                <tr>
+                                    <td>{{ order_item.product_name }}</td>
+                                    <td>{{ order_item.product_variant_name }}</td>
+                                    <td>{{ order_item.quantity }}</td>
+                                    <td>{{ order_item.rate }}</td>
+                                    <td>{{ order_item.amount }}</td>
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" style="text-align: center;">No Record Found...</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    
+    
+    
+    

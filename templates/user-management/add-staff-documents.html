@@ -1,0 +1,1009 @@
+{% load static %}
+
+<div class="modal-AddUser centered">
+    <form name="addDocumentDetailsForms" id="addDocumentDetailsForms" method="POST" enctype="multipart/form-data" >
+        {% csrf_token %}
+        <input type="hidden" name="page-step" id="page-step" value="1" />
+        <input type="hidden" name="last_user_id" id="last_user_id" value="{% if last_user_id %} {{ last_user_id }} {% endif %}" >
+        <input type="hidden" name="user_type" id="user_type" value="{% if user_type %} {{ user_type }} {% endif %}" >
+        <div class="modal-header" id="headerStep3">
+            <div class="col-12 p-0">
+                <div class="row">
+                    <div class="col-6">
+                        <button class="iconCover" type="button" onclick="perviousPage('{{ last_user_id }}', '2')">
+                            <img src="{% static 'img/svg/backarrow.svg' %}" style="width: 1rem" />
+                        </button>
+                        <h5 class="mt-md-2" style="display: inline">
+                            &nbsp;&nbsp; Upload Documents
+                        </h5>
+                    </div>
+                    <div class="col-6">
+                        <!-- <button class="btn btn-save float-right" type="submit" >
+                            Save & Proceed
+                        </button> -->
+                        <button class="btn btn-primary float-right" type="button" onclick="closeDocumentModal('addUserModal')">
+                            Save & Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+            <div class="row">
+                <div class="col-md-12 p-0 h-100 w-100" id="step1">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12 p-0">
+                                    <div class="row">
+                                        <div class="col-md-4 p-0">
+                                            <div class="row">
+                                                <div class="col-md-12 p-0 mt-2">
+                                                    <div class="row">
+                                                        
+                                                        <div class="col-md-12 p-0 mt-2">
+                                                            <select class="inputField selectField" style="width: 100% !important;" name="document_type" id="document_type" onchange="getBranch(this.value)">
+                                                                <option value="">Select Documents </option>
+                                                                {% for document_type in document_types %}
+                                                                <option value="{{document_type.id}}" >{{document_type.document_name}}</option>
+                                                                {% endfor %}
+                                                            </select>
+                                                            <label class="error_msg float-right" id="document_type_error"></label>
+                                                        </div>
+                                                     
+                                                    </div>
+                                                    <div class="row mt-3">
+                                                        <!-- <div class="col-md-12 p-0">
+                                                            <div class="col-md-12 p-0">
+                                                            <div class="uploadsection">
+                                                                <div class="upload-btn-wrapper">
+                                                                    <img src="/static/img/png/DOC.png" class="profileIconSize">
+                                                                    <input type="file" name="document_path" />
+                                                                  </div>
+                                                            </div>
+                                                            </div>
+                                                        </div> -->
+                                                        <div class="col-md-12 p-0">
+                                                            
+                                                            <div class="col-md-12 p-0 mt-2">
+                                                                <div class="input-group mb-3">
+                                                                    <input type="text" name="document_number" id="document_number" class="filetext">
+                                                                    
+                                                                    <div class="input-group-prepend">
+                                                                        <span class="input-group-text" onclick="addDocument('{{last_user_id}}')">Scan</span>
+                                                                      </div>
+                                                                      <br/><label class="error_msg float-right" id="document_number_error"></label>
+                                                                  </div>
+                                                                
+
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                   
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-4 p-0">
+                                            <div class="row">
+                                                <div class="col-md-12" >
+                                                    
+                                                   <div class="tableinner mt-3 p-2 bgicon" id="document_div_ids">
+                                                   
+                                                       
+                                                    <h6 style="float: left;">Unallocated Documents</h6> 
+                                                    <img src="/static/img/png/icons8-refresh-30.png" style="width: 1rem; float: right;" onclick="refreshDocumentDiv()" title="refresh">
+                                                    <br clear="all">
+                                                    {% if document_lists %}
+                                                    <ul class="documentsec drsec" id="sortable1">
+                                                        {% for document_list in document_lists %}
+                                                        <li id="doc{{ forloop.counter }}" data-filter-item data-filter-name="{{ document_list.id }}">
+                                                          <div class="Filesec"><img src="/static/img/png/pdf.png"><div class="doctitle">{{ document_list.document_name }}</div> </div>
+                                                        </li> 
+                                                        {% endfor %}
+                                                      </ul>
+                                                    {% else %}
+                                                    <p style="text-align: center; color: red; border: 1px solid #dee2e6;">No Document Found...</p>
+                                                    {% endif %}
+
+                                                    <script>
+                                                        $(document).ready(function () {
+                                                            setTimeout(function () {
+                                                                var last_user_id = '{{ last_user_id }}';
+                                                                $.ajax({
+                                                                        url: "{% url 'src:staff-document-list' %}",
+                                                                        method: 'POST',
+                                                                        data: {last_user_id, last_user_id,document_list_count:'{{document_list_count}}',type:0,csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+                                                                        success: function (data) {
+                                                                            
+                                                                            if(data.error == true){
+
+                                                                            }else{
+                                                                                $('#document_div_ids').html(data);
+                                                                            }
+                                                                        },
+                                                                        error: function (err) {
+                                                                            console.log(err)
+                                                                        }
+                                                                    });
+                                                            }, 2000);
+                                                            });
+                                                    </script>
+                                                </div>
+                                        </div>
+                                    </div>
+                                            </div>
+                                            <div class="col-md-4 p-0">
+                                                <div class="row">
+                                                    <div class="col-md-12">
+                                                        
+                                                        <div class="tableinner mt-3 p-2 bgdoccontainer" id="document_div_id">
+                                                            <div class="groupsec">
+                                                                <button class="backicon" type="button">
+                                                                    <img src="{% static 'img/svg/backarrow.svg' %}" style="width: 1rem" />
+                                                                </button>
+                                                                <div class="adsadd">
+                                                                    <div class="addressec">
+                                                                      <span id="address_div">Address</span><br>
+                                                                      <div id="folderpath"></div>
+                                                                    </div>                                                                    
+                                                                </div>
+                                                            </div>
+                                                            <div id="master_div">
+                                                            <div id="rooms" draggable="false">
+                                                                
+                                                                <div class="row"><div class="col-md-12 pt-2 pb-0"><h6>Rooms</h6></div></div>
+                                                                
+                                                                <ul class="documentsec">
+                                                                    {% for room in rooms %}
+                                                                    <li>
+                                                                    <div class="Foldersec" id="rom{{ room.id }}" onclick="getMasterData('{{ room.id }}', '{{room.room}}', 'room', '{{college_id}}', '{{last_user_id}}')"><img src="/static/img/png/rooms.png"><div class="doctitle">{{ room.room }}</div> </div>
+                                                                    
+                                                                    </li> 
+                                                                    {% endfor %}
+                                                                </ul>
+                                                                </div>
+                                                            </div>
+                                                           
+                                                            
+                                                        </div>
+                                                        
+                                            </div>
+                                                    
+                                                </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="contact_number_error" val="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> 
+        <nav class="navbar fixed-bottom" id="modalFooter">
+            <div class="dropdown-divider w-100"></div>
+            <div class="col-1 offset-11 p-0">
+                <ul id="stepFooter">
+                    <li id="li1" class="selectedstep">
+                        <button class="btn btn-step activeStep" id="stepBtn1">
+                            ✔
+                        </button>
+                    </li>
+                    <li id="li2">
+                        <button class="btn btn-step activeStep" id="stepBtn2">
+                            ✔
+                        </button>
+                    </li>
+                    <li id="li3">
+                        <button class="btn btn-step activeStep" id="stepBtn3">
+                            ✔
+                        </button>
+                    </li>
+                    
+                </ul>
+            </div>
+        </nav>
+    </form>
+</div>
+
+<script>
+    function closeDocumentModal(modalId){
+        $("#" + modalId).hide();
+        $(".modal-backdrop").css("display", "none"); 
+        var url = "{% url 'src:students' %}";
+        window.location.href=url;
+    }
+    function refreshDocumentDiv(){
+        showLoader();
+        var last_user_id = '{{ last_user_id }}';
+        $.ajax({
+                url: "{% url 'src:student-document-list' %}",
+                method: 'POST',
+                data: {last_user_id, last_user_id,document_list_count:'{{document_list_count}}',type:0,csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+                success: function (data) {
+                    hideLoader();
+                    
+                    if(data.error == true){
+
+                    }else{
+                        $('#document_div_ids').html(data);
+                    }
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+    };
+
+    $(function () {
+        $("#rooms").draggable({ disabled: false });
+        $("ul.drsec").sortable({
+            connectWith: 'ul.drsec',
+            opacity: 0.6,
+            revert: true,
+            helper: function (e, item) {
+                console.log('parent-helper');
+                console.log(item);
+                if(!item.hasClass('selected1'))
+                   item.addClass('selected1');
+                var elements = $('.selected1').not('.ui-sortable-placeholder').clone();
+                var helper = $('<ul/>');
+                item.siblings('.selected1').addClass('hidden');
+                return helper.append(elements);
+            },
+            start: function (e, ui) {
+                
+                var elements = ui.item.siblings('.selected1.hidden').not('.ui-sortable-placeholder');
+                ui.item.data('items', elements);   
+                //var docid = $(ui.item).attr('data-filter-name'); 
+                //makeNewFile(docid);    
+            },
+            receive: function (e, ui) {
+                
+                ui.item.before(ui.item.data('items'));
+                var docid = $(ui.item).attr('data-filter-name');
+                var id = $('#id').val();
+                var type = $('#type').val();
+                var student_id = $('#student_id').val(); 
+                var college_id = $('#college_id').val();  
+                var master_name = $('#master_name').val(); 
+                var room_id = $('#room_id').val(); 
+                var room_name = $('#room_name').val(); 
+                var almira_id = $('#almira_id').val(); 
+                var almira_name = $('#almira_name').val(); 
+                var rack_id = $('#rack_id').val(); 
+                var rack_name = $('#rack_name').val();
+                makeNewFile(docid, id, type, student_id, college_id, master_name, room_id, room_name, almira_id, almira_name, rack_id, rack_name, '{{last_user_id}}');
+            
+            },
+            stop: function (e, ui) {
+                ui.item.siblings('.selected1').removeClass('hidden');
+                $('.selected1').removeClass('selected1');
+            },
+            update: function(e,ui){
+                ui.item.before(ui.item.data('items'));
+                var docid = $(ui.item).attr('data-filter-name');
+                updatePostOrder(docid);
+            }
+        });
+       
+    
+        $("#sortable1, #sortable2").disableSelection();
+        $("#sortable1, #sortable2").css('minHeight', $("#sortable1, #sortable2").height() + "px");
+    });
+    
+    function updatePostOrder(e) {
+        var arr = [];
+        
+        $("#sortable2 li").each(function () {
+            arr.push($(this).attr('id'));
+        });
+        
+    }
+    
+    
+    
+</script>
+  
+<script>
+   /* $("#doc1").draggable();
+    $("#dropfile").draggable();
+    $("#dropzone").droppable({
+        drop: function(event, ui) {
+            $(this).css('background', 'rgb(0,200,0)');
+        },
+        over: function(event, ui) {
+            $(this).css('background', 'orange');
+        },
+        out: function(event, ui) {
+            $(this).css('background', 'cyan');
+        }
+    }); 
+    function allowDrop(ev) {
+      ev.preventDefault();
+    }
+    
+    function drag(ev) {
+      ev.dataTransfer.setData("text", ev.target.id);
+    }
+    
+    function drop(ev) {
+      ev.preventDefault();
+      var data = ev.dataTransfer.getData("text");
+      ev.target.appendChild(document.getElementById(data));
+    }*/
+    </script>
+<script>
+    $('#almiras').hide();
+    $('#racks').hide();
+    $('#newfolder').hide();
+    $('#getfiles').hide();
+    $('#getfiles').hide();
+  function getMasterData(id, master_name, type, college_id, last_user_id, div_type=0){
+      $.ajax({
+            url: "{% url 'src:get-master-details' %}",
+            method: 'POST',
+            data: {id:id, type:type, college_id:college_id, master_name:master_name, last_user_id:last_user_id, csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+            success: function (data) {
+                if(div_type == 1){
+                    $('#getfiles').html(data);
+                } else {
+                    $('#master_div').html(data);
+                }
+                
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+      //alert(id);
+    //  $('#folderpath').val(id);
+    //  $('#folderpath').html('<a onclick=removeAlmira() href="#">'+id+'/</>');
+    //  $('#rooms').hide();
+    //  $('#almiras').show();
+  }
+  function removeAlmira(){
+   $("#folderpath").find("a:last").remove();
+    $('#rooms').show(); 
+   $('#almiras').hide(); 
+   $('#racks').hide(); 
+   $('#almiras').hide();  
+   $('#newfolder').hide();
+   $('#getfiles').hide();
+  }
+  function getRacks(e){
+    var id = e;
+    //alert(id);
+    var curentpath = id;
+   $('#folderpath').append('<a onclick=removeRacks() href="#">'+curentpath+'/</a>');
+   $('#rooms').hide(); 
+   $('#almiras').hide(); 
+   $('#racks').show(); 
+  }
+  function removeRacks(){
+    $("#folderpath").find("a:last").remove();
+    $('#rooms').hide(); 
+   $('#almiras').hide(); 
+   $('#racks').hide(); 
+   $('#almiras').show();  
+   $('#newfolder').hide();
+   $('#getfiles').hide();
+  }
+  function getfolder(e){
+    var id = e;
+    //alert(id);
+    var curentpath = id;
+  $('#folderpath').append('<a onclick=removeFolder() href="#">'+curentpath+'/</a>');
+   $('#rooms').hide();  
+   $('#almiras').hide(); 
+   $('#racks').hide(); 
+   $('#newfolder').show();
+  }
+  function removeFolder(){
+    $("#folderpath").find("a:last").remove();
+    $('#rooms').hide(); 
+   $('#almiras').hide(); 
+   $('#racks').show();   
+   $('#newfolder').hide();
+   $('#getfiles').hide();
+  }
+ 
+  function viewfolder(e){
+    var id = e;
+    //alert(id);
+    var curentpath = id;
+   $('#folderpath').append('<a onclick=backFolder() href="#">'+curentpath+'/</a>');
+   $('#rooms').hide();  
+   $('#almiras').hide(); 
+   $('#racks').hide(); 
+   $('#newfolder').hide();
+   $('#foldername').text(id)
+   $('#getfiles').show();
+  }
+  function backFolder(){
+    $("#folderpath").find("a:last").remove();
+    $('#rooms').hide(); 
+   $('#almiras').hide(); 
+   $('#racks').hide();   
+   $('#newfolder').hide();
+   $('#getfiles').show();
+  }
+    function addDocument(last_user_id){
+        var document_type = $('#document_type').val();
+        var document_number = $('#document_number').val();
+        error = 0;
+
+        $('.error_msg').css("border", "");
+        $('.error_msg').html("");
+        $('#document_type').css("margin-top", "0");
+        if(document_type == ''){
+            var error = 1;
+            document.getElementById('document_type_error').innerHTML = 'Please select document type*';
+            $('#document_type').css("border", "1px solid #db8305");
+        }
+
+        $('#document_number').css("margin-top", "0");
+        if(document_number == ''){
+            var error = 1;
+            document.getElementById('document_number_error').innerHTML = 'Please select document number*';
+            $('#document_number').css("border", "1px solid #db8305");
+        }
+
+        if (error == 0) {
+            showLoader();
+            $.ajax({
+                url: "{% url 'src:add-student-documents' %}",
+                method: 'POST',
+                data: {last_user_id, last_user_id, document_type:document_type, document_number:document_number, csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+                success: function (data) {
+                    $('#document_number').val('');
+                    hideLoader();
+                    if (data.error == true) {
+                        openToaster("danger", data.message);
+                    }else{
+                        openToaster("success", 'Document scan request sent successfully.');
+                        $('#document_div_ids').html(data);
+                    }
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+    };
+
+    $(".selectField").select2();
+    $('#addBasicDetailsForms').submit(function(e){
+        debugger;
+        /*var error = 0;
+        var a = document.forms["addBasicDetailsForms"]["college_name"].value;
+        document.getElementById('college_name_error').innerHTML = '';
+        $('.college_name').css("border", "");
+        $('#college_name').css("margin-top", "0");
+        if (a == null || a == "") {
+            var error = 1;
+            document.getElementById('college_name_error').innerHTML = 'Please enter college name*';
+            $('.college_nam').css("border", "1px solid #db8305");
+            $('#last_name').css("margin-top", "12px");
+            $('.error_msg').css("margin-bottom", "0rem");
+        }
+        
+        var b = document.forms["addBasicDetailsForms"]["first_name"].value;
+        document.getElementById('first_name_error').innerHTML = '';
+        $('#first_name').css("border", "");
+        if (b == null || b == "") {
+            var error = 1;
+            document.getElementById('first_name_error').innerHTML = 'Please enter First name*';
+            $('#first_name').css("border", "1px solid #db8305");
+        }
+
+        var c = document.forms["addBasicDetailsForms"]["last_name"].value;
+        document.getElementById('last_name_error').innerHTML = '';
+        $('#last_name').css("border", "");
+        if (c == null || c == "") {
+            var error = 1;
+            document.getElementById('last_name_error').innerHTML = 'Please enter Last name*';
+            $('#last_name').css("border", "1px solid #db8305");
+        }
+
+        
+        var e1 = document.forms["addBasicDetailsForms"]["mother_name"].value;
+        document.getElementById('mother_name_error').innerHTML = '';
+        $('#mother_name').css("border", "");
+        if (e1 == null || e1 == "") {
+            var error = 1;
+            document.getElementById('mother_name_error').innerHTML = 'Please enter mother name*';
+            $('#mother_name').css("border", "1px solid #db8305");
+        }
+        
+        var f1 = document.forms["addBasicDetailsForms"]["father_name"].value;
+        document.getElementById('father_name_error').innerHTML = '';
+        $('#father_name').css("border", "");
+        if (f1 == null || f1 == "") {
+            var error = 1;
+            document.getElementById('father_name_error').innerHTML = 'Please enter father name*';
+            $('#father_name').css("border", "1px solid #db8305");
+        }
+        
+        var r1 = document.forms["addBasicDetailsForms"]["reg_no"].value;
+        document.getElementById('official_reg_error').innerHTML = '';
+        $('#reg_no').css("border", "");
+        if (r1 == null || r1 == "") {
+            var error = 1;
+            document.getElementById('official_reg_error').innerHTML = 'Please enter registration number*';
+            $('#reg_no').css("border", "1px solid #db8305");
+        }
+
+        var a1 = document.forms["addBasicDetailsForms"]["aadhaar_no"].value;
+        document.getElementById('official_aadhar_error').innerHTML = '';
+        $('#aadhaar_no').css("border", "");
+        if (a1 == null || a1 == "") {
+            var error = 1;
+            document.getElementById('official_aadhar_error').innerHTML = 'Please enter aadhar number*';
+            $('#aadhaar_no').css("border", "1px solid #db8305");
+        }
+
+        var p1 = document.forms["addBasicDetailsForms"]["primary_contact_no"].value;
+        document.getElementById('contact_no_error').innerHTML = '';
+        $('#primary_contact_no').css("border", "");
+        if (p1 == null || p1 == "") {
+            var error = 1;
+            document.getElementById('contact_no_error').innerHTML = 'Please enter contact number*';
+            $('#primary_contact_no').css("border", "1px solid #db8305");
+        }
+
+        var p2 = document.forms["addBasicDetailsForms"]["branch"].value;
+        document.getElementById('branch_name_error').innerHTML = '';
+        $('#branch').css("border", "");
+        if (p2 == null || p2 == "") {
+            var error = 1;
+            document.getElementById('branch_name_error').innerHTML = 'Select branch name*';
+            $('#branch').css("border", "1px solid #db8305");
+        }
+
+        var p3 = document.forms["addBasicDetailsForms"]["sem_name"].value;
+        document.getElementById('sem_name_error').innerHTML = '';
+        $('#sem_name').css("border", "");
+        if (p3 == null || p3 == "") {
+            var error = 1;
+            document.getElementById('sem_name_error').innerHTML = 'Select Semester name*';
+            $('#sem_name').css("border", "1px solid #db8305");
+        }
+        
+        var contact_number_error = $('#contact_number_error').val(); */   
+        
+        if (error == 0) {
+            showLoader();
+            e.preventDefault();
+            $form = $(this)
+            var formData = new FormData(this);
+            $.ajax({
+                url: "{% url 'src:add-student-biometric-details' %}",
+                type: 'POST',
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    if (response.error == true) {
+                        location.reload();
+                        $(".error_msg").html('');
+                        var data = response.message;
+                        $.each(data, function (index, value) {
+                            console.log(index);
+                            console.log(value);
+                            $('#' + index).html(value);
+                        });
+                    } else {
+                        $('#addUserModal').html(response);
+                        
+                        //location.reload();
+                    }
+                },
+                error: function (response) {
+                    hideLoader();
+                    var data = response.responseText;
+                    openToaster("danger", data);
+                    // $.each(data, function (index, value) {
+                    //     console.log(index);
+                    //     console.log(value);
+                    //     $('#' + index).html(value);
+                    // });
+                }
+            });
+        } else {
+            var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+            $("#addUserModalBody").height(mch);
+            $(".selectField").select2();
+            return false;
+            
+        }
+    });
+    
+    
+    
+    function getState(country_id, id, store_state_id, store_city_id, permanent_city_id){
+        if(country_id != ""){
+            //showLoader();
+            var url = "{% url 'src:get-state-options' 1 %}";
+            url = url.replace(1,country_id)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    // hideLoader();
+                    $('[name="'+id+'"]').html(data.options)
+                    $(".selectField").select2();
+                    if(store_state_id!=''){
+                        $('#permanent_state_id').val(store_state_id).trigger('change');
+                        getCity(store_state_id, 'permanent_city_id', store_city_id); 
+                    }
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            });
+        } else {
+            $('[name="'+id+'"]').html('<option value="" selected>Select State</option>')
+            $('[name="'+permanent_city_id+'"]').html('<option value="" selected>Select City</option>')
+            $(".selectField").select2();
+        }
+        
+    }
+    
+    function getCity(state_id, id, store_city_id){
+        if(state_id != ""){
+            //showLoader();
+            var url = "{% url 'src:get-city-options' 1 %}";
+            url = url.replace(1,state_id)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    // hideLoader();
+                    $('[name="'+id+'"]').html(data.options)
+                    $(".selectField").select2();
+                    if(store_city_id!=''){
+                        $('#permanent_city_id').val(store_city_id).trigger('change');
+                    }
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            });
+        } else {
+            $('[name="'+id+'"]').html('<option value="" selected>Select City</option>')
+            $(".selectField").select2();
+        }
+        
+    }
+    function openImageSelector(fileUploadID) {
+        $("#" + fileUploadID).click();
+    }
+    
+    function fileUploader(id, previewId, fileType) {
+        for (var i = 0; i < $("#"+id).get(0).files.length; ++i) {
+            var file1=$("#"+id).get(0).files[i].name;
+            var error = 0;
+            if(fileType == 'Store Image'){
+                document.getElementById('store_image_error').innerHTML = '';
+            }else{
+                document.getElementById('profile_image_error').innerHTML = '';
+            }
+            
+            if(file1){                     
+                var ext = file1.split('.').pop().toLowerCase(); 
+                if($.inArray(ext,['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'])===-1){
+                    error = 1;   
+                    if(fileType == 'Store Image'){
+                        document.getElementById('store_image_error').innerHTML = ''+fileType+' should be jpg or png*';
+                    }else{
+                        document.getElementById('profile_image_error').innerHTML = ''+fileType+' should be jpg or png*';
+                    }
+                    if(fileType == 'Store Image'){
+                        $("#"+previewId).attr("src", "static/img/png/storePic.png");
+                    }else{
+                        $("#"+previewId).attr("src", "static/img/svg/uploadProfile.svg");
+                    }
+                    
+                    $("#"+id).val('');
+                }else{
+                    error = 0;
+                    if(file1){                        
+                        var file_size=$("#"+id).get(0).files[i].size;
+                        file_size = Math.round((file_size / 1024));
+                        if(file_size>2048){
+                            error = 1;
+                            if(fileType == 'Store Image'){
+                                document.getElementById('store_image_error').innerHTML = ''+fileType+' should be upto 2MB*';
+                            }else{
+                                document.getElementById('profile_image_error').innerHTML = ''+fileType+' should be upto 2MB*';
+                            }
+                            
+                            if(fileType == 'Store Image'){
+                                $("#"+previewId).attr("src", "static/img/png/storePic.png");
+                            }else{
+                                $("#"+previewId).attr("src", "static/img/svg/uploadProfile.svg");
+                            }
+                            $("#"+id).val('');
+                        }else{
+                            error = 0;
+                        }                        
+                    } else {
+                        error = 0; 
+                    }
+                }                        
+            } else {
+                error = 0;
+            }
+        }
+        if(error == 0){
+            var i = $('#' + id).prev("label").clone();
+            var temp = $('#' + id)[0].files;
+            var file = temp[0].name;
+            $('#' + id).prev("label").text(file);
+            readURL(temp, previewId);
+        }
+    }
+    
+    function readURL(input, previewId) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $('#' + previewId).attr('src', e.target.result);
+            $('#' + previewId).css({ "width": "100%!important;", "transform": "translate(0,0)" });
+            $('#' + previewId).addClass('w-100 imgStyle');
+        }
+        reader.readAsDataURL(input[0]);
+    }
+    
+    function sameAbove(formtype) {
+        var store_address_line_1 = document.getElementById('store_address_line_1')
+        var store_address_line_2 = document.getElementById('store_address_line_2')
+        var store_country_id = document.getElementById('store_country_id').value
+        var store_state_id = document.getElementById('store_state_id').value
+        var store_city_id = document.getElementById('store_city_id').value
+        var store_pincode = document.getElementById('store_pincode')
+        var permanent_address_line_1 = document.getElementById('permanent_address_line_1');
+        var permanent_address_line_2 = document.getElementById('permanent_address_line_2');
+        var permanent_country_id = document.getElementById('permanent_country_id');
+        var permanent_state_id = document.getElementById('permanent_state_id');
+        var permanent_city_id = document.getElementById('permanent_city_id');
+        var permanent_pincode = document.getElementById('permanent_pincode');
+        
+        permanent_address_line_1.value = store_address_line_1.value
+        permanent_address_line_2.value = store_address_line_2.value
+        permanent_pincode.value = store_pincode.value
+        
+        $('#permanent_country_id').val(store_country_id).trigger('change');
+        
+        if(store_country_id != ''){
+            getState(store_country_id, 'permanent_state_id', store_state_id, store_city_id, 'permanent_city_id');
+        }    
+    }
+    
+    $(".add_user_contact_person").click(function(){
+        var contactNumber = `<div class="row wrappers"><div class="col-md-4 mt-3">
+            <input class="inputField alpha" type="text" placeholder="Name" name="contact_person_name[]"
+            id="contact_person_name" maxlength="50" />
+            <label class="error_msg float-right" id="otherName_error"></label>
+        </div>
+        <div class="col-md-3 mt-3 pl-0">
+            <input class="inputField alpha" type="text" placeholder="Desgination" name="designation[]"
+            id="designation" maxlength="50" />
+            <label class="error_msg float-right" id="otherDesignation_error"></label>
+        </div>
+        <div class="col-md-4 mt-3 pl-0">
+            <input class="inputField numeric" type="text" placeholder="Contact no.*" name="contact_number[]"
+            id="contact_number" maxlength="10" />
+            <label class="error_msg float-right" id="otherContact_error"></label>
+        </div>
+        <div class="col-md-1 mt-3 pl-0">
+            <button class="iconCover float-right fa fa-trash removeContactPerson" style="padding: 0.75rem;" type="button" 
+            onclick="removeTableRow("otherContactCont")">
+        </button>
+    </div></div>`;
+    
+    $("#otherContactCont").append(contactNumber);
+    $('.removeContactPerson').click(function() {
+        $(this).closest('.wrappers').remove();
+    });
+    
+});
+
+$(".add_user_contact").click(function(){
+    var length = $('.contact_no_class').length;
+    console.log(length);
+    var contactPerson = `<div class="row wrapper">
+        <div class="col-md-2 mt-3 p-0">
+            <select class="inputField selectField" style="width: 100% !important;" name="country_code[]">
+                {% for country_code in country_codes %}
+                <option value="{{country_code.country_code}}">{{country_code.country_code}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3 mt-3">
+            <input class="inputField contact_no_class numeric" type="text" placeholder="Contact Number" name="contact_no[]"
+            id="contact_no_` + length + `" maxlength="10" />
+            <label class="error_msg float-right contact_no_err_class" id="contact_no_` + length + `_error"></label>
+        </div>
+        <div class="col-md-3 mt-3 pl-0">
+            <select class="inputField contact_type" style="width: 100% !important;" name="contact_type[]" id="contact_type_` + length + `">
+                {% for contact_type in contact_types %}
+                <option value="{{contact_type.id}}">{{contact_type.contact_type}}</option>
+                {% endfor %}
+            </select>
+            <label class="error_msg float-right contact_type_err_class" id="contact_type_` + length + `_error"></label>
+        </div>
+        <div class="col-md-3 mt-3 p-0">
+            <div class="inputfield">
+                <input type="radio" class="input_class_checkbox is_primary" name="is_primary[]" id="set_as_primary_1" >
+                <input type="hidden" name="primary_contact[]" value="0">
+                <label class="mb-0" for="user_Primary_name">Set as Primary</label>
+            </div>
+        </div>
+        <div class="col-md-1 mt-3 p-0">
+            <button class="iconCover float-right fa fa-trash removeContactNumber" style="padding: 0.75rem;" type="button" >
+            </button>
+        </div></div>`;
+        
+        $("#contactNumberCont").append(contactPerson);
+        $(".selectField").select2();
+        $('.removeContactNumber').click(function() {
+            $(this).closest('.wrapper').remove();
+            resetRowIndex();
+        });
+    });
+    
+    $('.removeContactNumber').click(function() {
+        $(this).closest('.wrapper').remove();
+        resetRowIndex();
+    });
+    
+    $('.removeContactPerson').click(function() {
+        $(this).closest('.wrappers').remove();
+    });
+    
+    $(document).on('click','.is_primary',function(){
+        
+        if($(this).prop('checked')){
+            $('.is_primary').prop('checked',false);
+            $('input[name="primary_contact[]"]').val(0);
+            $(this).prop('checked',true);
+            $(this).next().val(1);
+        }
+    });
+    
+    $(document).on('click','.self_owned_val',function(){
+        if ($(this).is(':checked')) {
+            $('#self_owned').val('1');
+        } else {
+            $('#self_owned').val('0');
+        }
+    });
+    
+    $(document).ready(function () {    
+        $("input[type='radio']").click(function () {
+            if ($("input[name='user_gender']:checked")) {
+                var radioValue = $("input[name='user_gender']:checked").val();
+                $("#user_gender_" + radioValue).attr("src", "static/img/svg/" + radioValue + ".svg");
+                if (radioValue == 'male') {
+                    $("#user_gender_female").attr("src", "static/img/svg/femalegrey.svg");
+                    $("#user_gender_other").attr("src", "static/img/svg/othergrey.svg");
+                } else if (radioValue == 'female') {
+                    $("#user_gender_male").attr("src", "static/img/svg/malegrey.svg");
+                    $("#user_gender_other").attr("src", "static/img/svg/othergrey.svg");
+                } else {
+                    $("#user_gender_male").attr("src", "static/img/svg/malegrey.svg");
+                    $("#user_gender_female").attr("src", "static/img/svg/femalegrey.svg");
+                }
+            }
+        });
+    });
+    
+    function resetRowIndex(){
+        obj = $('#addUserModalBody').find('.contact_no_class');
+        $.each( obj, function( key, value ) {
+            id=value.id;
+            var sum = key;
+            $('#'+id).attr('id', 'contact_no_'+sum);
+        });
+        
+        obj = $('#addUserModalBody').find('.contact_no_err_class');
+        $.each( obj, function( key, value ) {
+            id=value.id;
+            var sum = key;
+            $('#'+id).attr('id', 'contact_no_'+sum+'_error');
+        });
+
+        obj = $('#addUserModalBody').find('.contact_type_err_class');
+        $.each( obj, function( key, value ) {
+            id=value.id;
+            var sum = key;
+            $('#'+id).attr('id', 'contact_type_'+sum+'_error');
+        });
+
+        $(document).ready(function () { 
+            
+            // function role_filter_by_org(){
+            //     var filter_org_id = $('#college_name').val();
+            //     console.log("College Name: ", filter_org_id)
+            //     if(filter_org_id){
+            //         $.ajax({
+            //             url: "{% url 'src:filter-by-organization' %}",
+            //             type: 'POST',
+            //             data: {filter_org_id:filter_org_id,csrfmiddlewaretoken: '{{ csrf_token }}'},
+            //             success: function (response) {                        
+            //                 hideLoader();
+            //                 if (response.filter_role_option !='') {
+            //                     $('#branch').html(response.branch_option);
+            //                 } else {
+            //                     openToaster("danger", response.filter_role_option);
+            //                     openToaster("danger", response.filter_role_option);
+            //                 }
+            //             }
+            //         });
+            //     }else{
+            //         $('#filter_role_id').html('');
+            //     }
+                
+            // }
+
+            $("#date_of_birth").datepicker({  
+				changeMonth: true,
+				changeYear: true,  
+				yearRange: "-100:+0"
+				,maxDate: 0,
+				dateFormat: 'dd/mm/yy' 
+				});
+                
+                   
+            $("input[type='radio']").click(function () {
+                if ($("input[name='user_gender']:checked")) {
+                    var radioValue = $("input[name='user_gender']:checked").val();
+                    $("#user_gender_" + radioValue).attr("src", "static/img/svg/" + radioValue + ".svg");
+                    if (radioValue == 'male') {
+                        $("#user_gender_female").attr("src", "static/img/svg/femalegrey.svg");
+                        $("#user_gender_other").attr("src", "static/img/svg/othergrey.svg");
+                    } else if (radioValue == 'female') {
+                        $("#user_gender_male").attr("src", "static/img/svg/malegrey.svg");
+                        $("#user_gender_other").attr("src", "static/img/svg/othergrey.svg");
+                    } else {
+                        $("#user_gender_male").attr("src", "static/img/svg/malegrey.svg");
+                        $("#user_gender_female").attr("src", "static/img/svg/femalegrey.svg");
+                    }
+                }
+            });
+        });
+        
+        
+    }
+</script>
+
+<script>
+    function role_filter_by_org(){
+        var filter_org_id = $('#college_name').val();
+        console.log("College Name: ", filter_org_id)
+        if(filter_org_id){
+            $.ajax({
+                url: "{% url 'src:filter-by-organization' %}",
+                type: 'POST',
+                data: {filter_org_id:filter_org_id,csrfmiddlewaretoken: '{{ csrf_token }}'},
+                success: function (response) {                        
+                    hideLoader();
+                    if (response.filter_role_option !='') {
+                        $('#branch').html(response.branch_option);
+                    } else {
+                        openToaster("danger", response.filter_role_option);
+                        openToaster("danger", response.filter_role_option);
+                    }
+                }
+            });
+        }else{
+            $('#filter_role_id').html('');
+        }
+        
+    }
+</script>

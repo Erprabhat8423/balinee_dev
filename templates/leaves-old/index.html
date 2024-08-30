@@ -1,0 +1,999 @@
+{% extends 'layout/layout.html' %}
+
+{% block title %}
+{{page_title}} 
+{% endblock %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} 
+<link rel="stylesheet" href="{% static 'css/jquery-confirm.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/student-attendance-screen.css' %}">
+<style>
+ 
+    .addRoleIcon{
+        height: 20px;
+    }
+    .google-visualization-orgchart-node {
+        background: #d0dee2a8 !important;
+        border: 1px solid #bcbcc5 !important;
+        border-radius: 4px 4px 4px 4px;
+        box-shadow: 0 1 5px #F2F2F2, 0 -1px 1px #FFFFFF inset;
+        padding-bottom: 15px !important;
+        padding-top: 10px !important;
+        width: 165px !important;
+    }
+    table {
+        border-collapse: separate !important;
+    }
+    
+    
+    .google-visualization-orgchart-lineleft {
+        border-left: 1px solid #CFCDCE !important;
+    }
+    
+    .google-visualization-orgchart-linebottom {
+        border-bottom: 1px solid #CFCDCE !important;
+    }
+    
+    .google-visualization-orgchart-node {
+        color: #3a3a38;
+        ;
+    }
+    
+    .google-visualization-orgchart-lineright {
+        border-right: 1px solid #CFCDCE !important;
+    }
+    
+    .plus {
+        position: relative;
+        top: 0px;
+        height: 0px;
+        cursor: pointer;
+    }
+    
+</style> 
+{% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-8 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-4 col-12 p-md-0">
+                    <h6 class="font-wt-b mt-2 mb-0">{{page_title}} <span class="fa fa-star ml-2 add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-8 col-12 p-md-0">
+                    
+                </div>
+            </div>
+            
+            <div class="row">
+                <div class="col-md-6 pl-0">
+                    <div class="row">
+                        <!--<div class="col-md-6 pl-0">-->
+                        <!--    <select class="inputField selectField px-0" name="policy_status" id="policy_status" onchange="getPolicyRecord()" style="display:none;">-->
+                        <!--        <option value="all_status">All Status</option>-->
+                        <!--        <option value="0" {% if order_status == 1 %} selected {% endif %}>Discarded</option>-->
+                        <!--        <option value="1" {% if order_status == 1 %} selected {% endif %}>Initiated</option>-->
+                        <!--        <option value="2" {% if order_status == 2 %} selected {% endif %}>Forwarded</option>-->
+                        <!--        <option value="3" {% if order_status == 3 %} selected {% endif %}>Approved</option>-->
+                        <!--    </select>-->
+                        <!--</div>-->
+                        <!--<div class="col-md-6 px-0">-->
+                        <!--    <button type="button" class="btn iconBox iconForward" data-toggle="modal" data-target="#addOrganisationModal" id="forwardButton" name="forwardButton" title="Forward" value="" style="float:left;display: none;" onclick="getRecordUpdated(this.value)"> </button>-->
+                        <!--    <button type="button" class="btn iconBox iconApproved" data-toggle="modal" data-target="#addOrganisationModal" id="approvedButton" name="approvedButton" title="Approve" value="" style="float:left;display: none;" onclick="getRecordUpdated(this.value)"></button>-->
+                        <!--    <button type="button" class="btn iconBox iconDiscard" data-toggle="modal" data-target="#addOrganisationModal" id="discardButton" name="discardButton" title="Discard" value="0" style="float:left;display: none;" onclick="getRecordUpdated(this.value)"></button>-->
+                        <!--</div>-->
+                    </div>
+                    
+                </div>
+                
+                <div class="col-md-6 text-right">
+                    
+                    <input class="search searchTable search mr-2" style="width: 30%;" placeholder="Search" type="search" data-column="all" id="masterSearchLeave" onkeyup="masterSearch(this)">
+                    
+                    <button type="button" class="btn iconBox iconAddLvPolicy" title="Add Policy" onclick="addPolicy()" data-toggle="modal" data-target="#addUserModal"></button>
+                    <div class="dropdown show-hide"   id="hideColumn" style="display: inline-block;">
+                        <button class="btn iconBox iconHide" title="Hide" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div class="dropdown-menu dropdown-menu-right logoutContainer" aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="leave_policy_name" id="leave_policy_name" data-id="2" onclick="showHideColumns(this.id,2)" />
+                                <label class="mb-0" for="leave_policy_name">Policy Name</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="total_leave_types" id="total_leave_types"  data-id="3" onclick="showHideColumns(this.id, 3)" />
+                                <label class="mb-0" for="total_leave_types">Total leaves</label>
+                            </a>
+                            {% comment %} <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="Status" id="Status"  data-id="4" onclick="showHideColumns(this.id, 4)" />
+                                <label class="mb-0" for="Status">Status</label>
+                            </a> {% endcomment %}
+                        </div>
+                    </div>
+                    <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                        <button class="btn iconBox iconUnFreeze" title="Stick" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                        aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="leave_policy_name" id="lock_leave_policy_name" data-id="2"
+                            onclick="toggleFreeze(this.id,'leave_policy_name',2)" />
+                            <label class="mb-0" for="lock_leave_policy_name">Policy Name</label>
+                        </a>
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="total_leave_types"
+                            id="lock_total_leave_types" data-id="3" 
+                            onclick="toggleFreeze(this.id,'total_leave_types',3)" />
+                            <label class="mb-0" for="lock_total_leave_types">Total leaves</label>
+                        </a>
+                        
+                        {% comment %} <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="Status"
+                            id="lock_status" data-id="4" 
+                            onclick="toggleFreeze(this.id,'Status',4)" />
+                            <label class="mb-0" for="lock_status">Status</label>
+                        </a> {% endcomment %}
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        <div class="row mt-2" id="tableBox" style="display: block;">
+            <div class="col-md-12 primaryContainerBG h-100 p-0 commonTableBg" id="ajax-div" >
+                <input type="hidden" name="page" id="page" value="2" />
+                <input type="hidden" name="page_status" id="page_status" value="0" />
+                <input type="hidden" name="total_pages" id="total_pages" value="{{ total_pages }}" />
+                <table id="addOrgTable" class=" detail-table table table-borderless table-striped table-hover mt-0"
+                style="width: 100%;">
+                <thead>
+                    <tr>
+                        <!--<th class="sorter-false checked_all" style="border-right:none!important; width:20px!important; min-width: 20px!important;" style="width: 4.5%;"><input type="checkbox" class="checked_all" id="new_module_1" onchange="masterCheckBox()"> </th>-->
+                        <th class="leave_policy_name" id="leave_policy_name">
+                            Policy Name
+                            <!--<i class="fa fa-fw fa-sort float-right"></i>-->
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="total_leave_types" id="total_leave_types">Total leaves
+                            <!--<i class="fa fa-fw fa-sort float-right"></i>-->
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        {% comment %} <th class="Status" id="lock_status">Status
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th> {% endcomment %}
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="tablebody">
+                    {% if leave_policies %}
+                    {% for leave_policy in leave_policies %}
+                    <tr  {% if forloop.first %} class="odd selected"  {% endif %}>                    
+                        <!--<td class="sorter-false checkbox" onclick="getLeavePolicyRecord('{{ leave_policy.id }}')">-->
+                        <!--    {% if leave_policy.leave_status != 3 %}-->
+                        <!--    <input type="checkbox" class="checkbox" id="new_module_1" name="policy_id[]" value="{{ leave_policy.id }}">-->
+                        <!--    {% else %} -->
+                        <!--    {% if leave_policy.leave_status == 1 %}-->
+                        <!--    <input type="checkbox" class="checkbox" id="new_module_1" name="policy_id[]" value="{{ leave_policy.id }}">-->
+                        <!--    {% elif leave_policy.leave_status == 2 %}-->
+                        <!--    <input type="checkbox" class="checkbox" id="new_module_1" name="policy_id[]" value="{{ leave_policy.id }}">-->
+                        <!--    {% elif leave_policy.leave_status == 3 %}-->
+                        <!--    <input type="checkbox" class="checkbox" id="new_module_1" name="policy_id[]" value="{{ leave_policy.id }}">-->
+                        <!--    {% else %}-->
+                        <!--    <input type="checkbox" disabled checked>-->
+                        <!--    {% endif %}-->
+                            
+                        <!--    {% endif %}-->
+                        <!--</td>-->
+                        
+                        <td class="leave_policy_name" onclick="getLeavePolicyRecord('{{ leave_policy.id }}')">{{ leave_policy.leave_policy | title }} <br>({{ leave_policy.organization_name }})</td>
+                        <td class="total_leave_types" onclick="getLeavePolicyRecord('{{ leave_policy.id }}')">{{ leave_policy.total_leave_count }}</td>
+                        {% comment %} {% if leave_policy.policy_status == 0 %}
+                        <td class="Status" onclick="getLeavePolicyRecord('{{ leave_policy.id }}')">Discarded</td>
+                        {% elif leave_policy.policy_status == 1 %}
+                        <td class="Status" onclick="getLeavePolicyRecord('{{ leave_policy.id }}')">Initiated</td>
+                        {% elif leave_policy.policy_status == 2 %}
+                        <td class="Status" onclick="getLeavePolicyRecord('{{ leave_policy.id }}')">Forwarded</td>
+                        {% elif leave_policy.policy_status == 3 %}
+                        <td class="Status" onclick="getLeavePolicyRecord('{{ leave_policy.id }}')">Approved</td>
+                        {% endif %} {% endcomment %}
+                        <td>
+                            <a href="javascript:void(0)" onclick="editLeavePolicy('{{ leave_policy.id }}')" data-toggle="modal" data-target="#addUserModal" class="action_editor">
+                                <img src="{% static 'img/svg/editcopy.svg' %}" title="Edit" />
+                            </a> 
+                          
+                            <div class="d-inline-block">
+                                <label class="switch" onclick="updateLeavePolicyStatus('{{ leave_policy.id }}', '{{ leave_policy.status }}')">
+                                    <input type="checkbox" class="checkbox" name="is_active" {% if leave_policy.status == 1 %} checked="" {% else %} {% endif %} id="is_active_{{ leave_policy.id }}" >
+                                    <span class="slider round" title="Enable/Disable"></span>
+                                </label>
+                            </div> 
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    <tr id="loading" style="display: none;">
+                        <td class="text-center" colspan="4"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                        </td>
+                    </tr>
+                    
+                    {% else %}
+                    <tr>
+                        <td colspan="4" style="text-align: center;">No Record Found...</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+        
+    </div>
+</div>
+</div>
+<div class="col-md-4 h-100">
+    <div class="primaryContainerBG h-100" id="detailsBox">
+        
+        {% if last_leave_policy_details %}
+        
+        <div class="row" id="detailsBoxFirst" style="display: block;">
+            <div class="col-md-12 p-md-0">
+                <h6><b> {{last_leave_policy.leave_policy}}</b></h6>
+                ({{ last_leave_policy.organization_name }})
+            </div>
+            
+            <div class="col-md-12 p-md-0">
+                <div class="row mb-2">
+                    
+                    {% for last_leave_policy_detail in last_leave_policy_details %}
+                    <div class="row deptRow">
+                        <div class="col-md-6 p-md-0">
+                            <h6 class="deptRowHead"><b style="color: black;">{{last_leave_policy_detail.leave_type}}</b></h6>
+                        </div>
+                        <div class="col-md-12 p-md-0">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <span class="smallText">Year Leave Count</span><br>
+                                    <span class="largeText">{{last_leave_policy_detail.year_leave_count}}</span>
+                                </div>
+                                <div class="col-md-4">
+                                    <span class="smallText">Month Leave Count</span><br>
+                                    <span class="largeText">{{last_leave_policy_detail.month_leave_count}}</span>
+                                </div>
+                                <div class="col-md-4">
+                                    <span class="smallText">Consecutive Leaves</span><br>
+                                    <span class="largeText">{{last_leave_policy_detail.consecutive_leave}}</span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <span class="smallText">Carry forward</span><br>
+                                    <span class="largeText">{% if last_leave_policy_detail.is_carry_forward > 0 %}Yes{% else %}No{% endif %}</span>
+                                </div>
+                                <div class="col-md-4">
+                                    <span class="smallText">Salary affecting</span><br>
+                                    <span class="largeText">{% if last_leave_policy_detail.is_salary_affecting > 0 %}Yes{% else %}No{% endif %}</span>
+                                </div>
+                                <div class="col-md-4">
+                                    <span class="smallText">Halfday Included</span><br>
+                                    <span class="largeText">{% if last_leave_policy_detail.is_halfday_included > 0 %}Yes{% else %}No{% endif %}</span>
+                                </div>
+                                <div class="col-md-4">
+                                    <span class="smallText">Can Swipe</span><br>
+                                    <span class="largeText">{% if last_leave_policy_detail.can_swipe > 0 %}Yes{% else %}No{% endif %}</span>
+                                </div>
+                                <div class="col-md-4">
+                                    <span class="smallText">Excess Leave</span><br>
+                                    <span class="largeText">{% if last_leave_policy_detail.access_leave > 0 %}Yes{% else %}No{% endif %}</span>
+                                </div>
+                                {% if last_leave_policy_detail.can_swipe > 0 %}
+                                <div class="col-md-4">
+                                    <span class="smallText">Swipeable Leave Types</span><br>
+                                    <span class="largeText">{{last_leave_policy_detail.swipeable_leave_types}}</span>
+                                </div>
+                                {% endif %}
+                                {% if last_leave_policy_detail.access_leave > 0 %}
+                                <div class="col-md-4">
+                                    <span class="smallText">Excess Leave Types</span><br>
+                                    <span class="largeText">{{last_leave_policy_detail.access_leave_types}}</span>
+                                </div>
+                                {% endif %}
+                                {% if last_leave_policy_detail.apply_leave_before %}
+                                <div class="col-md-4">
+                                    <span class="smallText">Apply Leave Before</span><br>
+                                    <span class="largeText">{{last_leave_policy_detail.apply_leave_before}}</span>
+                                </div>
+                                {% endif %}
+                                <div class="col-md-4">
+                                    <span class="smallText">Fraction of Leave</span><br>
+                                    <span class="largeText">{% if last_leave_policy_detail.is_fraction_leave > 0 %}Yes{% else %}No{% endif %}</span>
+                                </div>
+                                <div class="col-md-4">
+                                    <span class="smallText">Avail Advance Leave</span><br>
+                                    <span class="largeText">{% if last_leave_policy_detail.is_avial_advance_leave > 0 %}Yes{% else %}No{% endif %}</span>
+                                </div>
+                                <div class="col-md-4">
+                                    <span class="smallText">Is Document Required</span><br>
+                                    <span class="largeText">{% if last_leave_policy_detail.is_document_required > 0 %}Yes{% else %}No{% endif %}</span>
+                                </div>
+                            </div>
+                        </div>
+                     
+                    </div>
+                    {% endfor %}
+                    {% if mapped_roles %}
+                    <div class="col-md-12 p-2">
+                        
+                        <h6><b> Mapped Roles </b></h6> 
+                        <span style="color: #0052a0;">
+                            <ul class="list-group list-group-striped taglist">
+                                {% for role_name in mapped_roles %}
+                                <li>{{role_name.role_name}}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </span>
+                    </div>
+            </div>
+            
+        </div>
+        {% else %}
+        <p>No record found</p>
+        {% endif %}
+        
+    </div>
+</div>
+</div>
+
+<!-- *************************************Modal********************************** -->
+<div class="overlayModal" id="addUserModal" data-keyboard="false" data-backdrop="static">
+</div>
+<div class="overlayModal" id="addDescription" style="display: none;">
+    <div class="md-modal centered basic-inform-popup" >
+        <form name="addBasicDetailsForms" id="addBasicDetailsForms" method="POST" enctype="multipart/form-data" >
+            {% csrf_token %}
+            <input type="hidden" name="user_id" id="user_id" value="{{ user.id }}" >
+            <div class="modal-header" id="headerStep1">
+                <div class="col-12 col-sm-12 px-0">
+                    <div class="row">
+                        <div class="col-5 col-sm-5 px-0 ">
+                            <h5 class="mt-md-2">Description</h5>
+                        </div>
+                        <div class="col-7 col-sm-7 px-0">
+                            <button class="btn btn-close float-right mr-0" value="close" type="button" onclick="closeDiv()">
+                                Close
+                            </button>
+                            <button class="btn btn-save float-right mr-2" type="button" value="0" onclick="discard(this.value)" >
+                                Submit
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>        
+            <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+                <div class="col-md-12 col-12 px-0 " id="step1">
+                    <div class="row">
+                        <div class="col-md-12 col-12 pl-0 pr-3 mob-pr-0">
+                            <textarea class="inputField" id="description" name="description"></textarea>                        
+                        </div>                    
+                    </div>
+                </div>
+            </div>
+        </form>   
+    </div>
+</div>
+<!-- *************************************Modal********************************** -->
+{% endblock content %}
+{% block script %}
+<script src="{% static 'js/jquery-confirm.min.js' %}"></script>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+
+<script>
+    
+    $(document).ready(function () {
+        var policy_status = $('#policy_status').val();
+        if(policy_status == 'all_status'){
+            $(".checkbox").attr("disabled", true);
+            $(".checked_all").attr("disabled", true);
+            $(".checkbox").hide();
+            $(".checked_all").hide();
+        }
+        var prevTop = 0;
+        
+        $('.commonTableBg').on('scroll', function () {
+            
+            var page = $('#page').val();
+            var totalPages = $('#total_pages').val();
+            
+            var currentTop = $(this).scrollTop();
+            
+            if (prevTop !== currentTop) {
+                prevTop = currentTop;
+                
+                
+                
+                if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+                    if($('#page_status').val() == 0 && page <= totalPages){
+                        $('#loading').show(); 
+                        $('#page_status').val('1');
+                        $.ajax({
+                            url: "{% url 'src:ajax-leave-policy-rows' %}",
+                            method: 'GET',
+                            data: { page:page },
+                            success: function (data) {
+                                setTimeout(() => {
+                                    $('#tablebody').find('tr:last').prev().after(data);
+                                    $('#page').val(parseInt(page)+1);
+                                    $('#loading').hide();
+                                    $('#page_status').val('0');
+                                    $('#addOrgTable').trigger('update');
+                                }, 2000);
+                            },
+                            error: function (err) {
+                                alert(err.message);
+                                window.location.reload();
+                            }
+                        });
+                    }
+                }
+            }
+        })
+        
+    });
+    
+    function freezeColumn(id, colNo) {
+        $('#' + id).addClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function (index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter", "false");
+        });
+        $('#' + id + ' #freeze').show();
+        $('#' + id + ' #unfreeze').hide();
+    }
+    
+    function unfreezeColumn(id, colNo) {
+        $('#' + id).removeClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function (index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter");
+        });
+        $('#' + id + ' #unfreeze').show();
+        $('#' + id + ' #freeze').hide();
+    }
+    
+    function toggleFreeze(inputid, colid, colNo) {
+        var checkbox = document.getElementById(inputid);
+        if (checkbox.checked == true) {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+            });
+            $('#' + colid + ' #freeze').show();
+            $('#' + colid + ' #unfreeze').hide();
+        } else {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").removeClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("sorter-false");
+            });
+            $('#' + colid + ' #unfreeze').show();
+            $('#' + colid + ' #freeze').hide();
+        }
+    }
+    
+    function showHideColumns(inputid, colNo) {
+        var checkbox_val = [];
+        var checkbox = document.getElementById(inputid);
+        if (checkbox.checked == true) {
+            $('.'+inputid).hide();
+        }else{
+            $('.'+inputid).show();
+        }
+        $("input:checkbox[class=colCheck]").each(function () {
+            if(!$(this).is(':checked')){
+                checkbox_val.push($(this).attr("id"))
+            }
+        });
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+    }
+    
+    $(document).ready(function () {
+        
+        var checkbox_val = ["org_name","landline_no","mobile_no","email_id"];
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+        
+        $(".colCheck").change(function () {
+            if ($(".colCheck:not(:checked)").length == $(".colCheck").length) {
+                //do something
+                $(".iconHide").css("background-image", "url(/static/img/png/hide.png)");
+            } else {
+                $(".iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+            }
+        });
+        
+        $(".colFreezeCheck").change(function () {
+            if ($(".colFreezeCheck:not(:checked)").length == $(".colFreezeCheck").length) {
+                //do something
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/unfreeze.svg)");
+            } else {
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/freeze.svg)");
+            }
+        });
+    });
+    
+    $(window).resize(function () {
+        setHeightWidth();
+    });
+    
+</script>
+
+<script>
+    function addPolicy() {
+        $('#addUserModal').html('');
+        $('#addDeptModal').html('');
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:add-leave-policy' %}",
+            method: 'GET',
+            data: {},
+            success: function (data) {
+                hideLoader();
+                $("#addUserModal").show();
+                $('#addUserModal').html(data);
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    function editLeavePolicy(id) {
+        $('#addUserModal').html('');
+        $('#addDeptModal').html('');
+        showLoader();
+        url = "{% url 'src:edit-leave-policy' '1' %}";
+        url = url.replace('1',id)
+        
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+                hideLoader();
+                $("#addUserModal").show();
+                $('#addUserModal').html(data);
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    {% comment %} function getLeavePolicyFilterRecord(policy_status) {
+        $('#detailsBox').html('<div style="margin-top:40px; text-align:center"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+            //showLoader();
+            url = "{% url 'src:leave-policy-filter-short-details' '1'%}";
+            alert(policy_status)
+            url = url.replace('1',policy_status)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                //data: { policy_status:policy_status, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                success: function (data) {
+                    //hideLoader();
+                    $('#detailsBox').html(data);
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        } {% endcomment %}
+
+    function getLeavePolicyRecord(id) {
+        $('#detailsBox').html('<div style="margin-top:40px; text-align:center"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+            //showLoader();
+            url = "{% url 'src:leave-policy-short-details' '1' %}";
+            url = url.replace('1',id)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    //hideLoader();
+                    $('#detailsBox').html(data);
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+        
+        function updateLeavePolicyStatus(id, active_status) {
+         
+            if (active_status == 0) {
+                is_active = 1;
+                status = 'Unblock';
+            } else {
+                is_active = 0;  
+                status = 'Block';
+            }
+            
+            //showLoader();
+            $.ajax({
+                url: "{% url 'src:update-leave-policy-status' %}",
+                method: 'POST',
+                data: {
+                    id: id,
+                    is_active: is_active,
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (data) {
+                    if (data.error == false) {
+                        hideLoader();
+                        openToaster("success", data.message);
+                    }
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+         
+        function ajaxOrganizationList(page) {
+            $('#ajax-div').html('');
+            // showLoader();
+            $.ajax({
+                url: "{% url 'src:ajax-organization-list' %}",
+                method: 'GET',
+                data: { page:page },
+                success: function (data) {
+                    hideLoader();
+                    $('#ajax-div').html(data);
+                    
+                    $('#addOrgTable').tablesorter({
+                        widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                        widgetOptions: {
+                            resizable_addLastColumn: true,
+                            resizable: false,
+                            resizable_widths: ["21.5%", "21.5%", "21.5%", "21.5%", "12%"],
+                            stickyHeaders_attachTo: ".primaryContainerBG",
+                            filter_external: '.search',
+                            filter_columnFilters: false,
+                        }
+                    });
+                    $("#addOrgTable tbody tr").click(function () {
+                        $(this).addClass("selected").siblings().removeClass("selected");
+                    });
+                    $(".deptRow").click(function () {
+                        $(this).addClass("deptSelected").siblings().removeClass("deptSelected");
+                    });
+                    
+                    
+                    $(".primaryContainerBG").scroll(function () {
+                        var divTable = $(".primaryContainerBG");
+                        $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                    });
+                    
+                },
+                error: function (err) {
+                    alert(err.message);
+                    window.location.reload();
+                }
+            });
+        }
+        function masterSearch(element){
+            url = '';
+            var value = $(element).val();
+            var id = $(element).attr('id');
+            if(value != ""){
+                $('#tablebody').html('');
+                url = "{% url 'src:leave-policies-filter' 1 %}"
+                url = url.replace('1',value);
+                if(url != ""){
+                    
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        data: { value:value, id:id, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                        success: function (data) {
+                            hideLoader();
+                            $('#tablebody').html(data);
+                        },
+                        error: function (err) {
+                            alert(err.message);
+                            // window.location.reload();
+                        }
+                    });
+                }
+            }else{
+                $('#tablebody').html('');
+                url = "{% url 'src:leave-policies-filter' 1 %}"
+                if(url != ""){
+                    
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        data: { value:value, id:id, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                        success: function (data) {
+                            hideLoader();
+                            $('#tablebody').html(data);
+                        },
+                        error: function (err) {
+                            alert(err.message);
+                            // window.location.reload();
+                        }
+                    });
+                }
+                
+            }            
+        }
+        
+        function getPolicyRecord(){
+            var policy_status = $('#policy_status').val();
+            var policy_search = $('#masterSearchLeave').val();
+            //getLeavePolicyFilterRecord(policy_status);
+            var totalCheckedBox = 0
+            $('#forwardButton').hide();
+            $('#approvedButton').hide();
+            $('#discardButton').hide();
+            $(".checked_all").attr("checked", false);
+            if(policy_status =='1'| policy_status == 1){
+                $(".checkboxSingle").attr("disabled", false);
+                $(".checked_all").attr("disabled", false);
+                $('.checked_all').show();
+                if(totalCheckedBox>0){
+                    $('#forwardButton').show();
+                    $('#approvedButton').hide();
+                    $('#discardButton').show();
+                }
+                
+                $("#forwardButton").val("2");
+                $("#discardButton").val("0");
+            }
+            if(policy_status == '2' | policy_status == 2){
+                $(".checkboxSingle").attr("disabled", false);
+                $(".checked_all").attr("disabled", false);
+                $('.checked_all').show();
+                if(totalCheckedBox>0){
+                    $('#forwardButton').hide();
+                    $('#approvedButton').show();
+                    $('#discardButton').show();
+                }
+                $("#approvedButton").val("3");                
+                $("#discardButton").val("0");
+            }
+            
+            if(policy_status == 'all_status'| policy_status == 3| policy_status == 0){
+                $(".checkboxSingle").attr("disabled", true);
+                $(".checked_all").attr("disabled", true);
+                $(".checkboxSingle").hide();
+                $(".checkbox").hide();
+                $(".checked_all").hide();
+            }
+            
+            
+            
+            if(policy_search != ""|policy_status!=""){
+                $('#tablebody').html('');
+                url = "{% url 'src:leave-policies-filter-status' 'rep1' 'rep2'%}"
+                if(policy_search!=''){
+                    url = url.replace('rep1',policy_search);
+                }
+                if(policy_status!=''){
+                    url = url.replace('rep2',policy_status);
+                }
+                
+                if(url != ""){
+                    
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        data: { policy_search:policy_search, policy_status:policy_status, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                        success: function (data) {
+                            hideLoader();
+                            $('#tablebody').html(data);
+                            if(policy_status == 'all_status'| policy_status == 0 | policy_status == 3){
+                                $(".checkboxSingle").attr("disabled", true);
+                                $(".checked_all").attr("disabled", true);
+                                $(".checkboxSingle").hide();
+                                $(".checked_all").hide();
+                                $(".checkbox").hide();
+                                $('#forwardButton').hide();
+                                $('#approvedButton').hide();
+                                $('#discardButton').hide();   
+                            }
+                        },
+                        error: function (err) {
+                            alert(err.message);
+                            // window.location.reload();
+                        }
+                    });
+                }
+            }else{
+                $('#tablebody').html('');
+                url = "{% url 'src:leave-policies-filter-status' 'rep1' 'rep2' %}"
+                if(url != ""){
+                    
+                    $.ajax({
+                        url: url,
+                        method: 'POST',
+                        data: { policy_search:policy_search, policy_status:policy_status, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                        success: function (data) {
+                            hideLoader();
+                            $('#tablebody').html(data);
+                            $(".checkboxSingle").attr("disabled", false);
+                            $(".checked_all").attr("disabled", false);
+                        },
+                        error: function (err) {
+                            alert(err.message);
+                            // window.location.reload();
+                        }
+                    });
+                }
+                
+            }
+        }
+        function masterCheckBox(){
+            var check_all = $('.checked_all:checked').length;
+            var policy_status = $('#policy_status').val();
+            if(check_all==0){
+                $('.checkboxSingle').prop('checked',false);
+                $('#forwardButton').hide();
+                $('#approvedButton').hide();
+                $('#discardButton').hide();
+            }else{
+                $('.checkboxSingle').prop('checked',true);
+                if(policy_status == '1'){
+                    $('#forwardButton').show();
+                    $('#discardButton').show();
+                    $('#approvedButton').hide();
+                }
+                if(policy_status == '2'){
+                    $('#forwardButton').hide();
+                    $('#approvedButton').show();
+                    $('#discardButton').show();
+                }
+            }
+        }
+        function handleCheckBox(){
+            var policy_status = $('#policy_status').val();
+            var totalCheckbox = $('.checkboxSingle').length;
+            var totalCheckedBox = $('.checkboxSingle:checked').length;
+            if(totalCheckedBox == totalCheckbox){
+                $('.checked_all').prop('checked',true);
+                if(policy_status == '1'){
+                    $('#forwardButton').show();
+                    $('#discardButton').show();
+                    $('#approvedButton').hide();
+                }
+                if(policy_status == '2'){
+                    $('#forwardButton').hide();
+                    $('#approvedButton').show();
+                    $('#discardButton').show();
+                }
+            }
+            else{
+                $('.checked_all').prop('checked',false);
+                $('#forwardButton').hide();
+                $('#approvedButton').hide();
+                $('#discardButton').hide();
+            }
+            
+            if(totalCheckedBox > 0){
+                // $('.checked_all').show();
+                if(policy_status =='1'){
+                    $(".checkboxSingle").attr("disabled", false);
+                    $(".checked_all").attr("disabled", false);
+                    $('#forwardButton').show();
+                    $('#discardButton').show();
+                    $('#approvedButton').hide();
+                    $("#forwardButton").val("2");
+                    $("#discardButton").val("0");
+                }
+                if(policy_status == '2'){
+                    $(".checkboxSingle").attr("disabled", false);
+                    $(".checked_all").attr("disabled", false);
+                    $('#forwardButton').hide();
+                    $('#approvedButton').show();
+                    $('#discardButton').show();
+                    $("#approvedButton").val("3");                
+                    $("#discardButton").val("0");
+                }
+                if(policy_status == ''){
+                    $(".checkboxSingle").attr("disabled", true);
+                    $(".checked_all").attr("disabled", true);
+                    $(".checkbox").hide();
+                    $(".checked_all").hide();
+                }
+                
+            }else{
+                $(".checkbox").hide();
+                // $(".checked_all").hide();
+                $('#forwardButton').hide();
+                $('#approvedButton').hide();
+                $('#discardButton').hide();
+            }
+            
+        }
+        
+        function closeDiv(){
+            
+            $("#addDescription").hide();            
+        }
+        function discard(id){
+            
+            var checkBoxVal = $('.checkboxSingle').val();
+            var policyId = [];
+            var description = $('#description').val();
+            $("input:checkbox[class=checkboxSingle]:checked").each(function(){
+                var id = parseInt($(this).val());
+                policyId.push(id);
+            });
+            if(id == '0' & policyId.length > 0 & description != '' ){
+                $('#addDescription').hide();
+                url = "{% url 'src:leave-status-update' %}"                
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    data: { statusId:id, policyId:policyId,description:description, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                    success: function (data) {
+                        $('#tablebody').html(data);
+                        if (data.error == false) {
+                            hideLoader();
+                            openToaster("success", data.message);
+                            setTimeout(function(){
+                                window.location.reload(1);
+                            }, 5000);
+                        }else{
+                            openToaster("alert", data.message);
+                        }
+                    },
+                    error: function (err) {
+                        alert(err.message);
+                        window.location.reload();
+                    }
+                });                
+            }    
+        }
+        function getRecordUpdated(id){            
+            var checkBoxVal = $('.checkboxSingle').val();
+            var policyId = [];
+            var description = $('#description').text();
+            $("input:checkbox[class=checkboxSingle]:checked").each(function(){
+                var id = parseInt($(this).val());
+                policyId.push(id);
+            });
+            
+            if(id == '0' & policyId.length > 0){
+                $('#addDescription').show();                
+            } 
+            url = "{% url 'src:leave-status-update' %}"
+            if(url != "" & id != '0' & policyId.length > 0){
+                $.ajax({
+                    url: url,
+                    method: 'POST',
+                    data: { statusId:id, policyId:policyId,description:'', csrfmiddlewaretoken: '{{ csrf_token }}'},
+                    success: function (data) {
+                        $('#tablebody').html(data);
+                        if (data.error == false) {
+                            hideLoader();
+                            openToaster("success", data.message);
+                            setTimeout(function(){
+                                window.location.reload(1);
+                            }, 500);
+                        }else{
+                            openToaster("alert", data.message);
+                        }
+                    },
+                    error: function (err) {
+                        alert(err.message);
+                    }
+                });
+            }  
+    }
+    </script>
+    {% endblock %}

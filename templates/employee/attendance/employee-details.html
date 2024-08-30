@@ -1,0 +1,166 @@
+{% load static %}
+{% load static %}
+{% if student_details %}
+    <div class="row mt-3" >
+        <div class="col-md-12 col-12 px-0 pb-3">
+            <div class="row ">
+                <div class="col-md-2  col-2 px-0">
+                    {% if student_details.profile_image is not None %}
+                    <img src="{{college_base_url}}{{ student_details.profile_image }}" style="width: 100%;">
+                    {% else %}
+                    <img src="{% static 'img/png/default_icon.png' %}" style="width: 100%;">
+                    {% endif %}
+                </div>
+
+                <div class="col-md-10 px-0">
+                    <div class="row">
+                        <div class="col-md-8 col-8  px-3">
+                            <h6 class="font-wt-b">{{student_details.first_name}} {% if student_details.middle_name is not None %}{{student_details.middle_name}} {% endif %}{{student_details.last_name}}</h6>
+                            <h6 class="smallText accent-color">{{student_details.role_name}}
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-12 col-12 px-1 border-top pt-3">
+            <div class="row mb-2">
+                <div class="col-md-6 col-6 pl-0">
+                    <div class="row mb-2">
+                        <div class="col-2 p-0">
+                            <img src="{% static 'img/svg/org.svg' %}" class="profileIconSize" />
+                        </div>
+                        <div class="col-md-10 px-0">
+                            <h6 class="smallText">College</h6>
+                            <h6 class="largeText">{{student_details.organization_name|safe }}</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-6 pr-0">
+                    <div class="row">
+                        <div class="col-2 p-0">
+                            <img src="{% static 'img/svg/depart_no.svg' %}" class="profileIconSize" />
+                        </div>
+                        <div class="col-md-10 px-0">
+                            <h6 class="smallText">Department</h6>
+                            <h6 class="largeText">{{student_details.department_name }}</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="row mb-2">
+                <div class="col-md-6 col-6 pl-0">
+                    <div class="row">
+                        <div class="col-2 p-0">
+                            <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                        </div>
+                        <div class="col-md-10 px-0">
+                            <h6 class="smallText">Father Name</h6>
+                            <h6 class="largeText">{% if student_details.father_name is not None %}{{student_details.father_name }}{% else %} -- {% endif %}</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-6 pr-0">
+                    <div class="row">
+                        <div class="col-2 p-0">
+                            <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                        </div>
+                        <div class="col-md-10 px-0">
+                            <h6 class="smallText">Mother Name</h6>
+                            <h6 class="largeText">{% if student_details.mother_name is not None %}{{student_details.mother_name }}{% else %} -- {% endif %}</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>    
+
+            <div class="row mb-2">
+                <div class="col-md-6 col-6 pl-0">
+                    <div class="row">
+                        <div class="col-md-2 px-0">
+                            <img src="{% static 'img/svg/contactNo.svg' %}" class="profileIconSize" />
+                        </div>
+                        <div class="col-md-10 px-0">
+                            <h6 class="smallText">Contact No.</h6>
+                            <h6 class="largeText"> {{student_details.primary_contact_number}}</h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 col-6 pr-0">
+                    <div class="row">
+                        <div class="col-md-2 pl-0">
+                            <img src="{% static 'img/svg/contactNo.svg' %}" class="profileIconSize" />
+                        </div>
+                        <div class="col-md-10 px-0"> 
+                            <h6 class="smallText">Employee Id</h6>
+                            <h6 class="largeText"> {{student_details.emp_sap_id}}</h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!--<div class="row">    -->
+            <!--    <div class="col-md-6 px-0">-->
+            <!--        <div class="row">-->
+            <!--            <div class="col-2 p-0">-->
+            <!--                <img src="{% static 'img/svg/aadhaar.svg' %}" class="profileIconSize" />-->
+            <!--            </div>-->
+            <!--            <div class="col-md-10 px-0">-->
+            <!--                <h6 class="smallText">Aadhaar Number</h6>-->
+            <!--                <h6 class="largeText">{% if student_details.aadhaar_nubmer is not None %}-->
+            <!--                    {{student_details.aadhaar_nubmer}}-->
+            <!--                    {% else %}-->
+            <!--                    ---->
+            <!--                    {% endif %}-->
+            <!--                </h6>-->
+            <!--            </div>-->
+            <!--        </div>-->
+            <!--    </div>-->
+            <!--</div>    -->
+        </div>
+
+        <div class="col-sm-12 col-12  px-0 ">
+            <div class="row border border-redius-17">
+                <div class="col-sm-7 col-6 px-0 ">
+                    <div class="row ">
+                        <div class="center-fix">
+                            <div class="">
+                                <span class="grey-color d-block min-mb-8 font-wt-b font-11">
+                                    Last Punch Time
+                                </span>
+                                <span class="clock-value" id="last_punch_time">
+                                    {% if last_punch_in is not None %}
+                                    {{last_punch_in}}
+                                    {% else %}
+                                    --:--
+                                    {% endif %}
+                                </span>
+                                
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-sm-5 col-5 px-0">
+                    <div class="row border-left pt-2 pb-4">
+                        <div class="px-3 m-auto text-center pt-2">
+                            <a href="#" title="thumb-sacn-here" class="thumb-scan-box d-block">
+
+                                <img src="{% static 'img/png/Thumbcheckrd.png' %}" alt="" id="scanning_idle">
+                                <img src="{% static 'img/png/scan-fingerprint_2.gif' %}" alt="" id="scanning_thumb" style="display: none;">
+                                <img src="{% static 'img/png/Thumbcheced.svg' %}" alt="" id="scanning_success"  style="display: none;">
+                                <img src="{% static 'img/png/thumbUnchecked.svg' %}" alt="" id="scanning_failed"  style="display: none;">
+                            </a>
+                            <span class="d-block mt-2 font-wt-b font-12"> Scan Fingerprint</span>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+
+    </div>
+{% else %}
+No Record Found
+{% endif %}

@@ -1,0 +1,112 @@
+{% load static %}
+{% if student_detail %}
+{% for student_details in student_detail %}
+
+<div class="row" style="height: 85%;">
+    <div class="col-md-12 p-0">
+        <div class="row">
+            <div class="col-md-2 p-md-0">
+                {% if student_details.photo is not None %}
+                <img src="{{college_base_url}}{{ student_details.photo }}" style="width: 100%;">
+                {% else %}
+                <img src="{% static 'img/png/default_icon.png' %}" style="width: 100%;">
+                {% endif %}
+                
+            </div>
+            <div class="col-md-10 p-md-0">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6><b>{{student_details.student_name}}</b></h6>
+                    </div>
+                    
+                </div>
+                <br clear="all">
+                <div class="row">
+                    <div class="col-md-1 p-md-0">
+                        <img src="{% static 'img/svg/contactNo.svg' %}" class="profileIconSize" />
+                    </div>
+                    <div class="col-md-6 p-md-0">
+                        <h6 class="smallText">Contact No.</h6>
+                        <h6 class="largeText"> {{student_details.contact}}</h6>
+                    </div>
+                    <div class="col-md-5 p-md-0">
+                        <h6 class="smallText">Email</h6>
+                        <h6 class="largeText"> {{student_details.email}}</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 p-md-0 mt-md-3">
+                <div class="dropdown-divider">
+
+                </div>
+                <div class="row mb-md-2">
+                    <!-- <div class="col-md-6 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/org.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 p-md-0">
+                                <h6 class="smallText">College</h6>
+                                <h6 class="largeText">{{student_details.college_name|safe }}</h6>
+                            </div>
+                        </div>
+                    </div> -->
+                    <!-- <div class="col-md-6 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/depart_no.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 p-md-0">
+                                <h6 class="smallText">Course</h6>
+                                <h6 class="largeText">{{student_details.course_name }}</h6>
+                            </div>
+                        </div>
+                    </div> -->
+                </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-12 p-0 mt-4 col-md-12 p-md-0 mt-md-2">
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th class="header">S.No </th>
+                                <th class="header">Question</th>
+                                <th class="header">Correct Option</th>
+                                <th class="header">Selected Option</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if student_details.question_answers %}
+                            {% for question_answers in student_details.question_answers %}
+                            <tr>
+                                <td class="small">{{ forloop.counter }}</td>
+                                <td class="small">{{question_answers.question}}</td>
+                                <td class="small">
+                                    {{question_answers.option_no}}. <strong>{{question_answers.options}}</strong>
+                                </td>
+                                {% if question_answers.answer == 5 or question_answers.answer == 0  %}
+                                <td class="small text-info">Skipped</td>
+                                {% elif question_answers.answer == question_answers.option_no %}
+                                <td class="small text-success ">{{question_answers.ans}}</td>
+                                {% else %}
+                                    <td class="small text-danger">{{question_answers.ans}} </td>
+                                {% endif %}
+                            </tr>
+                            {% endfor %}
+                            {% else %}
+                            <tr>
+                                <td colspan="4" style="text-align: center;">Not Attempted Yet...</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% else %}
+No Record Found
+{% endif %}

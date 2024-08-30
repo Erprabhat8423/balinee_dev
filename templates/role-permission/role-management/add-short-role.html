@@ -1,0 +1,162 @@
+{% load static %}
+<div class="modal-AddOrganisation centered">
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-md-3 p-md-0" style="background-repeat: no-repeat;text-align: center;background-color: #0073e0;background-position: bottom left;background-size: 80%;">
+                <div class="transformImage">
+                    <img src="{% static 'img/svg/addRoleBig.svg' %}" class="w-50" />
+                    <h4 class="modalColHead">Add Role</h4>
+                </div>
+            </div>
+            
+            <div class="col-md-9 p-md-4">
+                <form id="addRoleForm" method="POST" autocomplete="off" action="" aria-label="Role">
+                    {% csrf_token %}
+                    <input type="hidden" name="reporting_role_id" value="{{reporting_role_id}}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b>Role details </b></h5>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <button class="btn btn-save float-right" type="button" onclick="saveRole('{{reporting_role_id}}')">
+                                Save
+                            </button>
+                            <button class="btn btn-close float-right" type="button"
+                            onclick="manipulateModal('addProductModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+                
+                
+                
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Role Name</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder="Role Name*"
+                        id="role_name" name="role_name" maxlength="50" />
+                        <label class="error_msg float-right" id="role_name_error"></label>
+                    </div>
+                </div>
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Organizations</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <select class="inputField selectField" style="width: 100%;" name="organization_id" id="organization_id">
+                            <option value="">Select</option>
+                            {% for organization in organizations %}
+                            <option value="{{organization.id}}" {% if parent_role is not None and organization.id == parent_role.organization_id|add:"0" %}selected{% endif %}>{{organization.organization_name}}</option>
+                            {% endfor %}
+                        </select>
+                        <label class="error_msg float-right" id=""></label>
+                        
+                    </div>
+                </div>
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Department</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <select class="inputField selectField" style="width: 100%;" name="department_id" id="department_id">
+                            <option value="">Select</option>
+                            {% for department in departments %}
+                            <option value="{{department.id}}" {% if parent_role is not None and department.id == parent_role.department_id|add:"0" %}selected{% endif %}>{{department.department_name}}</option>
+                            {% endfor %}
+                        </select>
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                
+                
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    
+    function saveRole(parent_role_id) {
+        showLoader();
+        if(validateProductForm()){
+            hideLoader();
+            return false;
+        }else{
+            var url = "{% url 'src:add-short-role' '1' %}";
+            url = url.replace('1',parent_role_id)
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: $('#addRoleForm').serialize(),
+                success: function (data) {
+                    hideLoader();
+                    if(data.flag){
+                        $("#addProductModal").html('');
+                        $("#addProductModal").hide();
+                        openToaster("success", data.message);
+                        setTimeout(function(){ 
+                            url = '{% url "src:organizations" %}' + '?view=organizational-chart';
+                            window.location.href = url; 
+                            }, 500);
+                    }else{
+                        openToaster("danger", data.message);
+                    }
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            }).always(function() {
+                // hideLoader();
+            });
+        } 
+    }
+    
+    
+    function validateProductForm(){
+        error = 0;
+        $('.error_msg ').text('');
+        $('.inputField').css("border", "");
+        if($.trim($('[name="role_name"]').val()) == ""){
+            $('[name="role_name"]').parent().find('.error_msg').text('Please enter role name');
+            $('[name="role_name"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        if($('[name="organization_id"]').val() == ""){
+            $('[name="organization_id"]').parent().find('.error_msg').text('Please select organization');
+            $('[name="organization_id"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+        if($('[name="department_id"]').val() == ""){
+            $('[name="department_id"]').parent().find('.error_msg').text('Please select department');
+            $('[name="department_id"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+        
+        
+        if(error > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
+</script>

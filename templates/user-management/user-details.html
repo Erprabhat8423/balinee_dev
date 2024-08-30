@@ -1,0 +1,850 @@
+{% load static %}
+<div class="modal-ViewUser centered">
+  <div class="modal-header" id="headerViewUser">
+    <div class="col-12 p-0">
+      <div class="row">
+        <div class="col-6">
+          <h5 class="mt-md-2" style="color: #0085d9;"><b>{{user.store_name }}</b> &nbsp; &nbsp;</h5>
+          <h6>{{user.salutation }} {{user.first_name }} {{user.middle_name }} {{user.last_name }}</h6>
+        </div>
+        <div class="col-6">
+          <button class="btn btn-close float-right mt-3" type="button" onclick="manipulateModal('viewUserModal','close')">
+            Close
+          </button>
+        </div>
+      </div>
+      <div class="row" id="infoPills">
+        <div class="col-sm-12 p-0">
+          <ul class="nav nav-tabs">
+            <li class="infoTabs activeInfoTabs" id="user_basicTab" onclick="changeInfoTab('user_basic')">Basic info
+            </li>
+            <li class="infoTabs" id="user_officialTab" onclick="changeInfoTab('user_official')">Official
+              Details
+            </li>
+            <li class="infoTabs" id="user_productDetailsTab" onclick="changeInfoTab('user_productDetails')">
+              Product
+              Details
+            </li>
+            <li class="infoTabs" id="user_cratesSumTab" onclick="changeInfoTab('user_cratesSum')">Crates
+              Summary
+            </li>
+            <li class="infoTabs" id="user_orderSumTab" onclick="changeInfoTab('user_orderSum')">Order
+              Summary
+            </li>
+            <li class="infoTabs" id="user_uploadsTab" onclick="changeInfoTab('user_uploads')">Uploads
+            </li>
+            <li class="infoTabs" id="user_schemesTab" onclick="changeInfoTab('user_schemes')">Scheme's
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="modal-body pt-0" id="viewUserModalBody" style="overflow: auto; height: 479px;">
+    <div class="row h-100">
+      <div class="col-md-12 p-0 h-100 activeTab" id="user_basic">
+        <div class="row">
+          <div class="col-md-7">
+            <div class="row">
+              <div class="col-md-12 p-0 mt-2">
+                <div class="row">
+                  <div class="col-md-2 p-0 text-center">
+                    <img src="{% if user.profile_image %}{{ user.profile_image }}{% else %}{% static 'img/svg/profile.svg' %}{% endif %}" style="width: 7rem;">
+                  </div>
+                  <div class="col-md-10 p-10">
+                    {% if user_contact %}
+                    <img src="{% static 'img/svg/contactNo.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                    <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                      Contact No.*
+                    </h6>
+                    {% endif %}  
+                    {% for user_contact in user_contacts %}
+                    <div class="row mt-2">
+                      <div class="col-md-4 pr-0">
+                        <h6 class="viewText mt-0">{{user_contact.country_code}} {{user_contact.contact_number}}</h6>
+                      </div>
+                      <div class="col-md-4 pr-0">
+                        <h6 class="viewText mt-0">{{user_contact.contact_type_name}}</h6>
+                        
+                      </div>
+                      {% if user_contact.is_primary == 1 %}
+                      <div class="col-md-4 pr-0">
+                        <button class="btn btn-step activeStep">
+                          &#10004;
+                        </button>
+                        <span class="viewText m-0">Primary</span>
+                      </div>
+                      {% endif %}
+                    </div>
+                    {% endfor %}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-md-3">
+                <img src="{% static 'img/svg/dob.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                  Date of Birth
+                </h6>
+                <h6 class="viewText">{{user.date_of_birth | date:"d/m/Y"}}</h6>
+              </div>
+              <div class="col-md-6">
+                <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                  Email id
+                </h6>
+                <h6 class="viewText">{% if user.official_email %}{{user.official_email}}{% else %}-{% endif %}</h6>
+              </div>
+              <div class="col-md-3">
+                <img src="{% static 'img/svg/gender.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                  Gender
+                </h6>
+                <h6 class="viewText">{{user.gender | title }}</h6>
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-md-3">
+                <img src="{% static 'img/svg/bloodgroup.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                  Blood group
+                </h6>
+                <h6 class="viewText">{% if user.blood_group %}{{ user.blood_group }}{% else %}-{% endif %}</h6>
+              </div>
+              <div class="col-md-6">
+                <img src="{% static 'img/svg/father.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                  Father's Name
+                </h6>
+                <h6 class="viewText">{% if user.father_name %}{{user.father_name }}{% else %}-{% endif %}</h6>
+              </div>
+              <div class="col-md-3">
+                <img src="{% static 'img/svg/mother.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                  Mother's Name
+                </h6>
+                <h6 class="viewText">{% if user.father_name %}{{user.mother_name }}{% else %}-{% endif %}</h6>
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-md-12">
+                <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                  Correspondance Address
+                </h6>
+                <h6 class="viewText">{% if user_correspondence_address.address_line_1 %} {{user_correspondence_address.address_line_1}},{% endif %} {% if user_correspondence_address.address_line_2 %} {{user_correspondence_address.address_line_2}},{% endif %} {{user_correspondence_address.state_name}}, {{user_correspondence_address.country_name}},{{user_correspondence_address.pincode}}</h6>
+              </div>
+            </div>
+            <div class="row mt-3">
+              <div class="col-md-12">
+                <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                  Permanent Address
+                </h6>
+                <h6 class="viewText">{% if user_permanent_address.address_line_1 %}{% if user_permanent_address.address_line_1 %} {{user_permanent_address.address_line_1}},{% endif %} {% if user_permanent_address.address_line_2 %} {{user_permanent_address.address_line_2}},{% endif %} {{user_permanent_address.state_name}}, {{user_permanent_address.country_name}},{{user_permanent_address.pincode}}{%else%}-{%endif%}</h6>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-5" style="border-left: 1px solid #d7d7d7;">
+            <div class="row">
+              <div class="col-md-12">
+                <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                <h6 class="mt-2 mb-0" style="display: inline-block;">
+                  Other Contact Person
+                </h6>
+              </div>
+            </div>
+            {% if contact_person %}
+            {% for contact_person in contact_persons %}
+            <div class="row mt-2 cardRow">
+              <div class="col-md-7 p-0">
+                <h6 class="m-0">{{contact_person.contact_person_name}}</h6>
+                <label class="smallText m-0">{{contact_person.designation}}</label>
+              </div>
+              <div class="col-md-5 p-0">
+                <h6 class="m-0">{{contact_person.contact_number}}</h6>
+              </div>
+            </div>
+            
+            {% endfor %}
+            {% else %}
+            <div class="row mt-2 cardRow">
+            <p>No Record Found</p>
+          </div>
+            {% endif %}
+            
+          </div>
+        </div>
+      </div>
+      <div class="col-md-12 p-0 h-100" id="user_official">
+        <div class="row">
+          <div class="col-md-3">
+            <img src="{% static 'img/svg/org.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+            <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+              Organisations*
+            </h6>
+            <h6 class="viewText">{% if user.organization_name %}{{user.organization_name}} {% else %}-{% endif %}</h6>
+          </div>
+          <div class="col-md-3">
+            <img src="{% static 'img/svg/depart_no.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+            <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+              Department*
+            </h6>
+            <h6 class="viewText">{% if user.department_name %}{{user.department_name}} {% else %}-{% endif %}</h6>
+          </div>
+          <div class="col-md-3">
+            <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+            <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+              Roles
+            </h6>
+            <h6 class="viewText">{{user.role_name}}</h6>
+          </div>
+          <div class="col-md-3">
+            <img src="{% static 'img/svg/aadhaar.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+            <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+              SAP ID
+            </h6>
+            <h6 class="viewText">{% if user.emp_sap_id %}{{user.emp_sap_id}}{% else %}-{% endif %}</h6>
+          </div>
+        </div>
+        <div class="row mt-3">
+          <div class="col-md-3">
+            <img src="{% static 'img/svg/aadhaar.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+            <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+              Aadhar Card No*
+            </h6>
+            <h6 class="viewText">{{user.aadhaar_nubmer}}</h6>
+          </div>
+          <div class="col-md-3">
+            <img src="{% static 'img/svg/PAN.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+            <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+              PAN Card No*
+            </h6>
+            <h6 class="viewText">{% if user.pan_number %}{{user.pan_number}}{% else %}-{% endif %}
+            </h6></div>
+            <div class="col-md-3">
+              <img src="{% static 'img/svg/dateofJoiniing.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+              <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                Date of Joining
+              </h6>
+              <h6 class="viewText">{% if user.date_of_joining %}{{user.date_of_joining|date:"d/m/Y" }}{% else %}-{% endif %}</h6>
+            </div>
+            <div class="col-md-3">
+              <img src="{% static 'img/svg/shift.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+              <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                Working Hour(Order Timing)
+              </h6>
+              <h6 class="viewText">{% if user.working_shift_name %}{{user.working_shift_name}}{% else %}-{% endif %}{% if user.order_timing %}({{user.order_timing}}){% else %}{% endif %}</h6>
+            </div>
+          </div>
+          <div class="row mt-3">
+            <div class="col-md-3">
+              <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+              <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                Reporting to
+              </h6>
+              <h6 class="viewText">{% if user.reporting_to_name %}{{user.reporting_to_name}}{% else %}-{% endif %}</h6>
+            </div>
+            <div class="col-md-3">
+              <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+              <h6 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                Email id (Official)
+              </h6>
+              <h6 class="viewText">{% if user.official_email %}{{user.official_email}}{% else %}-{% endif %}</h6>
+            </div>
+          </div>
+          
+          <div class="row mt-3">
+            <div class="col-md-12">
+              <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+              <h5 class="mt-2 mb-0" style="display: inline-block;">
+                Area Details
+              </h5>
+            </div>
+            
+            <div class="col-md-10">
+              <div class="row mt-3">
+                <div class="col-md-3">
+                  <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                  <h6 class="mt-2 mb-0" style="display: inline-block;">
+                    Zone
+                  </h6>
+                </div>
+                <div class="col-md-3">
+                  <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                  <h6 class="mt-2 mb-0" style="display: inline-block;">
+                    Town
+                  </h6>
+                </div>
+                <div class="col-md-3">
+                  <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                  <h6 class="mt-2 mb-0" style="display: inline-block;">
+                    Route
+                  </h6>
+                </div>
+              </div>
+              <div class="row cardRow mt-3">
+                <div class="col-md-3">
+                  <h6 class="viewText">{{area_allocated.zone_name}}</h6>
+                </div>
+                <div class="col-md-3">
+                  <h6 class="viewText">{{area_allocated.town_name}}</h6>
+                </div>
+                <div class="col-md-3">
+                  <h6 class="viewText">{{area_allocated.route_name}}</h6>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12 p-0 h-100" id="user_productDetails">
+          <div class="row h-100">
+            <div class="col-md-12 TContainer">
+              <table class="table table-striped table-borderless" style="font-size: 1rem;">
+                <thead>
+                    <tr>
+                        <th class="header">SKU Code</th>
+                        <th class="header">Product Name</th>
+                        <th class="header">Product Variant</th>
+                        <th class="header">MRP</th>
+                        <th class="header">Sales Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% if user_variants %}
+                    {% for user_variant in user_variants %}
+                    <tr>
+                        <td>{% if user_variant.item_sku_code %} {{ user_variant.item_sku_code }} {% endif %}</td>
+                        <td>{% if user_variant.product_name %} {{ user_variant.product_name }} {% endif %}</td>
+                        <td>{% if user_variant.variant_name %} {{ user_variant.variant_name }} {% endif %}</td>
+                        <td>{% if user_variant.mrp %} {{ user_variant.mrp }} {% endif %}</td>
+                        <td>{% if user_details.user_type == 2 %} {% if user_details.is_distributor == 1 %} {{ user_variant.sp_distributor }} {% else %} {{ user_variant.sp_superstockist }} {% endif %}  {% else %} {{ user_variant.sp_employee }} {% endif %}</td>
+                      </tr>
+                    {% endfor %}
+                    {% else %}
+                    <tr>
+                        <td colspan="6" style="text-align: center;">No Record Found...</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-12 p-0 h-100" id="user_cratesSum">
+          <div class="row">
+            <div class="col-md-4">
+              <h6><img src="{% static 'img/svg/openingCrates.svg' %}" class="profileIconSize">&nbsp;&nbsp;&nbsp;Crates
+                Ledger</h6>
+              </div>
+              <div class="col-md-4 offset-md-4 text-right">
+                <h6><img src="{% static 'img/svg/openingCrates.svg' %}" class="profileIconSize">&nbsp;&nbsp;&nbsp;20</h6>
+                <h6 class="smalltext lightGrey">No. of crates with Distributor</h6>
+              </div>
+            </div>
+            <div class="row" style="height: 90%;">
+              <div class="col-md-12 TContainer">
+                <p>Coming Soon</p>
+                <!-- <table class="table table-striped table-borderless text-center" style="font-size: 1rem;">
+                  <thead>
+                    <tr>
+                      <th class="header">Date</th>
+                      <th class="header">Delievery crates</th>
+                      <th class="header">Recieved Crates</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                    <tr>
+                      <td>23.10.2020</td>
+                      <td>40</td>
+                      <td>20</td>
+                    </tr>
+                  </tbody>
+                </table> -->
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-12 p-0 h-100" id="user_orderSum">
+            <div class="row h-100">
+              <p>Coming Soon</p>
+              <!-- <div class="col-md-6 TContainer">
+                <table class="table table-striped table-borderless" style="font-size: 1rem;">
+                  <thead>
+                    <tr>
+                      <th class="header">OrderID</th>
+                      <th class="header">Order Value</th>
+                      <th class="header">Date/Time</th>
+                      <th class="header">Shift</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                    <tr>
+                      <td>ORD241</td>
+                      <td>2000</td>
+                      <td>24.10.2020, 10:00 am</td>
+                      <td>Morning</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+              <div class="col-md-6" style="height: 90%;overflow: auto;">
+                <div class="orderSummaryRight h-100">
+                  <div class="row">
+                    <div class="col-md-4">
+                      <h6 class="lightGrey">Order No.</h6>
+                      <h6 class="lightGrey">201254</h6>
+                    </div>
+                    <div class="col-md-4">
+                      <h6 class="lightGrey">Date/Time</h6>
+                      <h6 class="lightGrey">20.10.2020, 10:00 am</h6>
+                    </div>
+                    <div class="col-md-4">
+                      <h6 class="lightGrey">Shift</h6>
+                      <h6 class="lightGrey">Morning</h6>
+                    </div>
+                  </div>
+                  <div class="row ord_sum_scroll">
+                    <div class="col-md-12 TContainer">
+                      <table class="table table-borderless" style="font-size: 1rem;">
+                        <thead>
+                          <tr>
+                            <th>Product Name</th>
+                            <th>Varient</th>
+                            <th>Quantity</th>
+                            <th>Rate <img src="{% static 'img/svg/rupeeGray.svg' %}" class="profileIconSize"></th>
+                            <th>Amount <img src="{% static 'img/svg/rupeeGray.svg' %}" class="profileIconSize"></th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td>Milk Full Cream</td>
+                            <td>500ml</td>
+                            <td>2 crates</td>
+                            <td>28</td>
+                            <td>1120</td>
+                          </tr>
+                          <tr>
+                            <td>Milk Full Cream</td>
+                            <td>500ml</td>
+                            <td>2 crates</td>
+                            <td>28</td>
+                            <td>1120</td>
+                          </tr>
+                          <tr>
+                            <td>Milk Full Cream</td>
+                            <td>500ml</td>
+                            <td>2 crates</td>
+                            <td>28</td>
+                            <td>1120</td>
+                          </tr>
+                          <tr>
+                            <td>Milk Full Cream</td>
+                            <td>500ml</td>
+                            <td>2 crates</td>
+                            <td>28</td>
+                            <td>1120</td>
+                          </tr>
+                          <tr>
+                            <td>Milk Full Cream</td>
+                            <td>500ml</td>
+                            <td>2 crates</td>
+                            <td>28</td>
+                            <td>1120</td>
+                          </tr>
+                          <tr>
+                            <td>Milk Full Cream</td>
+                            <td>500ml</td>
+                            <td>2 crates</td>
+                            <td>28</td>
+                            <td>1120</td>
+                          </tr>
+                          <tr>
+                            <td>Milk Full Cream</td>
+                            <td>500ml</td>
+                            <td>2 crates</td>
+                            <td>28</td>
+                            <td>1120</td>
+                          </tr>
+                          <tr>
+                            <td>Milk Full Cream</td>
+                            <td>500ml</td>
+                            <td>2 crates</td>
+                            <td>28</td>
+                            <td>1120</td>
+                          </tr>
+                          <tr>
+                            <td>Milk Full Cream</td>
+                            <td>500ml</td>
+                            <td>2 crates</td>
+                            <td>28</td>
+                            <td>1120</td>
+                          </tr>
+                          <tr>
+                            <td>Milk Full Cream</td>
+                            <td>500ml</td>
+                            <td>2 crates</td>
+                            <td>28</td>
+                            <td>1120</td>
+                          </tr>
+                          <tr>
+                            <td>Milk Full Cream</td>
+                            <td>500ml</td>
+                            <td>2 crates</td>
+                            <td>28</td>
+                            <td>1120</td>
+                          </tr>
+                          <tr>
+                            <td>Milk Full Cream</td>
+                            <td>500ml</td>
+                            <td>2 crates</td>
+                            <td>28</td>
+                            <td>1120</td>
+                          </tr>
+                          <tr>
+                            <td>Milk Full Cream</td>
+                            <td>500ml</td>
+                            <td>2 crates</td>
+                            <td>28</td>
+                            <td>1120</td>
+                          </tr>
+                          <tr>
+                            <td>Milk Full Cream</td>
+                            <td>500ml</td>
+                            <td>2 crates</td>
+                            <td>28</td>
+                            <td>1120</td>
+                          </tr>
+                          <tr>
+                            <td>Milk Full Cream</td>
+                            <td>500ml</td>
+                            <td>2 crates</td>
+                            <td>28</td>
+                            <td>1120</td>
+                          </tr>
+                          <tr>
+                            <td>Milk Full Cream</td>
+                            <td>500ml</td>
+                            <td>2 crates</td>
+                            <td>28</td>
+                            <td>1120</td>
+                          </tr>
+                          <tr>
+                            <td>Milk Full Cream</td>
+                            <td>500ml</td>
+                            <td>2 crates</td>
+                            <td>28</td>
+                            <td>1120</td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  <div class="dropdown-divider"></div>
+                  <div class="row">
+                    <div class="col-md-4">
+                      <h6 style="color: #009cff;">Order Value</h6>
+                    </div>
+                    <div class="col-md-4 offset-md-4 text-right">
+                      <h6 class="lightGrey"><img src="{% static 'img/svg/rupeeBlack.svg' %}" class="profileIconSize">&nbsp;&nbsp;5140</h6>
+                    </div>
+                  </div>
+                  
+                </div>
+                
+              </div> -->
+            </div>
+          </div>
+          <div class="col-md-12 p-0 h-100" id="user_uploads">
+            <div class="row">
+              <div class="col-md-2" style="flex: 0 0 19.666667%;max-width:19.666667%">
+                <h6><img src="{% static 'img/svg/aadhaar.svg' %}"> &nbsp;&nbsp; Aadhar Card</h6>
+                <div class="card">
+                  {% if user_documents.aadhaar_card %}
+                  <img src="{{ user_documents.aadhaar_card }}" class="w-50 w-100 imgStyle" style="transform: translate(0px, 0px);">
+                  {% else %}
+                  <img src="{% static 'img/svg/aadhaargrey.svg' %}" class="w-50" style="transform: translate(50%,50%);">
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-md-2" style="flex: 0 0 19.666667%;max-width:19.666667%">
+                <h6><img src="{% static 'img/svg/PAN.svg' %}"> &nbsp;&nbsp; PAN Card</h6>
+                <div class="card">
+                  {% if user_documents.pan_card %}
+                  <img src="{{ user_documents.pan_card }}" class="w-50 w-100 imgStyle" style="transform: translate(0px, 0px);">
+                  {% else %}
+                  <img src="{% static 'img/svg/PANGrey.svg' %}" class="w-50" style="transform: translate(50%,50%);">
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-md-2" style="flex: 0 0 19.666667%;max-width:19.666667%">
+                <h6><img src="{% static 'img/svg/PAN.svg' %}"> &nbsp;&nbsp; CIN</h6>
+                <div class="card">
+                  {% if user_documents.cin %}
+                  <img src="{{ user_documents.cin }}" class="w-50 w-100 imgStyle" style="transform: translate(0px, 0px);">
+                  {% else %}
+                  <img src="{% static 'img/svg/aadhaargrey.svg' %}" class="w-50" style="transform: translate(50%,50%);">
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-md-2" style="flex: 0 0 19.666667%;max-width:19.666667%">
+                <h6><img src="{% static 'img/svg/PAN.svg' %}"> &nbsp;&nbsp; GSTIN</h6>
+                <div class="card">
+                  {% if user_documents.gstin %}
+                  <img src="{{ user_documents.gstin }}" class="w-50 w-100 imgStyle" style="transform: translate(0px, 0px);">
+                  {% else %}
+                  <img src="{% static 'img/svg/aadhaargrey.svg' %}" class="w-50" style="transform: translate(50%,50%);">
+                  {% endif %}
+                </div>
+              </div>
+              <div class="col-md-2" style="flex: 0 0 19.666667%;max-width:19.666667%">
+                <h6><img src="{% static 'img/svg/PAN.svg' %}"> &nbsp;&nbsp; FSSAI</h6>
+                <div class="card">
+                  {% if user_documents.fssai %}
+                  <img src="{{ user_documents.fssai }}" class="w-50 w-100 imgStyle" style="transform: translate(0px, 0px);">
+                  {% else %}
+                  <img src="{% static 'img/svg/aadhaargrey.svg' %}" class="w-50" style="transform: translate(50%,50%);">
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="col-md-12 p-0 h-100" id="user_schemes" style="display: none;">
+            <div class="row h-100">
+              <p>Coming Soon</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>

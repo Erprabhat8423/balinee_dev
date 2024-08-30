@@ -1,0 +1,228 @@
+{% load static %}
+<div class="modal-AddOrganisation centered">
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-md-3 p-md-0" style="background-repeat: no-repeat;text-align: center;background-color: #0073e0;background-position: bottom left;background-size: 80%;">
+                <div class="transformImage">
+                    <img src="{% static 'img/svg/master/payBands.svg' %}" style="height:60px;" />
+                    <h4 class="modalColHead">Edit MPP</h4>
+                </div>
+            </div>
+            
+            <div class="col-md-9 p-md-4">
+                <form id="updateForm" method="POST" autocomplete="off" action="" aria-label="Income category">
+                    {% csrf_token %}
+                     <input type="hidden" name="mpp_id" value="{{mpp.id}}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b>MPP </b></h5>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <button class="btn btn-save float-right" type="button" onclick="updateMPP()">
+                                Save
+                            </button>
+                            <button class="btn btn-close float-right" type="button"
+                            onclick="manipulateModal('addProductModal','close')">
+                            Close
+                        </button>
+                    </div>
+                    </div>
+                     <div class="row mt-md-3">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12 p-md-0">
+                                    <h6 style="display: inline-block;"><b>Employee Name</b></h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 p-md-0">
+                            <select class="inputField selectField" style="width: 100%;" name="employee_id"  id="employee_id" >
+                                <option value="">Select Employee</option>
+                                {% for employee in reporting_user_list %}
+                                <option value="{{employee.id}}" {% if employee.id == mpp.employee.id %}selected{% endif %}>{{employee.first_name}} {{employee.middle_name|default:""}} {{employee.last_name}}({{employee.emp_sap_id}})</option>
+                                {% endfor %}
+                                <label class="error_msg float-right" id=""></label>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row mt-md-3">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12 p-md-0">
+                                    <h6 style="display: inline-block;"><b>BMC Name</b></h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 p-md-0">
+                            <select class="inputField selectField" style="width: 100%;" name="bmc_id"  >
+                                <option value="">Select</option>
+                                {% for bmc in bmc_list %}
+                                <option value="{{bmc.id}}" {% if bmc.id == mpp.bmc.id %}selected{% endif %}>{{bmc.name}}({{bmc.bmc_code}})</option>
+                                {% endfor %}
+                                <label class="error_msg float-right" id=""></label>
+                            </select>
+                        </div>
+                    </div>
+                     <div class="row mt-md-3">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12 p-md-0">
+                                    <h6 style="display: inline-block;"><b>MPP Name</b></h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 p-md-0">
+                            <input class="inputField " type="text" placeholder="mpp name.*" value="{{mpp.name}}" name="name" maxlength="100" />
+                            <label class="error_msg float-right"></label>
+                        </div>
+                    </div>
+                    <div class="row mt-md-3">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12 p-md-0">
+                                    <h6 style="display: inline-block;"><b>MPP Code</b></h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 p-md-0">
+                            <input class="inputField " type="text" placeholder="mpp code.*" value="{{mpp.mpp_code}}" name="mpp_code" maxlength="50" />
+                            <label class="error_msg float-right"></label>
+                        </div>
+                    </div>
+                    <div class="row mt-md-3">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12 p-md-0">
+                                    <h6 style="display: inline-block;"><b>MPP TR CODE</b></h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 p-md-0">
+                            <input class="inputField " type="text" placeholder="mpp_tr_code" value="{{mpp.mpp_tr_code|default:""}}" name="mpp_tr_code" maxlength="50" />
+                            <label class="error_msg float-right"></label>
+                        </div>
+                    </div>
+                     <div class="row mt-md-3">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12 p-md-0">
+                                    <h6 style="display: inline-block;"><b>Latitude</b></h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 p-md-0">
+                            <input class="inputField " type="text" placeholder="latitude" value="{{mpp.latitude}}" name="latitude" maxlength="50" />
+                            <label class="error_msg float-right"></label>
+                        </div>
+                    </div>
+                    <div class="row mt-md-3">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12 p-md-0">
+                                    <h6 style="display: inline-block;"><b>Longitude</b></h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 p-md-0">
+                            <input class="inputField " type="text" placeholder="longitude" value="{{mpp.longitude}}" name="longitude" maxlength="50" />
+                            <label class="error_msg float-right"></label>
+                        </div>
+                    </div>
+                    <div class="row mt-md-3">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12 p-md-0">
+                                    <h6 style="display: inline-block;"><b>WEF Date</b></h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 p-md-0">
+                            <input class="inputField"
+                                    placeholder="Enter WEF Date" name="wef_date" value="{{mpp.wef_date|date:'d/m/Y'}}" id="wef_date">
+                            <label class="error_msg float-right"></label>
+                        </div>
+                    </div>
+                    
+                    
+                </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+   var mpp_id = '{{mpp.id}}';
+    function updateMPP () {
+        showLoader();
+        if(validateForm()){
+            hideLoader();
+            return false;
+        }else{
+            url = "{% url 'src:edit-mpp' '1' %}";
+            url = url.replace('1',mpp_id);
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: $('#updateForm').serialize(),
+                success: function (data) {
+                    hideLoader();
+                    if(data.flag){
+                        $("#addProductModal").html('');
+                        $("#addProductModal").hide();
+                        getList('mpp');
+                        openToaster("success", data.message);
+                    }else{
+                        openToaster("danger", data.message);
+                    }
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            }).always(function() {
+                // hideLoader();
+            });
+        } 
+    }
+    
+    
+    function validateForm(){
+        error = 0;
+        $('.error_msg ').text('');
+        $('.inputField').css("border", "");
+        
+        if($.trim($('[name="name"]').val()) == ""){
+            $('[name="name"]').parent().find('.error_msg').text('Please enter MPP Name.');
+            $('[name="name"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        if($.trim($('[name="mpp_code"]').val()) == ""){
+            $('[name="mpp_code"]').parent().find('.error_msg').text('Please enter MPP Code.');
+            $('[name="mpp_code"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        if($.trim($('[name="bmc_id"]').val()) == ""){
+            $('[name="bmc_id"]').parent().find('.error_msg').text('Please choose BMC Name');
+            $('[name="bmc_id"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+
+     
+        if(error > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+     $("#wef_date").datepicker({
+            weekStart: 1,
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+0",
+            daysOfWeekHighlighted: "6,0",
+            autoclose: true,
+            todayHighlight: true,
+            dateFormat: 'dd/mm/yy',
+        });
+    
+</script>

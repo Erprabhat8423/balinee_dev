@@ -1,0 +1,33 @@
+{% load static %}
+<div class="col-sm-12 col-12 primaryContainerBG h-100 p-0 commonTableBg" id="ajax-div">
+    <input type="hidden" name="page" id="page" value="2" />
+    <input type="hidden" name="page_status" id="page_status" value="0" />
+    <input type="hidden" name="total_pages" id="total_pages" value="{{ total_pages }}" />
+    <table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+        <tbody id="tablebody">
+            {% if holidays %}
+            {% for holiday in holidays %}
+            <tr  {% if forloop.first %} class="odd selected" {% endif %}>
+                <td onclick="getHolidayCalendar('{{ holiday.id }}','{{current_month}}','{{current_year}}')">{{ holiday.holiday }}
+                    
+                    <br>
+                </td>
+                <td onclick="getHolidayCalendar('{{ holiday.id }}','{{current_month}}','{{current_year}}')">{{holiday.holiday_type}}</td>
+                <td onclick="getHolidayCalendar('{{ holiday.id }}','{{current_month}}','{{current_year}}')">
+                    {{ holiday.description|safe}}
+                </td>                                
+            </tr>
+            {% endfor %}
+            <tr id="loading" style="display: none;">
+                <td class="text-center" colspan="4"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                </td>
+            </tr>
+            
+            {% else %}
+            <tr>
+                <td colspan="4" style="text-align: center;">No Record Found...</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>

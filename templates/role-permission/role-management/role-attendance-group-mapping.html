@@ -1,0 +1,281 @@
+{% load static %}
+{% block style %} 
+<link rel="stylesheet" href="{% static 'css/add-edit-popup.css' %}" />
+
+    <style>
+        .md-modal{
+            max-height: 75%;
+            min-height: 60%;
+        }
+        .role-map-wraper{
+            /* height: calc(100% - 20px);  */
+            height: 307px; 
+        }
+        .role-map-ul{
+            width: 100%;
+            height: 100%;
+            overflow: scroll;
+            border: 1px solid #d7d7d791;
+            border-radius: 8px;
+            min-height: 100%;
+            height: calc(100% - 221px);
+        }
+        .role-map-ul .role-map-li{
+            width: 100%;
+            display: block;
+            padding: 6px 12px;
+            font-size: 12px;
+            font-weight: 500;
+            position: relative;
+        }
+        .role-map-li a{
+            color: #000;
+            font-weight: 500;
+        }
+        .role-map-li:hover{
+            box-shadow: 0px 0px 15px 0px rgb(106 132 165 / 31%);
+        }
+        .role-map-arrowangle:hover{
+            box-shadow: 0px 0px 15px 0px rgb(106 132 165 / 31%);
+        }
+        .role-map-arrowangle:hover:after{
+            width: 20px;
+            height: 20px;
+            background-color: #0a60ff;
+            float: right;
+            text-align: center;
+            position: relative;
+            border-radius: 50%;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 500;
+            padding: 0.8%;
+            box-shadow: 0px 0px 15px 0px rgb(106 132 165 / 31%);
+            font-family: "FontAwesome"
+        }
+        .role-map-arrowright:hover:after{
+            content: "\f054";
+            top: 4px;
+            right: 8px;
+        }
+        .role-map-arrowleft:hover:after{
+            content: "\f053";
+            top: 4px;
+            left: -89.8%;
+        }
+        .role-map-arrowangle{
+            width: 100%;
+            background-color: transparent;
+            position: absolute;
+            top: 0;
+            left: 0px;
+            height: 100%;
+        }
+        
+        .role-map-ul .role-map-li:nth-of-type(odd) {
+            background-color: rgb(255, 255, 255);
+        }
+        .role-map-ul .role-map-li:nth-of-type(even) {
+            background-color: #f7f7f7;
+        }
+
+        @media screen and (max-width: 767px) {
+            .role-map-wraper{
+                height: 178px; 
+            }
+            .font-13{
+                font-size: 12px !important;
+            }
+            h5{ font-size: 13px;}
+        
+        .role-map-arrowright:hover:after{
+            content: "\f078";
+            top: 4px;
+            right: 8px;
+        }
+        .role-map-arrowleft:hover:after{
+            content: "\f077";
+            top: 4px;
+            left: -89.8%;
+        }
+        .md-modal{
+            max-height: 84%;
+            min-height: 84%;
+        }
+        }
+    </style>
+{% endblock %}
+<div class="md-modal centered" style=" height:500px;">
+    <div class="modal-header basic-inform-popup" id="headerStep1">
+        <div class="col-md-12 col-12 px-0">
+            <div class="row">
+                <div class="col-6 col-sm-6 px-0">
+                    <h5 class="mt-2 mb-0">Attendance Group Mapping ({{role.role_name}}) </h5>
+                </div>
+                <div class="col-6 col-sm-6 px-0">
+                    <!-- <button class="btn btn-save float-right" type="button" onclick="saveRoleMapping()" >
+                        Save
+                    </button> -->
+                    <button class="btn btn-close float-right" type="button" onclick="manipulateModal('addUserModal','close')">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+        <div class="col-md-12 col-12 px-0 h-100 w-100" id="step1">
+            <div class="row" id="ajaxSection">
+                <div class="col-md-6 col-12 pl-0 pr-3 mob-border-right-0 mob-pr-0 text-left" style="border-right: 1px solid rgb(226 223 223);">
+                    <span class="d-inline-block font-wt-b mb-2 font-13"style="padding-left: 13px; color: #0073e0;">Unmapped</span>
+                    <div class="role-map-wraper">
+                        <ul class="role-map-ul" id="entity_list">
+                            {% for attendance_group in attendance_groups %}
+                            <li id="attendance_group_{{attendance_group.id}}" class="role-map-li" onclick="movePolicy('{{attendance_group.id}}','{{attendance_group.attendance_group}}')">{{attendance_group.attendance_group}}
+                                <div class="role-map-arrowangle role-map-arrowright">
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                <div class="col-md-6 col-12 pl-3 pr-0 mob-pl-0 mob-pt-8 text-right">
+                    <span class="d-inline-block font-wt-b mb-2 font-13" style="padding-right: 17px; color: #0073e0;" >Mapped</span>
+                    <form id="mappingForm">
+                        {% csrf_token %}
+                        <div id="input_section">
+                            {% if mapping %}
+                            {% for mapping_attendance in mapping %}
+                                <input type="hidden" name="attendance_group_id[]" value="{{mapping_attendance.entity_id}}" >
+                            {% endfor %}
+                            {% endif %}
+                        </div>
+                        <input type="hidden" name="role_id" value="{{role.id}}">
+                        <input type="hidden" name="entity_type" value="attendance_group">
+                        <div class="role-map-wraper">
+                            <ul class="role-map-ul" id="mapped_section">
+                                {% if mapping %}
+                                {% for mapping_attendance in mapping %}
+                                <li id="attendance_group_{{mapping_attendance.entity_id}}" class="role-map-li" onclick="moveBackPolicy('{{mapping_attendance.entity_id}}','{{mapping_attendance.attendance_group}}')">{{mapping_attendance.attendance_group}}
+                                    <div class="role-map-arrowangle role-map-arrowleft">
+                                    </div>
+                                </li>
+                                {% endfor %}
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    
+    
+    function movePolicy(attendance_group_id,attendance_group){
+        
+        $.ajax({
+            url: "{% url 'src:save-role-mapping' %}",
+            method: 'POST',
+            data: {
+                role_id:'{{role.id}}',
+                entity_type:'attendance_group',
+                entity_id:attendance_group_id
+            },
+            success: function (data) {
+                if(typeof data.flag !== "undefined" && !data.flag){
+					openToaster("danger", data.message);
+				}else{
+                    $('#ajaxSection').html(data)
+                }
+            },
+            error: function (err) {
+                hideLoader();
+                console.log(err)
+            }
+        }).always(function() {
+            hideLoader();
+        });
+        
+        
+        
+        
+    }
+    
+    function moveBackPolicy(attendance_group_id,attendance_group){
+        
+        $.ajax({
+            url: "{% url 'src:save-role-unmapping' %}",
+            method: 'POST',
+            data: {
+                role_id:'{{role.id}}',
+                entity_type:'attendance_group',
+                entity_id:attendance_group_id
+            },
+            success: function (data) {
+                if(typeof data.flag !== "undefined" && !data.flag){
+					openToaster("danger", data.message);
+				}else{
+                    $('#ajaxSection').html(data)
+                }
+            },
+            error: function (err) {
+                hideLoader();
+                console.log(err)
+            }
+        }).always(function() {
+            hideLoader();
+        });
+        
+        return false;
+
+    }
+    
+
+    function saveRoleMapping(){
+        showLoader();
+        if(validateForm()){
+            hideLoader();
+            return false;
+        }else{
+            $.ajax({
+                url: "{% url 'src:save-role-attendance-group-mapping' %}",
+                method: 'POST',
+                data: $('#mappingForm').serialize(),
+                success: function (data) {
+                    hideLoader();
+                    if(data.flag){
+                        $('#addUserModal').html('');
+                        $('#addUserModal').hide();
+                        openToaster("success", data.message);
+                    }else{
+                        openToaster("danger", data.message);
+                    }
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            }).always(function() {
+                hideLoader();
+            });
+        }
+    }
+    
+    function validateForm(){
+        error = false;
+        $('[name="attendance_group_id[]"]').each(function(){
+            if($(this).val() == ""){
+                error = true;
+            }
+        });
+        if(error){
+            openToaster("warning", "Please choose holiday");
+        }
+        return error;
+    }
+</script>
+

@@ -1,0 +1,461 @@
+{% load static %}
+<style>
+	#addPermissionModule{
+		-webkit-filter: blur(5px);
+		-moz-filter: blur(5px);
+		-ms-filter: blur(5px);
+		-o-filter: blur(5px);
+		filter: blur(5px);
+		pointer-events:none;
+	}	
+	@media screen and (max-width: 767px) {
+		.select2-container ,.inputField{
+			width:  calc(100% - 45px) !important;
+
+		}
+		
+	}
+</style>
+<link rel="stylesheet" href="{% static 'css/jquery-confirm.min.css' %}">
+<div class="modal-AddOrganisation centered ">
+    <div class="modal-body p-0" >
+        <div class="row">
+            <div class="col-sm-3 col-12 px-0 modalOrgBG">
+                <div class="transformImage">
+                    <img src="{% static 'img/svg/addorgW.svg' %}" class="w-50" />
+                    <h4 class="modalColHead">Add Leave</h4>
+                </div>
+            </div>
+            <div class="col-sm-9 col-12 role-details-form py-3">
+                <form method="POST" id="addRoleForm" autocomplete="off" action="" aria-label="Add Role" enctype="multipart/form-data">
+					{% csrf_token %}
+					
+                    <div class="row ">
+                        <div class="col-sm-5 col-7 px-0">
+                            <h5 class="d-inline-block font-wt-b">Leave Details</h5>
+                        </div>
+						<div class="col-sm-7 col-5 px-0"> 
+							<button class="btn btn-close float-right ml-0 mr-0" type="button" onclick="manipulateModal('addOrganisationModal','close')">
+								<span class="mob-d-none">Close</span>
+								<i class="far fa-times-circle mob-d-block desk-d-none"></i>
+							</button>
+							<button class="btn btn-save mob-ml-16 float-right mr-2" type="button" onclick="saveLeave()">Save</button>
+						</div>
+                    </div>
+
+				
+                    <div class="row mt-3">
+                        <div class="col-md-6 p-0">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/profile.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="font-wt-b d-inline-block">
+									Employee Name
+								</h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <select class="inputField selectField" name="employee_name" id="employee_name" style="width: 100%;" onchange="getRolesEmployee(this.value, 'employee_id');getleaveEmployee(this.value,leave_type)">
+									<option value="">Select Employee Name</option>
+									{% for employee in employee %}
+									<option value="{{employee.id}}">{{employee.first_name}}{{employee.middle_name}}{{employee.last_name}}({{employee.emp_sap_id}})</option>
+									{% endfor %}
+								</select>
+								<label class="error_msg float-right" ></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 pr-0">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/profile.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="font-wt-b d-inline-block">
+									Leave Type
+								</h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <select class="inputField selectField" name="leave_type" id="leave_type" style="width: 100%;">
+									<option value="">Select Leave Type</option>
+									{% comment %} {% for leave in leave %}
+									<option value="{{leave.id}}">{{leave.leave_type}}</option>
+									{% endfor %} {% endcomment %}
+								</select>
+								<label class="error_msg float-right"></label>
+                            </div>
+                        </div>
+                    </div>
+					<div class="row mt-3">
+                        <div class="col-md-6 p-0">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/cal_date.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="font-wt-b d-inline-block">
+									From Date
+								</h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+								<input class="inputField alpha" type="text" placeholder="Choose From Date" name="from_date"
+                                id="from_date" maxlength="50">
+                                <label class="error_msg float-right" id="from_date_error"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 pr-0">
+                            <div class="col-md-12 p-0">
+                                {% comment %} <img src="{% static 'img/svg/profile.svg' %}" class="profileIconSize">&nbsp;&nbsp; {% endcomment %}
+                                <h6 class="font-wt-b d-inline-block">
+									is first halfday ?
+								</h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <label class="switch">
+                                    <input type="checkbox" class="checkbox" name="is_active"  onchange = "updateStatus()"
+                                    id="is_active" value="0">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+						
+					<div class="row mt-3">
+                        <div class="col-md-6 p-0">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/cal_date.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="font-wt-b d-inline-block">
+									To Date
+								</h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <input class="inputField alpha" type="text" placeholder="Choose To Date" name="to_date"
+                                id="to_date" maxlength="50">
+                                <label class="error_msg float-right" id="to_date_error"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-6 pr-0">
+                            <div class="col-md-12 p-0">
+                                <h6 class="font-wt-b d-inline-block">
+									is last halfday ?
+								</h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <label class="switch">
+                                    <input type="checkbox" class="checkbox" name="is_last_day"  onchange = "updatelastStatus()"
+                                    id="is_last_day" value="0">
+                                    <span class="slider round"></span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+					
+					<div class="row mt-3">
+                        <div class="col-md-12 p-0">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/profile.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="font-wt-b d-inline-block">
+									Handover To
+								</h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+								<select class="inputField selectField" style="width: 100% !important;" name="employee_id" id="employee_id" >
+									<option value="">Select Handover</option>
+
+								</select>
+								<label class="error_msg float-right" id="district_id_error"></label>  
+                            </div>
+                        </div>
+					</div>
+					<div class="row mt-3">
+                        <div class="col-md-12 p-0">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/profile.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="font-wt-b d-inline-block">
+									Reason For Leave
+								</h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <textarea name="reason" class="inputField " id="reason" cols="10" rows="3" placeholder="Enter Reason For Leave"></textarea>
+								<label class="error_msg float-right" id="reason_error"></label>
+                            </div>
+                        </div>
+                    </div>	
+                    <div class="row mt-3">
+                        <div class="col-md-6 p-0">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/profile.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="font-wt-b d-inline-block">
+									Required Documents
+								</h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <select class="inputField selectField document" name="document_type[]" id="document_type" style="width: 100%;" >
+									<option value="">Select Document Type</option>
+									{% for doc in doc %}
+									<option value="{{doc.id}}">{{doc.document}}</option>
+									{% endfor %}
+								</select>
+								<label class="error_msg float-right"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-4 pr-0">
+                            <div class="col-md-12 p-0">
+                                <img src="{% static 'img/svg/profile.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                <h6 class="font-wt-b d-inline-block">
+									Select Document
+								</h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <input class="inputField" type="file" placeholder="Attachment*" name="attechment[]" id="attechment_0" />
+                                <label class="attachment_error" id="attachment_error" style="color: red; font-size: 11px;"></label>
+                            </div>
+                        </div>
+                        <div class="col-md-2 mt-1">
+                            <div class="col-md-12 p-0">
+                                <h6 class="font-wt-b d-inline-block">
+									
+								</h6>
+                            </div>
+                            <div class="col-md-12 p-0 mt-2">
+                                <button class="iconCover float-right" style="padding: 0.75rem;" type="button"  onclick="addNewDocument();">
+                                    <img src="{% static 'img/svg/add.svg' %}" style="width: 1rem;" />
+                                </button>
+                            </div>
+                           
+                            {% comment %} <a href="javascript:;" onclick="addNewDocument()" class="btn btn-primary"><i class="fa fa-plus"></i></a> {% endcomment %}
+                        </div>
+                        
+                        <div id="newDocument">
+                    
+                        </div>
+                    </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+						
+<script src="{% static 'js/jquery-confirm.min.js' %}"></script>
+<script>
+    
+    function updateStatus(){
+        if ($('#is_active').prop("checked") == true) {
+            $('#is_active').val('1');
+         }
+         else{
+             $('#is_active').val('0');
+         }  
+    }
+    function updatelastStatus(){
+
+        if ($('#is_last_day').prop("checked") == true) {
+            $('#is_last_day').val('1');
+        }
+        else{
+            $('#is_last_day').val('0');
+        }
+     
+    }
+	$(document).ready(function () {
+
+        $("#from_date").datepicker({
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+0",
+            dateFormat: 'dd/mm/yy' 
+        });
+
+		$("#to_date").datepicker({
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+0",
+            dateFormat: 'dd/mm/yy' 
+        });
+    })
+
+    function addNewDocument(){
+        var length = $('.document').length;
+      
+        var newHtml = `<div class="row mt-1">
+            <div class="col-md-7 p-0">
+                <div class="col-md-12 p-0">
+                    <select class="inputField selectField document" name="document_type[]" id="document_type_` + length + `" style="width: 100%;" onchange="getRolesEmployee(this.value, 'employee_id')">
+                        <option value="">Select Document Type</option>
+                        {% for doc in doc %}
+                        <option value="{{doc.id}}">{{doc.document}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-5 pr-0">
+                <div class="col-md-12 p-0">
+                    <input class="inputField" type="file" placeholder="Attachment*" name="attechment[]" id="attechment_` + length + `" />
+                    <label class="attachment_error" id="attachment_error" style="color: red; font-size: 11px;"></label>
+                </div>
+            </div>
+            <div class="col-md-1">
+                <a href="javascript:;" onclick="removeNewDocument(this)" class="btn btn-danger"><i class="fa fa-trash"></i></a>
+            </div>
+        </div>`;
+        $('#newDocument').append(newHtml);
+        $(".selectField").select2();
+            $('.removeNewDocument').click(function() {
+                $(element).parent().parent().remove();
+            });
+    }
+
+    {% comment %} function removeSelectionOpt(){
+        debugger;
+        var length = $('.document').length;
+        var v = $('.document').val();
+        var ids = $("#document_type_"+ length ).val()
+        alert(ids)
+        $('#document_type_'+ length +' > option[value=' + v + ']').remove();
+        
+    } {% endcomment %}
+
+    function removeNewDocument(element){
+        $(element).parent().parent().remove();
+    }
+
+	function getRolesEmployee(employee_name, employee_id){
+        if(employee_name != ""){
+
+            var url = "{% url 'src:get-emp-role-options' 1 %}";
+            url = url.replace(1,employee_name)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+
+                    $('[name="'+employee_id+'"]').html(data.options)
+                    $(".selectField").select2();
+                    
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            });
+        } else {
+            $('[name="'+employee_id+'"]').html('<option value="" selected>Select Employee</option>')
+            $(".selectField").select2();
+        } 
+    }   
+    
+    function getleaveEmployee(employee_name,id){
+       
+        if(employee_name != ""){
+
+            var url = "{% url 'src:get-emp-leave-count' 1 %}";
+            url = url.replace(1,employee_name)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+
+                    $('#leave_type').html(data.options)
+                    $(".selectField").select2();
+                    
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            });
+        } else {
+            $('#leave_type').html('<option value="" selected>Select Leave type</option>')
+            $(".selectField").select2();
+        } 
+    }   
+    
+
+    function saveLeave() {
+        if(validateRoleForm() == false){
+            var question = "Do you want to save the ledger?";
+                $.confirm({
+                    title: 'Confirm!',
+                    content: question,
+                    buttons: {
+                        confirm: function () {
+                        
+                            $('#addRoleForm').submit();
+                            
+                        },
+                        cancel: function () {
+                            
+                        }
+                    }
+                });
+        }    
+    } 
+ 
+    $('#addRoleForm').submit(function(e){
+        showLoader();
+        if(validateRoleForm()){
+            hideLoader();
+            return false;
+        }else{ 
+            e.preventDefault();
+            $form = $(this)
+            var formData = new FormData(this);
+            $.ajax({
+                url: "{% url 'src:save-leaves' %}",
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    hideLoader();
+                    if(response.error){
+                        openToaster("danger", response.message);
+                    } else {
+                        hideLoader();
+                        $('#addOrganisationModal').html('');
+                        openToaster("success", response.message);
+                        window.location.reload();
+                    }
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        }
+    });
+
+    function validateRoleForm(){
+      
+		error = 0;
+		$('.error_msg ').text('');
+		$('.inputField').css("border", "");
+		if($.trim($('[name="employee_name"]').val()) == ''){
+			$('[name="employee_name"]').parent().find('.error_msg').text('Please choose employee name');
+			$('[name="employee_name"]').css("border", "1px solid #db8305");
+			error = error + 1;
+		}
+		
+		if($('[name="leave_type"]').val() == ""){
+			$('[name="leave_type"]').parent().find('.error_msg').text('Please select leave type');
+			$('[name="leave_type"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			error = error + 1;
+		}
+		if($('[name="from_date"]').val() == ""){
+			$('[name="from_date"]').parent().find('.error_msg').text('Please choose From Date');
+			$('[name="from_date"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			error = error + 1;
+		}
+		if($('[name="to_date"]').val() == ""){
+			$('[name="to_date"]').parent().find('.error_msg').text('Please choose To Date');
+			$('[name="to_date"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			error = error + 1;
+		}
+		if($('[name="reason"]').val() == ""){
+			$('[name="reason"]').parent().find('.error_msg').text('Please enter reason');
+			$('[name="reason"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			error = error + 1;
+		}
+        if($('[name="document_type"]').val() == ""){
+			$('[name="from_date"]').parent().find('.error_msg').text('Please choose From Date');
+			$('[name="from_date"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+			error = error + 1;
+		}
+    
+		
+		if(error > 0){
+			return true;
+		}else{
+			return false;
+		}
+	}
+</script>

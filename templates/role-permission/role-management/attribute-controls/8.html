@@ -1,0 +1,39 @@
+
+<table class="table table-striped detail-table" id="table_8">
+	<thead>
+		<tr>
+			<th>Fields</th>
+			<th>Optional/Mandatory <br>
+				<div class="switch_box">
+					<input type="checkbox"  class="switch_1 check_optional_field" value="8">
+				</div>
+			</th>
+			<th>Hide/Show</th>
+		</tr>
+	</thead>
+	<tbody>
+		{% for required_document in required_documents %}
+		<tr>
+			<td><label for="">{{required_document.document}}</label></td>
+			<td>
+				<div class="switch_box">
+					<input type="checkbox" name="{{attribute.id}}[]"  class="switch_1 optional_field" value="{{required_document.document|slugify}}"  {% if required_document.document|slugify not in attribute.fields %}checked{% endif %}>
+				</div>
+			</td>
+			<td>
+				<div class="switch_box">
+					<input type="checkbox"  class="switch_1" name="hidden_attr_{{attribute.id}}[]" value="{{required_document.document|slugify}}" {% if required_document.document|slugify not in attribute.hidden_fields %}checked{% endif %}>
+				</div>
+			</td>
+			
+		</tr>
+		{% endfor %}
+		
+	</tbody>
+</table>
+
+
+<input type="hidden" name="optional_{{attribute.id}}" id="optional_{{attribute.id}}" value="{% if attribute.fields %}{{attribute.fields|join:", " }}{% endif %}"> 
+<input type="hidden" name="hidden_{{attribute.id}}" id="hidden_{{attribute.id}}" value="{% if attribute.hidden_fields %}{{attribute.hidden_fields|join:", " }}{% endif %}"> 
+
+

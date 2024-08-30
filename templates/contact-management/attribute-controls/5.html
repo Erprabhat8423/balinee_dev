@@ -1,0 +1,407 @@
+{% load static %}
+<div class="bank_detail_row">
+	<div class="row mt-3 wrapper ">
+		{% if 'bank' not in attribute.hidden_fields %}
+		<div class="col-md-3">
+			<div class="col-md-12 p-0">
+				<img src="{% static 'img/svg/org.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+				<h6 class="mt-2 mb-0" style="display: inline-block;">
+					Bank Name: {% if 'bank' not in attribute.fields %}*{% endif %}
+				</h6>
+			</div>
+			<div class="col-md-12 p-0 mt-2">
+				<select class="inputField selectField banks" style="width: 100% !important;" name="bank[]" id="bank_0">
+					<option value="">Select Bank Name</option>
+					{% if banks %}
+					{% for bank in banks %}
+					<option value="{{bank.id}}">{{bank.bank_name}}</option>
+					{% endfor %}
+					{% endif %}
+				</select>
+				<label class="error_msg float-right" id="bank_error"></label>
+			</div>
+		</div>
+		{% endif %}
+		
+		
+		
+		{% if 'ifsc_code' not in attribute.hidden_fields %}
+		<div class="col-md-3">
+			<div class="col-md-12 p-0">
+				<img src="{% static 'img/svg/org.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+				<h6 class="mt-2 mb-0" style="display: inline-block;">
+					IFSC Code: {% if 'ifsc_code' not in attribute.fields %}*{% endif %}
+				</h6>
+			</div>
+			<div class="col-md-12 p-0 mt-2">
+				<input class="inputField alpha_numeric ifsc_codes" type="text" placeholder="IFSC Code" name="ifsc_code[]" id="ifsc_code_0">
+				<label class="error_msg float-right" id="ifsc_code_error"></label>
+			</div>
+		</div>
+		{% endif %}
+		
+		{% if 'bank_account_no' not in attribute.hidden_fields %}
+		<div class="col-md-3">
+			<div class="col-md-12 p-0">
+				<img src="{% static 'img/svg/org.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+				<h6 class="mt-2 mb-0" style="display: inline-block;">
+					Bank Account no: {% if 'bank_account_no' not in attribute.fields %}*{% endif %}
+				</h6>
+			</div>
+			<div class="col-md-12 p-0 mt-2">
+				<input class="inputField numeric bank_account_nos" type="text" placeholder="Bank Account no" name="bank_account_no[]" id="bank_account_no_0">
+				<label class="error_msg float-right" id="bank_account_no_error"></label>
+			</div>
+		</div>
+		{% endif %}
+	</div>
+	
+	
+	
+	<div class="row mt-3 wrapper ">
+		{% if 'account_holder_name' not in attribute.hidden_fields %}
+		<div class="col-md-3">
+			<div class="col-md-12 p-0">
+				<img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+				<h6 class="mt-2 mb-0" style="display: inline-block;">
+					Account holder name: {% if 'account_holder_name' not in attribute.fields %}*{% endif %}
+				</h6>
+			</div>
+			<div class="col-md-12 p-0 mt-2">
+				<input class="inputField alpha account_holder_names" type="text" placeholder="Account holder name" name="account_holder_name[]" id="account_holder_name_0">
+				<label class="error_msg float-right" id="account_holder_name_error"></label>
+			</div>
+		</div>
+		{% endif %}
+		
+	</div>
+</div>
+
+<div id="newBankRows">
+	
+</div>
+<div class="row mt-2">
+	<div class="col-md-8 text-right"  >
+		<a href="javascript:;" class="btn btn-primary" onclick="addNewBankRow()"><i class="fa fa-plus" title="Add Bank Details"></i></a>
+	</div>
+</div>
+
+
+<div class="row mt-3 wrapper ">
+	{% if 'health_insurence' not in attribute.hidden_fields %}
+	<div class="col-md-3">
+		<div class="col-md-12 p-0">
+			<h6 class="mt-2 mb-0" style="display: inline-block;">
+				Health Insurance? {% if 'health_insurence' not in attribute.fields %}*{% endif %}
+			</h6>
+		</div>
+		<div class="col-md-12 p-0 mt-2">
+			<label class="switch">
+				<input type="checkbox" class="checkbox " name="healthInsurance">
+				<span class="slider round" title="Enable/Disable"></span>
+				<input type="hidden" name="is_health_insurance" value="0">
+				<label class="error_msg float-right" id="is_health_insurance_error"></label>
+			</label>
+		</div>
+	</div>
+	{% endif %}
+	
+	{% if 'wage_tax' not in attribute.hidden_fields %}
+	<div class="col-md-3">
+		<div class="col-md-12 p-0">
+			<h6 class="mt-2 mb-0" style="display: inline-block;">
+				Wage tax and social security contributions applicable? {% if 'wage_tax' not in attribute.fields %}*{% endif %}
+			</h6>
+		</div>
+		<div class="col-md-12 p-0 mt-2">
+			<label class="switch">
+				<input type="checkbox" class="checkbox " name="wageTaxApplicable">
+				<span class="slider round" title="Enable/Disable"></span>
+				<input type="hidden" name="is_wage_tax_applicable" value="0">
+				<label class="error_msg float-right" id="is_wage_tax_applicable_error"></label>
+			</label>
+		</div>
+	</div>
+	{% endif %}
+	
+	{% if 'salary_saving_scheme' not in attribute.hidden_fields %}
+	<div class="col-md-3" >
+		<div class="col-md-12 p-0">
+			<h6 class="mt-2 mb-0" style="display: inline-block;">
+				Participation in a life-cycle savings or salary savings scheme? {% if 'salary_saving_scheme' not in attribute.fields %}*{% endif %}
+			</h6>
+		</div>
+		<div class="col-md-12 p-0 mt-2">
+			<label class="switch">
+				<input type="checkbox" class="checkbox " name="salarySavingScheme">
+				<span class="slider round" title="Enable/Disable"></span>
+				<input type="hidden" name="is_salary_saving_scheme" value="0">
+				<label class="error_msg float-right" id="is_salary_saving_scheme_error"></label>
+			</label>
+		</div>
+	</div>
+	{% endif %}
+</div>
+
+
+<div class="row mt-5 wrapper">
+	{% if 'health_insurence' not in attribute.hidden_fields %}
+	<div class="col-md-3"  id="health_insurence_section" style="display: none;">
+		<div class="col-md-12 p-0">
+			<img src="{% static 'img/svg/contact.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+			<h6 class="mt-2 mb-0" style="display: inline-block;">
+				Health Insurance
+			</h6>
+		</div>
+		<div class="col-md-12 p-0 mt-2">
+			<input class="inputField  health_insurences" type="text" placeholder="Vehicle no" name="health_insurence" id="health_insurence" maxlength="50">
+			<label class="error_msg float-right" id="health_insurence_error"></label>
+		</div>
+	</div>
+	{% endif %}
+
+	{% if 'wage_tax' not in attribute.hidden_fields %}
+	<div class="col-md-3"  id="wage_tax_section" style="display: none;">
+		<div class="col-md-12 p-0">
+			<img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+			<h6 class="mt-2 mb-0" style="display: inline-block;">
+				Wage tax and social security
+			</h6>
+		</div>
+		<div class="col-md-12 p-0 mt-2">
+			<input class="inputField  wage_taxs" type="text" placeholder="Wage tax and social security" name="wage_tax" id="wage_tax" maxlength="50">
+			<label class="error_msg float-right" id="wage_tax_error"></label>
+		</div>
+	</div>
+	{% endif %}
+
+	{% if 'salary_saving_scheme' not in attribute.hidden_fields %}
+	<div class="col-md-4"  id="saving_scheme_section" style="display: none;">
+		<div class="col-md-12 p-0">
+			<img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+			<h6 class="mt-2 mb-0" style="display: inline-block;">
+				life-cycle savings or salary savings scheme?
+			</h6>
+		</div>
+		<div class="col-md-12 p-0 mt-2">
+			<input class="inputField  salary_saving_schemes" type="text" placeholder="life-cycle savings or salary savings scheme?" name="salary_saving_scheme" id="salary_saving_scheme" maxlength="50">
+			<label class="error_msg float-right" id="salary_saving_scheme_error"></label>
+		</div>
+	</div>
+	{% endif %}
+	
+	
+</div>
+
+
+<div class="row mt-5 wrapper ">
+	{% if 'gstin' not in attribute.hidden_fields %}
+	<div class="col-md-3" >
+		<div class="col-md-12 p-0">
+			<img src="{% static 'img/svg/contact.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+			<h6 class="mt-2 mb-0" style="display: inline-block;">
+				GSTIN: {% if 'gstin' not in attribute.fields %}*{% endif %}
+			</h6>
+		</div>
+		<div class="col-md-12 p-0 mt-2">
+			<input class="inputField  gstins alpha_numeric" type="text" placeholder="GSTIN" name="gstin" id="gstin" maxlength="50">
+			<label class="error_msg float-right" id="gstin_error"></label>
+		</div>
+	</div>
+	{% endif %}
+
+	{% if 'salary_addition' not in attribute.hidden_fields %}
+	<div class="col-md-3"  >
+		<div class="col-md-12 p-0">
+			<img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+			<h6 class="mt-2 mb-0" style="display: inline-block;">
+				Salary Additions: {% if 'salary_addition' not in attribute.fields %}*{% endif %}
+			</h6>
+		</div>
+		<div class="col-md-12 p-0 mt-2">
+			<select class="inputField selectField banks" style="width: 100% !important;" name="salary_addition[]" id="salary_addition">
+				<option value="">Select Salary Additions</option>
+				{% if salary_additions %}
+				{% for salary_addition in salary_additions %}
+				<option value="{{salary_addition.id}}">{{salary_addition.addition}}</option>
+				{% endfor %}
+				{% endif %}
+			</select>
+			<label class="error_msg float-right" id="salary_addition_error"></label>
+		</div>
+	</div>
+	{% endif %}
+
+	{% if 'salary_deduction' not in attribute.hidden_fields %}
+	<div class="col-md-4" >
+		<div class="col-md-12 p-0">
+			<img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+			<h6 class="mt-2 mb-0" style="display: inline-block;">
+				Salary Deductions: {% if 'salary_deduction' not in attribute.fields %}*{% endif %}
+			</h6>
+		</div>
+		<div class="col-md-12 p-0 mt-2">
+			<select class="inputField selectField banks" style="width: 100% !important;" name="salary_deduction[]" id="salary_deduction">
+				<option value="">Select Salary Additions</option>
+				{% if salary_deductions %}
+				{% for salary_deduction in salary_deductions %}
+				<option value="{{salary_deduction.id}}">{{salary_deduction.deduction}}</option>
+				{% endfor %}
+				{% endif %}
+			</select>
+			<label class="error_msg float-right" id="salary_deduction_error"></label>
+		</div>
+	</div>
+	{% endif %}
+	
+	
+</div>
+
+
+<script>
+	function addNewBankRow(){
+		count = $('.bank_detail_row').length
+		new_count = count;
+		newRow = `
+		<div class="bank_detail_row">
+			<div class="row mt-3 wrapper ">
+				{% if 'bank' not in attribute.hidden_fields %}
+				<div class="col-md-3">
+					<div class="col-md-12 p-0">
+						<img src="{% static 'img/svg/org.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+						<h6 class="mt-2 mb-0" style="display: inline-block;">
+							Bank Name: {% if 'bank' not in attribute.fields %}*{% endif %}
+						</h6>
+					</div>
+					<div class="col-md-12 p-0 mt-2">
+						<select class="inputField selectField banks" style="width: 100% !important;" name="bank[]" id="bank_`+new_count+`">
+							<option value="">Select Bank Name</option>
+							{% if banks %}
+							{% for bank in banks %}
+							<option value="{{bank.id}}">{{bank.bank_name}}</option>
+							{% endfor %}
+							{% endif %}
+						</select>
+					</div>
+				</div>
+				{% endif %}
+				
+				
+				
+				{% if 'ifsc_code' not in attribute.hidden_fields %}
+				<div class="col-md-3">
+					<div class="col-md-12 p-0">
+						<img src="{% static 'img/svg/org.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+						<h6 class="mt-2 mb-0" style="display: inline-block;">
+							IFSC Code: {% if 'ifsc_code' not in attribute.fields %}*{% endif %}
+						</h6>
+					</div>
+					<div class="col-md-12 p-0 mt-2">
+						<input class="inputField numeric ifsc_codes" type="text" placeholder="IFSC Code" name="ifsc_code[]" id="ifsc_code_`+new_count+`">
+						<label class="error_msg float-right"></label>
+					</div>
+				</div>
+				{% endif %}
+				
+				{% if 'bank_account_no' not in attribute.hidden_fields %}
+				<div class="col-md-3">
+					<div class="col-md-12 p-0">
+						<img src="{% static 'img/svg/org.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+						<h6 class="mt-2 mb-0" style="display: inline-block;">
+							Bank Account no: {% if 'bank_account_no' not in attribute.fields %}*{% endif %}
+						</h6>
+					</div>
+					<div class="col-md-12 p-0 mt-2">
+						<input class="inputField numeric bank_account_nos" type="text" placeholder="Bank Account no" name="bank_account_no[]" id="bank_account_no_`+new_count+`">
+						<label class="error_msg float-right"></label>
+					</div>
+				</div>
+				{% endif %}
+			</div>
+			
+			
+			<div class="row mt-3 wrapper ">
+				{% if 'account_holder_name' not in attribute.hidden_fields %}
+				<div class="col-md-3">
+					<div class="col-md-12 p-0">
+						<img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+						<h6 class="mt-2 mb-0" style="display: inline-block;">
+							Account holder name: {% if 'account_holder_name' not in attribute.fields %}*{% endif %}
+						</h6>
+					</div>
+					<div class="col-md-12 p-0 mt-2">
+						<input class="inputField numeric account_holder_names" type="text" placeholder="Account holder name" name="account_holder_name[]" id="account_holder_name_`+new_count+`">
+						<label class="error_msg float-right"></label>
+					</div>
+				</div>
+				{% endif %}
+				
+				<div class="col-md-1">
+					<a href="javascript:;" class="btn btn-danger" style="margin-top: 37px;" onclick="removeBankRow(this)"><i class="fa fa-trash"></i></a>
+				</div>
+			</div>
+			
+		</div>
+		`;
+		
+		console.log(newRow)
+		
+		$('#newBankRows').append(newRow);
+		
+		 $(".selectField").select2();
+		// $("[name='contact_type_"+new_count+"[]']").select2({placeholder:'Select'});
+		// $("[name='swipeable_leave_types_"+new_count+"[]']").select2({placeholder:'Select'});
+	}
+	
+	function removeBankRow(element){
+		$(element).parents(':last .bank_detail_row').remove();
+		refeshBankNames();
+	}
+	
+	function refeshBankNames(){
+		i=0;
+		$('.bank_detail_row').each(function(){
+			if(i>0){
+				$(this).find('.account_holder_names').attr('id','account_holder_name_'+i);
+				$(this).find('.bank_account_nos').attr('id','bank_account_no_'+i);
+				$(this).find('.ifsc_codes').attr('id','ifsc_code_'+i);
+				$(this).find('.banks').attr('id','bank_'+i);
+				
+			}
+			i = i + 1;
+		})
+		
+	}
+	
+	$(document).on('click',"input[name='healthInsurance']",function(){
+		if($(this).prop('checked')){
+			$('#health_insurence').val('');
+			$('#health_insurence_section').show();
+		}else{
+			$('#health_insurence').val('');
+			$('#health_insurence_section').hide();
+			
+		}
+	});
+	
+	
+	$(document).on('click',"input[name='wageTaxApplicable']",function(){
+		if($(this).prop('checked')){
+			$('#wage_tax').val('');
+			$('#wage_tax_section').show();
+		}else{
+			$('#wage_tax').val('');
+			$('#wage_tax_section').hide();
+		}
+	})
+	
+	$(document).on('click',"input[name='salarySavingScheme']",function(){
+		if($(this).prop('checked')){
+			$('#salary_saving_scheme').val('');
+			$('#saving_scheme_section').show();
+		}else{
+			$('#salary_saving_scheme').val('');
+			$('#saving_scheme_section').hide();
+		}
+	})
+</script>

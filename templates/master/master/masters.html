@@ -1,0 +1,1019 @@
+{% extends 'layout/layout.html' %}
+
+{% block title %}
+{{page_title}} 
+{% endblock %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/jquery-confirm.min.css' %}">
+<!-- <link rel="stylesheet" href="{% static 'css/mdtimepicker.min.css' %}"> -->
+<style>
+    .vartient-top-pad{
+        padding-top: 47px;
+    }
+</style>
+{% endblock %}
+
+<div class="row px-3" id="containerHeight">
+    <div class="col-md-4 col-12 px-0 mob-h-100 h-100 mob-mt-8 ">
+        <div class="primaryContainer  h-100" id="detailsBox">
+            <div class="row mb-2 mob-mb-0" id="topRow">
+                <div class="col-sm-12 col-12 px-0">
+                    <h6 class="font-wt-b mob-mb-0">{{page_title}}
+                        <i class="ml-2 fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></i>
+                    </h6>
+                </div>
+            </div>
+            <div class="row border-redius-17 mob-mt-8" style="margin-top: 10px;" id="tableBox">
+                <div class="col-md-12 col-12 primaryContainerBG h-100 p-2 commonTableBg" id="ajax-div">
+                    <div class="p-2" id="secondRow">
+                        <h6 class="font-wt-b">Master list</h6>
+                        <!--<input class="master_search searchTable" style="width: 100% !important;margin-bottom: 10px;" placeholder="Search" type="search" data-column="all">-->
+                        <table id="masterTable" class="detail-table table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+                            <thead>
+                                <tr>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="odd selected" data-role ="leave_types">
+                                    <td onclick="getList('leave_types')">Leave Types</td>
+                                </tr>
+
+                                <tr data-role ="holiday_types">
+                                    <td onclick="getList('holiday_types')">Holiday Types</td>
+                                </tr>
+
+                                <tr data-role ="pay_bands">
+                                    <td onclick="getList('pay_bands')">Pay Bands</td>
+                                </tr>
+
+                                <tr data-role ="working_shift">
+                                    <td onclick="getList('working_shift')">Working Shift</td>
+                                </tr>
+
+                                <tr data-role ="salary_addition_types">
+                                    <td onclick="getList('salary_addition_types')">Salary Addition types</td>
+                                </tr>
+
+                                <tr data-role ="salary_deduction_types">
+                                    <td onclick="getList('salary_deduction_types')">Salary Deduction types</td>
+                                </tr>
+                                <tr data-role ="course_types">
+                                    <td onclick="getList('tehsil')">Tehsil</td>
+                                </tr>
+                                <tr data-role ="college_session_types">
+                                    <td onclick="getList('district')">District</td>
+                                </tr>
+                                <tr data-role ="caste_category">
+                                    <td onclick="getList('caste_category')">Caste Category</td>
+                                </tr>
+                                <tr data-role ="income_category">
+                                    <td onclick="getList('income_category')">Income Category</td>
+                                </tr>
+                                <tr data-role ="Prviliage_category">
+                                    <td onclick="getList('Prviliage_category')">Prviliage Category</td>
+                                </tr>
+                                <tr data-role ="college_session_types">
+                                    <td onclick="getList('college_session_types')">Colleges Session Type</td>
+                                </tr>
+                                <tr data-role ="section_types">
+                                    <td onclick="getList('section_types')">Section</td>
+                                </tr>
+                                <tr data-role ="document_type">
+                                    <td onclick="getList('document_type')">Document Type</td>
+                                </tr>
+
+                                <tr data-role ="room_no">
+                                    <td onclick="getList('room_no')">Room No.</td>
+                                </tr>
+                                <tr data-role ="almirah_type">
+                                    <td onclick="getList('almirah_type')">Almirah Types</td>
+                                </tr>
+                                <tr data-role ="rack_type">
+                                    <td onclick="getList('rack_type')">Rack Types</td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8 col-12 pl-3 pr-0 mob-mt-8 mob-mb-8 h-100 mob-pl-0 vartient-top-pad" id="ajaxMaster">
+        <div  class="primaryContainer h-100" id="mainbox" >
+            <div class="row mb-2" id="topRow">
+                <div class="col-sm-6 col-12 px-0 mob-mt-8  mob-mb-8">
+                    <h6 class="font-wt-b">leaves Types</h6>
+                </div>
+                <div class="col-sm-6 col-12 px-0">
+                    <div class="row" id="secondRow">
+                        <div class="col-sm-6 col-5 px-0">
+                        <!--    <input class="searchTable zone_search w-100" placeholder="Search" type="search" data-column="all" id="leave_types_filter" onkeyup="master_search_bar(this)">-->
+                        </div>    
+
+                        <button type="button" class="btn iconBox iconAddNew ml-2"
+                        onclick="addMaster('leave_types')" title="Add New Leave Type"></button>
+
+                        <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                            <button class="btn iconBox iconHide" title="Hide" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                            aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name=""
+                                onclick="showHideColumns(this,'leave_type',2)" />
+                                <label class="mb-0" for="zone_name">Leave Types</label>
+                            </a>
+
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name=""
+                                onclick="showHideColumns(this,'Alias',2)" />
+                                <label class="mb-0" for="state_name">Alias</label>
+                            </a>
+
+                        </div>
+                    </div>
+
+                    <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                        <button class="btn iconBox iconUnFreeze" title="Stick" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                        aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="" id="lock_zone_name"
+                            data-id="1" onclick="toggleFreeze(this.id,'leave_type',1)" />
+                            <label class="mb-0" for="lock_zone_name">Leave Types</label>
+                        </a>
+
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="" id="lock_state"
+                            data-id="1" onclick="toggleFreeze(this.id,'Alias',1)" />
+                            <label class="mb-0" for="lock_state">Alias</label>
+                        </a>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="row border-redius-17" id="tableBox">
+        <div class="col-md-12 col-12 primaryContainerBG h-100 px-0 " id="masterListTable">
+            <input type="hidden" name="page" id="page" value="2" />
+            <input type="hidden" name="page_status" id="page_status" value="0" />
+            <input type="hidden" name="total_variant_pages" id="total_variant_pages"
+            value="{{ total_variant_pages }}" />
+            <table id="addOrgTable" class="detail-table table table-borderless table-striped table-hover mt-0" >
+                <thead>
+                    <tr>
+                <th class="leave_type">
+                    Leave Type
+                    <i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                
+                <th class="alias">
+                    Alias
+                    <i class="fa fa-fw fa-sort float-right"></i>
+                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                </th>
+                
+                <th data-sorter="false">Action</th>
+            </tr>
+                </thead>
+                <tbody id="tablebody">
+                    {% if leave_types %}
+                    {% for leave_type in leave_types %}
+                    <tr>
+                        <td class="leave_type">{{ leave_type.leave_type }}<br> 
+                            <a href="javascript:;" onclick="viewRequiredDocuments('{{ leave_type.id }}')">view required documents</a></td>
+
+                            <td class="alias">{{ leave_type.alias }}</td>
+                            <td>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <a href="javascript:void(0)" onclick="editMaster('leave_types','{{leave_type.id}}')"  >
+                                            <img src="{% static 'img/svg/editcopy.svg' %}" title="Edit" />
+                                        </a> 
+                                    </div>
+                                    <div class="col-md-5">
+                                        <label class="switch">
+                                            <input type="checkbox" class="checkbox" name="is_active" 
+                                            {% if leave_type.status == 1 %} checked="" {% else %}
+                                            {% endif %}
+                                            onclick="changeMasterStatus('leave_types', '{{ leave_type.id }}')">
+                                            <span class="slider round" title="Enable/Disable"></span>
+                                        </label>
+
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                        <tr id="loading" style="display: none;">
+                            <td class="text-center" colspan="3"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="2" style="text-align: center;">No Record Found...</td>
+                        </tr>
+                        {% endif %}
+                    </tbody>
+
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- *************************************Modal********************************** -->
+<div class="overlayModal" id="addProductModal" style="display: none;">
+
+</div>
+
+<!-- *************************************Modal********************************** -->
+{% endblock content %}
+{% block script %}
+<script src="{% static 'js/jquery-confirm.min.js' %}"></script>
+<script src="{% static 'js/mdtimepicker.min.js' %}"></script>
+
+<script>
+
+function viewRequiredDocuments(leave_type_id){
+        showLoader();
+        url = "{% url 'src:get-leave-type-documents' '1' %}";
+        url = url.replace('1',parseInt(leave_type_id))
+        $.ajax({
+            url: url,
+            method: 'GET',
+            data: {},
+            success: function (data) {
+                hideLoader();
+                if(data.flag){
+
+                    html = `<table class="table table-hover">
+                    <thead>
+                    <tr><th>Document</th></tr>
+                    </thead>
+                    <tbody>`;
+                    $.each(data.documents, function(key,value){
+                        html += `<tr><td>`+value.document+`</td></tr>`;
+                    });
+                    html += `
+                    </tbody>
+                    </table>`;
+                    
+                    $.confirm({
+                        title: '<p style="font-size:15px;">Required Documents</p>',
+                        content:' ' + html,
+                        theme:'material',
+                        animation:'zoom',
+                        buttons: {
+                            cancel: function () {
+                            },
+                        },
+                    });
+                    
+                }else{
+                    hideLoader();
+                    openToaster("danger", data.message);
+                    
+                }
+         
+                
+            },
+            error: function (err) {
+                console.log(err)
+                hideLoader();
+            }
+        });
+        
+    }
+
+
+    {% comment %} function master_search_bar(element){
+        url = '';
+        
+        var value = $(element).val();
+        var id = $(element).attr('id');
+        console.log(value,id);
+        if (value!="") {
+            if(id == "leave_types_filter"){
+                $('#ajaxMaster').html('');
+                url = "{% url 'src:search-leave-type-list' 1 %}"
+                url = url.replace('1',value)
+            }else if(id == "searchTableList"){
+                $('#ajaxMaster').html('');
+                url = "{% url 'src:search-leave-type-list' 1 %}"
+                url = url.replace('1',value)
+            }else if(id == "holiday_types_filter"){
+                $('#ajaxMaster').html('');
+                url = "{% url 'src:search-holiday-type-list' 1 %}"
+                url = url.replace('1',value)
+            }else if(id == "pay_bands_filter"){
+                $('#ajaxMaster').html('');
+                url = "{% url 'src:search-pay-band-list' 1 %}"
+                url = url.replace('1',value)
+            }else if(id == "attendance_group_types_filter"){
+                $('#ajaxMaster').html('');
+                url = "{% url 'src:search-attendance-group-list' 1 %}"
+                url = url.replace('1',value)
+            }else if(id == "salary_addition_types_filter"){
+                $('#ajaxMaster').html('');
+                url = "{% url 'src:search-salary-addition-type-list' 1 %}"
+                url = url.replace('1',value)
+            }else if(id == "salary_deduction_types_filter"){
+                $('#ajaxMaster').html('');
+                url = "{% url 'src:search-salary-deduction-type-list' 1 %}"
+                url = url.replace('1',value)
+            }
+            else if(id == "district_types_filter"){
+                $('#ajaxMaster').html('');
+                url = "{% url 'src:search-districts-list' 1 %}"
+                url = url.replace('1',value)
+            }
+            else if(id == "tehsil_types_filter"){
+                $('#ajaxMaster').html('');
+                url = "{% url 'src:search-tehsil-list' 1 %}"
+                url = url.replace('1',value)
+            }
+            else if(id == "caste_category_type_filter"){
+                $('#ajaxMaster').html('');
+                url = "{% url 'src:search-caste-category-list' 1 %}"
+                url = url.replace('1',value)
+            }
+            else if(id == "income_category_type_filter"){
+                $('#ajaxMaster').html('');
+                url = "{% url 'src:search-income-category-type-list' 1 %}"
+                url = url.replace('1',value)
+            }
+            else if(id == "Prviliage_category_filter"){
+                $('#ajaxMaster').html('');
+                url = "{% url 'src:search-prviliage-category-list' 1 %}"
+                url = url.replace('1',value)
+            }
+            else if(id == "college_session_types_filter"){
+                $('#ajaxMaster').html('');
+                url = "{% url 'src:search-course-types-list' 1 %}"
+                url = url.replace('1',value)
+            }
+            else if(id == "section_type_filter"){
+                $('#ajaxMaster').html('');
+                url = "{% url 'src:search-section-types-list' 1 %}"
+                url = url.replace('1',value)
+            }
+        }
+        if(url != ""){
+
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    hideLoader();
+                    $('#ajaxMaster').html(data);
+                    
+                    if(id == "leave_types_filter"){
+                        resizable_width_arr = ["33%","33%","33%"]
+                    }else if(id == "searchTableList"){
+                        resizable_width_arr = ["50%","50%"]
+                    }else if(id == "holiday_types_filter"){
+                        resizable_width_arr = ["50%","50%"]
+                    }else if(id == "pay_bands_filter"){
+                        resizable_width_arr = ["33%","33%","33%"]
+                    }else if(id == "attendance_group_types_filter"){
+                        resizable_width_arr = ["20%","20%","20%","20%","20%"]
+                    }else if(id == "salary_addition_types_filter"){
+                        resizable_width_arr = ["20%","15%","17%","15%","13%","20%"]
+                    }else if(id == "salary_deduction_types_filter"){
+                        resizable_width_arr = ["20%","15%","17%","15%","13%","20%"]
+                    }
+                    {% comment %} else if(id == "district_types_filter"){
+                        resizable_width_arr = ["20%","15%","17%","15%","13%","20%"]
+                    }
+                    else if(id == "tehsil_types_filter"){
+                        resizable_width_arr = ["20%","15%","17%","15%","13%","20%"]
+                    }
+                     else if(id == "caste_category_type_filter"){
+                        resizable_width_arr = ["20%","15%","17%","15%","13%","20%"]
+                    }
+                    else if(id == "income_category_type_filter"){
+                        resizable_width_arr = ["20%","15%","17%","15%","13%","20%"]
+                    }
+                    else if(id == "Prviliage_category_filter"){
+                        resizable_width_arr = ["20%","15%","17%","15%","13%","20%"]
+                    }
+                    else if(id == "college_session_types_filter"){
+                        resizable_width_arr = ["20%","15%","17%","15%","13%","20%"]
+                    }
+                    else if(id == "section_type_filter"){
+                        resizable_width_arr = ["20%","15%","17%","15%","13%","20%"]
+                    } 
+                    $('#addOrgTable').tablesorter({
+                        widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                        widgetOptions: {
+                            resizable_addLastColumn: true,
+                            resizable: false,
+                            resizable_widths: resizable_width_arr,
+                            stickyHeaders_attachTo: ".primaryContainerBG",
+                            filter_external: '.master_type_search',
+                            filter_columnFilters: false,
+                        }
+                    });
+
+                    $("#addOrgTable tbody tr").click(function () {
+                        $(this).addClass("selected").siblings().removeClass("selected");
+                    });
+                    
+                    
+                    $(".primaryContainerBG").scroll(function () {
+                        var divTable = $(".primaryContainerBG");
+                        $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                    });
+                    
+                },
+                error: function (err) {
+                    alert(err.message);
+                    // window.location.reload();
+                }
+            });
+        }
+        
+    } {% endcomment %}
+
+    function freezeColumn(id, colNo) {
+        $('#' + id).addClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function (index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter", "false");
+        });
+        $('#' + id + ' #freeze').show();
+        $('#' + id + ' #unfreeze').hide();
+    }
+
+    function unfreezeColumn(id, colNo) {
+        $('#' + id).removeClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function (index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter");
+        });
+        $('#' + id + ' #unfreeze').show();
+        $('#' + id + ' #freeze').hide();
+    }
+
+    function toggleFreeze(inputid, colid, colNo) {
+        var checkbox = document.getElementById(inputid);
+
+        if (checkbox.checked == true) {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+            });
+            $('.' + colid + ' #freeze').show();
+            $('.' + colid + ' #unfreeze').hide();
+        } else {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").removeClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("sorter-false");
+            });
+            $('.' + colid + ' #unfreeze').show();
+            $('.' + colid + ' #freeze').hide();
+        }
+    }
+
+    function showHideColumns(element, el_class, colNo) {
+        var checkbox_val = [];
+        var checkbox = $(element);
+        if ($(element).is(':checked')) {
+            $('.' + el_class).hide();
+        } else {
+            $('.' + el_class).show();
+        }
+        $("input:checkbox[class=colCheck]").each(function () {
+            if (!$(this).is(':checked')) {
+                checkbox_val.push($(this).attr("id"))
+            }
+        });
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+    }
+
+    $(document).ready(function () {
+        setHeightWidth();
+
+
+
+
+
+    });
+
+    $(document).ready(function () {
+        var checkbox_val = ["org_name", "landline_no", "mobile_no", "email_id"];
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+
+        $(".colCheck").change(function () {
+            if ($(".colCheck:not(:checked)").length == $(".colCheck").length) {
+                //do something
+                $(".iconHide").css("background-image", "url(/static/img/png/hide.png)");
+            } else {
+                $(".iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+            }
+        });
+
+        $(".colFreezeCheck").change(function () {
+            if ($(".colFreezeCheck:not(:checked)").length == $(".colFreezeCheck").length) {
+                //do something
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/unfreeze.svg)");
+            } else {
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/freeze.svg)");
+            }
+        });
+    });
+
+    $(window).resize(function () {
+        setHeightWidth();
+    });
+
+
+    $('#masterTable').tablesorter({
+        widgets: ["zebra", "filter"],
+        widgetOptions: {
+            filter_external: '.master_search',
+            filter_columnFilters: false,
+        }
+    });
+
+    $("#masterTable tbody tr").click(function () {
+        $(this).addClass("selected").siblings().removeClass("selected");
+    });
+
+
+    $('#addOrgTable').tablesorter({
+        widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+        widgetOptions: {
+            resizable_addLastColumn: true,
+            resizable: false,
+            resizable_widths: ["33%", "33%", "33%"],
+            stickyHeaders_attachTo: ".primaryContainerBG",
+            filter_external: '.zone_search',
+            filter_columnFilters: false,
+        }
+    });
+    $("#addOrgTable tbody tr").click(function () {
+        $(this).addClass("selected").siblings().removeClass("selected");
+    });
+
+    $(".primaryContainerBG").scroll(function () {
+        var divTable = $(".primaryContainerBG");
+        $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+    });
+
+</script>
+
+<script>
+    function getList(master_type){
+        url = '';
+        // showLoader();
+        if(master_type == "leave_types"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-leave-type-list' %}"
+        }else if(master_type == "holiday_types"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-holiday-type-list' %}"
+        }else if(master_type == "pay_bands"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-pay-band-list' %}"
+        }else if(master_type == "working_shift"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-attendance-group-list' %}"
+        }else if(master_type == "salary_addition_types"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-salary-addition-type-list' %}"
+        }else if(master_type == "salary_deduction_types"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-salary-deduction-type-list' %}"
+        }else if(master_type == "income_category"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-income-category-list' %}"
+        }else if(master_type == "caste_category"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-caste-category-list' %}"
+        }else if(master_type == "Prviliage_category"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-prviliage-category' %}"
+        }else if(master_type == "college_session_types"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-college-session-types' %}"
+        }else if(master_type == "tehsil"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-tehsil-master-list' %}"
+        }
+        else if(master_type == "district"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-district-master-list' %}"
+        } else if(master_type == "section_types"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-section-list' %}"
+        }
+        else if(master_type == "document_type"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-document-type-list' %}"
+        }
+        else if(master_type == "almirah_type"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-almirah-list' %}"
+        }
+        else if(master_type == "rack_type"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-rack-list' %}"
+        }else if(master_type == "room_no"){
+            $('#ajaxMaster').html('');
+            url = "{% url 'src:get-room-list' %}"
+        }
+        if(url != ""){
+
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    hideLoader();
+                    $('#ajaxMaster').html(data);
+                    
+                    if(master_type == "leave_types"){
+                        resizable_width_arr = ["33%","33%","33%"]
+                    }else if(master_type == "holiday_types"){
+                        resizable_width_arr = ["50%","50%"]
+                    }else if(master_type == "pay_bands"){
+                        resizable_width_arr = ["33%","33%","33%"]
+                    }else if(master_type == "working_shift"){
+                        resizable_width_arr = ["20%","20%","20%","20%","20%"]
+                    }else if(master_type == "salary_addition_types"){
+                        resizable_width_arr = ["20%","15%","17%","15%","13%","20%"]
+                    }else if(master_type == "salary_deduction_types"){
+                        resizable_width_arr = ["20%","15%","17%","15%","13%","20%"]
+                    }else if(master_type == "district"){
+                        resizable_width_arr = ["20%","15%","17%","15%","13%","20%"]
+                    }else if(master_type == "tehsil"){
+                        resizable_width_arr = ["20%","15%","17%","15%","13%","20%"]
+                    }else if(master_type == "income_category"){
+                        resizable_width_arr = ["20%","15%","17%","15%","13%","20%"]
+                    }else if(master_type == "caste_category"){
+                         resizable_width_arr = ["20%","15%","17%","15%","13%","20%"]
+                     }else if(master_type == "Prviliage_category"){
+                         resizable_width_arr = ["20%","15%","17%","15%","13%","20%"]
+                     }else if(master_type == "college_session_types"){
+                         resizable_width_arr = ["20%","15%","17%","15%","13%","20%"]
+                     }else if(master_type == "section_types"){
+                        resizable_width_arr = ["20%","15%","17%","15%","13%","20%"]
+                    }else if(master_type == "document_type"){
+                        resizable_width_arr = ["20%","15%","17%","15%","13%","20%"]
+                    }else if(master_type == "almirah_type"){
+                        resizable_width_arr = ["20%","15%","17%","15%","13%","20%"]
+                    }else if(master_type == "rack_type"){
+                        resizable_width_arr = ["20%","15%","17%","15%","13%","20%"]
+                    }else if(master_type == "room_no"){
+                        resizable_width_arr = ["20%","15%","17%","15%","13%","20%"]
+                    }
+                    
+                    
+                    $('#addOrgTable').tablesorter({
+                        widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                        widgetOptions: {
+                            resizable_addLastColumn: true,
+                            resizable: false,
+                            resizable_widths: resizable_width_arr,
+                            stickyHeaders_attachTo: ".primaryContainerBG",
+                            filter_external: '.master_type_search',
+                            filter_columnFilters: false,
+                        }
+                    });
+                    $("#masterTable tbody tr").click(function () {
+                        $(this).addClass("selected").siblings().removeClass("selected");
+                    });
+                    
+                    
+                    $(".primaryContainerBG").scroll(function () {
+                        var divTable = $(".primaryContainerBG");
+                        $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                    });
+                    
+                },
+                error: function (err) {
+                    alert(err.message);
+                    // window.location.reload();
+                }
+            });
+        }
+        
+    }
+
+
+    function addMaster(master_type) {
+        url = "";
+        
+        $('#addProductModal').html('');
+        if(master_type == "leave_types"){
+            url = "{% url 'src:add-leave-type' %}"
+        }else if(master_type == "holiday_types"){
+            url = "{% url 'src:add-holiday-type' %}"
+        }else if(master_type == "pay_bands"){
+            url = "{% url 'src:add-pay-band' %}"
+        }else if(master_type == "working_shift"){
+            url = "{% url 'src:add-attendance-group' %}"
+        }else if(master_type == "salary_addition_types"){
+            url = "{% url 'src:add-salary-addition-type' %}"
+        }else if(master_type == "salary_deduction_types"){
+            url = "{% url 'src:add-salary-deduction-type' %}"
+        }else if(master_type == "caste_category"){
+            url = "{% url 'src:add-caste-category-type' %}"
+        }else if(master_type == "Prviliage_category"){
+            url = "{% url 'src:add-prviliage-category' %}"
+        }else if(master_type == "college_session_types"){
+            url = "{% url 'src:add-college-session' %}"
+        }else if(master_type == "income_category"){
+            url = "{% url 'src:add-income-category-type' %}"
+        }else if(master_type == "tehsil"){
+            url = "{% url 'src:add-tehsil' %}"
+        }
+        else if(master_type == "district"){
+            url = "{% url 'src:add-district' %}"
+        }else if(master_type == "section_types"){
+            url = "{% url 'src:add-section' %}"
+        } else if(master_type == "document_type"){
+            url = "{% url 'src:add-document-type' %}"
+        } else if(master_type == "almirah_type"){
+            url = "{% url 'src:add-almirah' %}"
+        } else if(master_type == "rack_type"){
+            url = "{% url 'src:add-rack' %}"
+        }else if(master_type == "room_no"){
+            url = "{% url 'src:add-room-list' %}"
+        }
+        if(url != ""){
+            showLoader();
+            $.ajax({
+                url: url,
+                method: 'GET',
+                data: {},
+                success: function (data) {
+                    hideLoader();
+                    $("#addProductModal").show();
+                    $('#addProductModal').html(data);
+                    $('.selectField').select2();
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+    }
+    
+    
+    function editMaster(master_type,id) {
+        url = "";
+        $('#addProductModal').html('');
+        if(master_type == "leave_types"){
+            url = "{% url 'src:edit-leave-type' '1' %}";
+            url = url.replace('1',id)
+        }else if(master_type == "holiday_types"){
+            url = "{% url 'src:edit-holiday-type' '1' %}";
+            url = url.replace('1',id)
+        }else if(master_type == "pay_bands"){
+            url = "{% url 'src:edit-pay-band' '1' %}";
+            url = url.replace('1',id)
+        }else if(master_type == "working_shift"){
+            url = "{% url 'src:edit-attendance-group' '1' %}";
+            url = url.replace('1',id)
+        }else if(master_type == "salary_addition_types"){
+            url = "{% url 'src:edit-salary-addition-type' '1' %}";
+            url = url.replace('1',id)
+        }else if(master_type == "salary_deduction_types"){
+            url = "{% url 'src:edit-salary-deduction-type' '1' %}";
+            url = url.replace('1',id)
+        }else if(master_type == "income_category"){
+            url = "{% url 'src:edit-income-category-type' '1' %}";
+            url = url.replace('1',id)
+        }else if(master_type == "caste_category"){
+            url = "{% url 'src:edit-caste-category-type' '1' %}";
+            url = url.replace('1',id)
+        }else if(master_type == "Prviliage_category"){
+            url = "{% url 'src:edit-prviliage-category' '1' %}";
+            url = url.replace('1',id)
+        } else if(master_type == "college_session_types"){
+            url = "{% url 'src:edit-college-session' '1' %}";
+            url = url.replace('1',id)
+        }else if(master_type == "district"){
+            url = "{% url 'src:edit-district' '1' %}";
+            url = url.replace('1',id)
+        }else if(master_type == "tehsil"){
+            url = "{% url 'src:edit-tehsil' '1' %}";
+            url = url.replace('1',id)
+        }else if(master_type == "section_types"){
+            url = "{% url 'src:edit-section' '1' %}";
+            url = url.replace('1',id)
+        }else if(master_type == "document_type"){
+            url = "{% url 'src:edit-document-type' '1' %}";
+            url = url.replace('1',id)
+        }else if(master_type == "almirah_type"){
+            url = "{% url 'src:edit-almirah' '1' %}";
+            url = url.replace('1',id)
+        }else if(master_type == "rack_type"){
+            url = "{% url 'src:edit-rack' '1' %}";
+            url = url.replace('1',id)
+        }else if(master_type == "room_no"){
+            url = "{% url 'src:edit-room-list' '1' %}";
+            url = url.replace('1',id)
+        }
+        
+        if(url != ""){
+            showLoader();
+            $.ajax({
+                url: url,
+                method: 'GET',
+                data: {},
+                success: function (data) {
+                    hideLoader();
+                    $("#addProductModal").show();
+                    $('#addProductModal').html(data);
+                    $('.selectField').select2();
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+    }
+    
+    function changeMasterStatus(master_type,id) {
+        url = "";
+        $('#addProductModal').html('');
+        if(master_type == "leave_types"){
+            url = "{% url 'src:update-leave-type-status' '1' %}";
+            url = url.replace('1',id)
+        }else if(master_type == "holiday_types"){
+            url = "{% url 'src:update-holiday-type-status' '1' %}";
+            url = url.replace('1',id)
+        }else if(master_type == "pay_bands"){
+            url = "{% url 'src:update-pay-band-status' '1' %}";
+            url = url.replace('1',id)
+        }else if(master_type == "working_shift"){
+            url = "{% url 'src:update-attendance-group-status' '1' %}";
+            url = url.replace('1',id)
+        }else if(master_type == "salary_addition_types"){
+            url = "{% url 'src:update-salary-addition-type-status' '1' %}";
+            url = url.replace('1',id)
+        }else if(master_type == "salary_deduction_types"){
+            url = "{% url 'src:update-salary-deduction-type-status' '1' %}";
+            url = url.replace('1',id)
+        }
+        else if(master_type == "room_no"){
+            url = "{% url 'src:room-status' '1' %}";
+            url = url.replace('1',id)
+        }
+        else if(master_type == "almirah_type"){
+            url = "{% url 'src:almira-status' '1' %}";
+            url = url.replace('1',id)
+
+        }else if(master_type == "rack_type"){
+            url = "{% url 'src:rack-status' '1' %}";
+            url = url.replace('1',id)
+        }
+        if(url != ""){
+            $.ajax({
+                url: url,
+                method: 'GET',
+                data: {},
+                success: function (data) {
+                    if(data.flag){
+                        openToaster('success',data.message);
+                    }else{
+                        openToaster('warning',data.message);
+                    }
+                    
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+    }
+
+    function showZoneTowns(zone_id) {
+        showLoader();
+        url = "{% url 'src:get-zone-towns' 1 %}";
+        url = url.replace(1, parseInt(zone_id))
+        $.ajax({
+            url: url,
+            method: 'GET',
+            data: {},
+            success: function (data) {
+                hideLoader();
+                if (data.flag) {
+
+                    html = `<table class="detail-table table table-hover">
+                    <thead>
+                    <tr><th>Town</th></tr>
+                    </thead>
+                    <tbody>`;
+                    $.each(data.towns, function (key, value) {
+                        html += `<tr><td>` + value.town + `</td></tr>`;
+                    });
+                    html += `
+                    </tbody>
+                    </table>`;
+
+                    $.confirm({
+                        title: '<p style="font-size:15px;">Zones Towns</p>',
+                        content: ' ' + html,
+                        theme: 'material',
+                        animation: 'zoom',
+                        buttons: {
+                            cancel: function () {
+                            },
+                        },
+                    });
+
+                } else {
+                    hideLoader();
+                    openToaster("danger", data.message);
+
+                }
+
+
+
+            },
+            error: function (err) {
+                console.log(err)
+                hideLoader();
+            }
+        });
+
+    }
+
+
+    function showRouteTowns(route_id) {
+        showLoader();
+        url = "{% url 'src:get-route-towns' 1 %}";
+        url = url.replace(1, parseInt(route_id))
+        $.ajax({
+            url: url,
+            method: 'GET',
+            data: {},
+            success: function (data) {
+                hideLoader();
+                if (data.flag) {
+
+                    html = `<table class="table table-hover">
+                    <thead>
+                    <tr><th>Town</th> <th>Order</th></tr>
+                    </thead>
+                    <tbody>`;
+                    $.each(data.towns, function (key, value) {
+                        html += `<tr><td>` + value.town_name + `</td> <td>` + value.order_index + `</td></tr>`;
+                    });
+                    html += `
+                    </tbody>
+                    </table>`;
+
+                    $.confirm({
+                        title: '<p style="font-size:15px;">Route Details</p>',
+                        content: ' ' + html,
+                        theme: 'material',
+                        animation: 'zoom',
+                        buttons: {
+                            cancel: function () {
+                            },
+                        },
+                    });
+
+                } else {
+                    hideLoader();
+                    openToaster("danger", data.message);
+
+                }
+
+
+
+            },
+            error: function (err) {
+                console.log(err)
+                hideLoader();
+            }
+        });
+
+    }
+
+</script>
+{% endblock %}

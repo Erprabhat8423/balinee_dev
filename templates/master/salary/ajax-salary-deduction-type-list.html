@@ -1,0 +1,198 @@
+{% load static %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="row mb-2" id="topRow">
+            <div class="col-md-5 p-md-0">
+                <h6><b>Salary Deduction Types &nbsp;&nbsp;</b></h6>
+            </div>
+            <div class="col-md-7 p-md-0">
+                <div class="row" >
+                    <div class="col-md-12 p-md-0 text-right">
+                        <input class="searchTable master_type_search" placeholder="Search" type="search" data-column="all" id="salary_deduction_types_filter" onkeyup="master_search_bar(this)">
+                        <button type="button" class="btn iconBox iconAddNew" title="Add New Salary Deduction Types" onclick="addMaster('salary_deduction_types')"></button>
+                        <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                            <button class="btn iconBox iconHide" title="Hide" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                            aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="" 
+                                onclick="showHideColumns(this,'deduction_type',2)"
+                                />
+                                <label class="mb-0" for="deduction_type">Deduction Type</label>
+                            </a>
+                            
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="" 
+                                onclick="showHideColumns(this,'deduction_type_basis',2)"
+                                />
+                                <label class="mb-0" for="deduction_type_basis">Deduction Basis</label>
+                            </a>
+                            
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="" 
+                                onclick="showHideColumns(this,'deduction_value',2)"
+                                />
+                                <label class="mb-0" for="deduction_value">Deduction Value</label>
+                            </a>
+                            
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="" 
+                                onclick="showHideColumns(this,'deduction_duration_limit',2)"
+                                />
+                                <label class="mb-0" for="deduction_duration_limit">Duration Limit</label>
+                            </a>
+                            
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="" 
+                                onclick="showHideColumns(this,'deduction_upper_limit',2)"
+                                />
+                                <label class="mb-0" for="deduction_upper_limit">Upper Limit</label>
+                            </a>
+                            
+                        </div>
+                    </div>
+                    
+                    <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                        <button class="btn iconBox iconUnFreeze" title="Stick" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                        aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="" id="pay_band" data-id="1"
+                            onclick="toggleFreeze(this.id,'pay_band',1)" />
+                            <label class="mb-0" for="pay_band">Deduction Type</label>
+                        </a>
+                        
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="" id="deduction_type_basis" data-id="1"
+                            onclick="toggleFreeze(this.id,'deduction_type_basis',1)" />
+                            <label class="mb-0" for="deduction_type_basis">Deduction Basis</label>
+                        </a>
+                        
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="" id="deduction_value" data-id="1"
+                            onclick="toggleFreeze(this.id,'deduction_value',1)" />
+                            <label class="mb-0" for="deduction_value">Deduction Value</label>
+                        </a>
+                        
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="" id="deduction_duration_limit" data-id="1"
+                            onclick="toggleFreeze(this.id,'deduction_duration_limit',1)" />
+                            <label class="mb-0" for="deduction_duration_limit">Duration Limit</label>
+                        </a>
+                        
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="" id="deduction_upper_limit" data-id="1"
+                            onclick="toggleFreeze(this.id,'deduction_upper_limit',1)" />
+                            <label class="mb-0" for="deduction_upper_limit">Upper Limit</label>
+                        </a>
+                        
+                    </div>
+                </div>
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<div class="row border-redius-17 h-100" id="tableBox">
+    <div class="col-md-12 col-12 primaryContainerBG h-100 px-0" id="masterListTable">
+            <table id="addOrgTable" class="detail-table table table-borderless table-striped table-hover mt-0" >
+            <thead>
+                <tr>
+                    <th class="pay_band">
+                        Deduction Type
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    
+                    <th class="deduction_type_basis">
+                        Deduction Basis
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    
+                    <th class="deduction_value">
+                        Deduction Value
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    
+                    <th class="deduction_duration_limit">
+                        Duration Limit
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    
+                    <th class="deduction_upper_limit">
+                        Upper Limit
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    
+                    <th data-sorter="false">Action</th>
+                </tr>
+            </thead>
+            <tbody id="tablebody">
+                {% if salary_deduction_types %}
+                {% for deduction_type in salary_deduction_types %}
+                <tr>
+                    <td class="deduction_type">{{ deduction_type.deduction }}</td>
+                    <td class="deduction_type_basis">
+                        {% if deduction_type.deduction_basis == "fixed" %}Fixed{% else %}Percentage{% endif %}
+                    </td>
+                    <td class="deduction_value">{{ deduction_type.deduction_amount }}</td>
+                    <td class="deduction_duration_limit">
+                        {% if deduction_type.deduction_limit|add:'0' == 0 %}
+                        1 time
+                        {% elif deduction_type.deduction_limit|add:'0' < 0 %}
+                        Permanent
+                        {% else %}
+                        {{ deduction_type.deduction_limit }} time
+                        {% endif %}
+                    </td>
+                    <td class="deduction_upper_limit">{{ deduction_type.deduction_upper_limit }}</td>
+                    <td>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <a href="javascript:void(0)"  onclick="editMaster('salary_deduction_types','{{deduction_type.id}}')"  >
+                                    <img src="{% static 'img/svg/editcopy.svg' %}" title="edit" />
+                                </a> 
+                            </div>
+                            <div class="col-md-5">
+                                <label class="switch">
+                                    <input type="checkbox" class="checkbox" name="is_active"
+                                    {% if deduction_type.status == 1 %} checked="" {% else %}
+                                    {% endif %}
+                                    onclick="changeMasterStatus('salary_deduction_types', '{{ deduction_type.id }}')">
+                                    <span class="slider round" title="Enable/Disable"></span>
+                                </label>
+                                
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr id="loading" style="display: none;">
+                    <td class="text-center" colspan="6">
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" style="text-align: center;">No Record Found...</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+</div>
+</div>

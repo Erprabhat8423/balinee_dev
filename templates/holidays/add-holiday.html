@@ -1,0 +1,246 @@
+{% load static %}
+<div class="modal-AddOrganisation centered">
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-md-3 p-md-0" style="background-repeat: no-repeat;text-align: center;background-color: #0073e0;background-position: bottom left;background-size: 80%;">
+                <div class="transformImage">
+                    <img src="{% static 'img/svg/master/holidayTypes.svg' %}" class="w-50" />
+                    <h4 class="modalColHead">Add Holiday</h4>
+                </div>
+            </div>
+            
+            <div class="col-md-9 p-md-4">
+                <form id="addHolidayForm" method="POST" autocomplete="off" action="" aria-label="Holiday">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b>Holiday details </b></h5>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <button class="btn btn-save float-right" type="button" onclick="saveHoliday()">
+                                Save
+                            </button>
+                            <button class="btn btn-close float-right" type="button"
+                            onclick="manipulateModal('addProductModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+                
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Holiday Name</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder="Holiday Name*" name="holiday" maxlength="50" />
+                        <label class="error_msg float-right"></label>
+                    </div>
+                </div>
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-3">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>From date</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>From time</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>To date</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>To time</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-3">
+                        <input class="inputField" type="text" placeholder="From date*" name="from_date" maxlength="50" readonly />
+                        <label class="error_msg float-right"></label>
+                    </div>
+                    
+                    <div class="col-md-3">
+                        <input class="inputField" type="text" placeholder="From time*" name="from_time" maxlength="50" readonly />
+                        <label class="error_msg float-right"></label>
+                    </div>
+                    <div class="col-md-3">
+                        <input class="inputField" type="text" placeholder="To time*" name="to_date" maxlength="50" readonly />
+                        <label class="error_msg float-right"></label>
+                    </div>
+                    <div class="col-md-3">
+                        <input class="inputField" type="text" placeholder="To time*" name="to_time" maxlength="50" readonly />
+                        <label class="error_msg float-right"></label>
+                    </div>
+                </div>
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Holiday Type</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <select class="inputField selectField" style="width: 100%;" name="holiday_type_id">
+                            <option value="">Select</option>
+                            {% for holiday_type in holiday_types %}
+                            <option value="{{holiday_type.id}}">{{holiday_type.holiday_type}}</option>
+                            {% endfor %}
+                        </select>
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Holiday Type</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                       <textarea class="inputField" name="description"  cols="30" rows="5" maxlength="250" placeholder="Description"></textarea>
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    $(document).ready(function(){
+        $("[name='from_date']").datepicker({  
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+0",
+            minDate: 0,
+            dateFormat: 'dd/mm/yy' 
+        });
+        $("[name='to_date']").datepicker({  
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+0",
+            minDate: 0,
+            dateFormat: 'dd/mm/yy' 
+        });
+        
+        $("[name='from_time']").mdtimepicker({
+            timeFormat: 'hh:mm:ss.000',
+            format: 'h:mm tt',     
+            theme: 'blue',       
+            readOnly: true,      
+            hourPadding: false    
+        });
+        
+        $("[name='to_time']").mdtimepicker({
+            timeFormat: 'hh:mm:ss.000',
+            format: 'h:mm tt',     
+            theme: 'blue',       
+            readOnly: true,      
+            hourPadding: false    
+        });
+        
+    })
+    function saveHoliday() {
+        showLoader();
+        if(validateForm()){
+            hideLoader();
+            return false;
+        }else{
+            $.ajax({
+                url: "{% url 'src:add-holiday' %}",
+                method: 'POST',
+                data: $('#addHolidayForm').serialize(),
+                success: function (data) {
+                    hideLoader();
+                    if(data.flag){
+                        $("#addProductModal").html('');
+                        openToaster("success", data.message);
+                        manipulateModal('addProductModal','close')
+                        setInterval(function(){ window.location.reload(); }, 500);
+                    }else{
+                        openToaster("danger", data.message);
+                    }
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            }).always(function() {
+                // hideLoader();
+            });
+        } 
+    }
+    
+    
+    function validateForm(){
+        error = 0;
+        $('.error_msg ').text('');
+        $('.inputField').css("border", "");
+        
+        
+        if($.trim($('[name="holiday"]').val()) == ""){
+            $('[name="holiday"]').parent().find('.error_msg').text('Please enter holiday name');
+            $('[name="holiday"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        if($('[name="from_date"]').val() == ""){
+            $('[name="from_date"]').parent().find('.error_msg').text('Please enter holiday start date');
+            $('[name="from_date"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        if($('[name="to_date"]').val() == ""){
+            $('[name="to_date"]').parent().find('.error_msg').text('Please enter holiday end date');
+            $('[name="to_date"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        
+        if($('[name="holiday_type"]').val() == ""){
+            $('[name="holiday_type"]').parent().find('.error_msg').text('Please select holiday type');
+            $('[name="holiday_type"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+        if($.trim($('[name="description"]').val()) == ""){
+            $('[name="description"]').parent().find('.error_msg').text('Please enter holiday description');
+            $('[name="description"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        
+        
+        if(error > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
+</script>

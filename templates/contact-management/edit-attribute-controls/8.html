@@ -1,0 +1,38 @@
+<div class="row">
+	<div class="col-md-10 col-xs-12 col-sm-12" >
+		<table class="table " id="table_8">
+			<thead>
+				<tr style="background: #cbd1d8 !important;">
+					<td><b>Document</b></td>
+					<td><b>Document Details</b></td>
+				  </tr>
+			</thead>
+			<tbody>
+				{% for required_document in required_documents %}
+				{% if required_document.document|slugify not in attribute.hidden_fields %}
+				<tr>
+					<td><label for="">{{required_document.document}}</label>
+						{% if required_document.document|slugify not in attribute.fields %}
+						<label style="color:red;">*</label>
+						{% endif %}
+					</td>
+					<td class="has-feedback"> 
+					
+					
+						<input type="text" name="{{required_document.document|slugify}}"  class="form-control staff_document has-feedback-left alpha_numeric" oninput="this.value = this.value.replace(/[^0-9.]/g, ''); this.value = this.value.replace(/(\..*)\./g, '$1');" maxlength="50" placeholder="Document Number" value="{% for document_detail in document_details %}{% if document_detail.ducument_number is not None and required_document.id == document_detail.document_id %}{{document_detail.ducument_number}}{% endif %}{% endfor %}">
+						<span class="label error_label" id="error_{{required_document.document|slugify}}"></span>
+					  </td>
+					
+					
+				</tr>
+				{% endif %}
+				{% endfor %}
+				
+			</tbody>
+		</table>
+	</div>
+  </div>
+  
+
+
+

@@ -1,0 +1,731 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %}
+
+<style>
+    .table td, .table th{
+        padding:0.65rem!important;
+    }
+    .ui-widget.ui-widget-content{
+        z-index: 999999999!important;
+    }
+    .ui-datepicker-prev span,
+    .ui-datepicker-next span {
+        background-image: none !important;
+    }
+    
+    .ui-datepicker-prev:before,
+    .ui-datepicker-next:before {
+        font-family: FontAwesome;
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        display: flex;
+        font-weight: normal;
+        align-items: center;
+        justify-content: center;
+        z-index: 999999999!important;
+    }
+    
+    .ui-datepicker-prev:before {
+        content: "\f100";
+    }
+    
+    .ui-datepicker-next:before {
+        content: "\f101";
+    }
+    .header{
+        background-color: #0073e0;
+        color: #ffffff;
+    }
+    
+    #user_wise_order {
+        width: 100%;
+        height: 200px;
+        border-top:1px solid rgb(223, 223, 223);
+        border-left:1px solid rgb(223, 223, 223);
+        border-bottom:1px solid rgb(223, 223, 223);
+        box-shadow: 0px 0px 18px 0px rgba(135, 169, 224, 0.3);
+    }
+    
+    #product_wise_order {
+        width: 100%;
+        height: 200px;
+        border:1px solid rgb(223, 223, 223);
+        box-shadow: 0px 0px 18px 0px rgba(135, 169, 224, 0.3);
+    }
+    #weekly {
+        width: 100%;
+        height: 280px;
+        border:1px solid rgb(223, 223, 223);
+        box-shadow: 0px 0px 18px 0px rgba(135, 169, 224, 0.3);
+    }
+    .select2-container--default .select2-selection--single .select2-selection__rendered{
+        text-align:left!important;
+    }
+    
+</style>
+
+{% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-12 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-3 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-8 p-md-0">
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-12  text-right">
+                            
+                            <select class="inputField selectField" style="width: 25% !important; padding: 0.3rem;" id="user_id" onchange="getRegularizationRecord()">
+                                <option value="">All</option>
+                                {% for user in users %}
+                                <option value="{{user.id}}">{{user.first_name}} {% if user.middle_name is not None %} {{user.middle_name}} {% endif %}{{user.last_name}} ({{user.emp_sap_id}})</option>
+                                {% endfor %}
+                            </select>
+                            
+                            {% if role_id == 0 %}
+                            <select class="inputField selectField" style="width: 25% !important; padding: 0.3rem;" name="regularization_status" id="regularization_status" onchange="getRegularizationRecord()">
+                                <option value="">All Status</option>
+                                <option value="1" {% if regularization_status == 1 %} selected {% endif %}>Initiated</option>
+                                <option value="2" {% if regularization_status == 2 %} selected {% endif %}>Forwarded</option>
+                                <option value="3" {% if regularization_status == 3 %} selected {% endif %}>Approved</option>
+                                <option value="4" {% if regularization_status == 4 %} selected {% endif %}>Declined</option>
+                            </select>
+                            {% else %}
+                            {% endif %}
+                            
+                            <input type="hidden" name="regularization_status" id="regularization_status" value="{{ regularization_status }}" />
+                            
+                            <!-- <input class="search searchTable search" style="width: 30%;" id="user_name_search"  name="user_name_search" placeholder="Search By Name" type="text" data-column="all" onkeyup="getRegularizationRecord()" > -->
+                            <!-- <input class="inputField" placeholder="Leave From Date" name="regularization_from_datepicker" id="regularization_from_datepicker" value="" style="width: 25%; padding: 0.3rem;" onchange="getregularizationRecord()" readonly> -->
+                            <!-- <input class="inputField" placeholder="Leave To Date" name="regularization_to_datepicker" id="regularization_to_datepicker" value="" style="width: 25%; padding: 0.3rem;" onchange="getregularizationRecord()" readonly> -->
+                            
+                            {% if role_id == 0 %}
+                            <button type="button" class="btn iconBox iconForward" id="forward" onclick="updateRegularizationRemarks({{level_id}}, '2')" value="2" style="display: none;"></button>
+                            <button type="button" class="btn iconBox iconApproved" id="forward" onclick="updateRegularizationRemarks({{level_id}}, '3')" value="3" style="display: none;"></button>
+                            <button type="button" class="btn iconBox iconDeclined" id="forward" onclick="updateRegularizationRemarks({{level_id}}, '4')" value="4" style="display: none;"></button>
+                            {% else %}
+                            {% if level_id == 2 %}
+                            <button type="button" class="btn iconBox iconForward" id="forward" onclick="updateRegularizationRemarks({{level_id}}, '2')" value="2" style="display: none;"></button>
+                            <button type="button" class="btn iconBox iconDeclined" id="forward" onclick="updateRegularizationRemarks({{level_id}}, '4')" value="4" style="display: none;"></button>
+                            {% else %}
+                            <button type="button" class="btn iconBox iconApproved" id="forward" onclick="updateRegularizationRemarks({{level_id}}, '3')" value="3" style="display: none;"></button>
+                            <button type="button" class="btn iconBox iconDeclined" id="forward" onclick="updateRegularizationRemarks({{level_id}}, '4')" value="4" style="display: none;"></button>
+                            {% endif %}
+                            {% endif %}
+                            <div class="dropdown" style="display: inline-block;">
+                                <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">
+                                
+                                <input type="hidden" name="show_columns" id="show_columns" value="" >
+                                <a class="dropdown-item logoutItem" onclick="exports('excel')" href="javascript:void(0)">Export to Excel &nbsp;&nbsp;<img
+                                    src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons" /> </a>
+                                    <!-- <a class="dropdown-item logoutItem" onclick="exports('pdf')" href="javascript:void(0)">Export to Pdf &nbsp;&nbsp;<img
+                                        src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a> -->
+                                    </div>
+                                </div>
+                                <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                                    <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton"
+                                    data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                    <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                    aria-labelledby="dropdownMenuButton">
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="user_name" id="user_name" data-id="1"
+                                        onclick="showHideColumns(this.id,1)"
+                                        />
+                                        <label class="mb-0" for="user_name">User name</label>
+                                    </a>
+
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="regularization_type" id="regularization_type" data-id="2"
+                                        onclick="showHideColumns(this.id,2)"
+                                        />
+                                        <label class="mb-0" for="regularization_type">Regularization Type</label>
+                                    </a>
+                                    
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="regularization_from_date" id="regularization_from_date" data-id="3"
+                                        onclick="showHideColumns(this.id, 3)"
+                                        />
+                                        <label class="mb-0" for="regularization_from_date">Date From</label>
+                                    </a>
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="regularization_to_date" id="regularization_to_date" data-id="4"
+                                        onclick="showHideColumns(this.id, 4)"
+                                        />
+                                        <label class="mb-0" for="regularization_to_date">Date To</label>
+                                    </a>
+                                    
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="mobile_no" id="mobile_no" data-id="5"
+                                        onclick="showHideColumns(this.id, 5)"
+                                        />
+                                        <label class="mb-0" for="mobile_no">Mobile No.</label>
+                                    </a>
+
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="place" id="place" data-id="6"
+                                        onclick="showHideColumns(this.id, 6)"
+                                        />
+                                        <label class="mb-0" for="place">Place</label>
+                                    </a>
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="reason" id="reason" data-id="7"
+                                        onclick="showHideColumns(this.id, 7)"
+                                        />
+                                        <label class="mb-0" for="reason">Reason for Leave</label>
+                                    </a>
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="manager" id="manager" data-id="8"
+                                        onclick="showHideColumns(this.id, 8)"
+                                        />
+                                        <label class="mb-0" for="manager">Manager</label>
+                                    </a>
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="hod" id="hod" data-id="9"
+                                        onclick="showHideColumns(this.id, 9)"
+                                        />
+                                        <label class="mb-0" for="hod">HOD</label>
+                                    </a>
+                                    <a class="dropdown-item columnHideItem">
+                                        <input type="checkbox" class="colCheck" name="status" id="status" data-id="10"
+                                        onclick="showHideColumns(this.id, 10)"
+                                        />
+                                        <label class="mb-0" for="status">Status</label>
+                                    </a>
+                                </div>
+                            </div>
+                            
+                            <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                                <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                                <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                                aria-labelledby="dropdownMenuButton">
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="user_name" id="lock_user_name" data-id="1"
+                                    onclick="toggleFreeze(this.id,'user_name',1)" />
+                                    <label class="mb-0" for="lock_user_name">User Name</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="regularization_type" id="lock_regularization_type" data-id="2"
+                                    onclick="toggleFreeze(this.id,'regularization_type',2)" />
+                                    <label class="mb-0" for="lock_regularization_type">Regularization Type</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="lock_regularization_from_date"
+                                    id="lock_regularization_from_date" data-id="3" 
+                                    onclick="toggleFreeze(this.id,'regularization_from_date',3)" />
+                                    <label class="mb-0" for="lock_regularization_from_date">Date From</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="lock_regularization_to_date"
+                                    id="lock_regularization_to_date" data-id="4" 
+                                    onclick="toggleFreeze(this.id,'regularization_to_date',4)" />
+                                    <label class="mb-0" for="lock_regularization_to_date">Date To</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="lock_mobile_no"
+                                    id="lock_mobile_no" data-id="5" 
+                                    onclick="toggleFreeze(this.id,'mobile_no',5)" />
+                                    <label class="mb-0" for="lock_mobile_no">Mobile No.</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="lock_place"
+                                    id="lock_place" data-id="6" 
+                                    onclick="toggleFreeze(this.id,'place',6)" />
+                                    <label class="mb-0" for="lock_place">Place</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="lock_reason"
+                                    id="lock_reason" data-id="7" 
+                                    onclick="toggleFreeze(this.id,'reason',7)" />
+                                    <label class="mb-0" for="lock_reason">Reason for leave</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="lock_manager"
+                                    id="lock_manager" data-id="8" 
+                                    onclick="toggleFreeze(this.id,'manager',8)" />
+                                    <label class="mb-0" for="lock_manager">Manager</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="lock_hod"
+                                    id="lock_hod" data-id="9" 
+                                    onclick="toggleFreeze(this.id,'hod',9)" />
+                                    <label class="mb-0" for="lock_hod">HOD</label>
+                                </a>
+                                <a class="dropdown-item columnHideItem">
+                                    <input type="checkbox" class="colFreezeCheck" name="lock_status"
+                                    id="lock_status" data-id="10" 
+                                    onclick="toggleFreeze(this.id,'status',10)" />
+                                    <label class="mb-0" for="lock_status">Status</label>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-1"></div>
+        </div>
+        <div class="row" id="tableBox">
+            <div class="col-md-12 primaryContainerBG h-100 p-0 commonTableBg" id="ajax-div">
+                <input type="hidden" name="page" id="page" value="2" />
+                <input type="hidden" name="page_status" id="page_status" value="0" />
+                <input type="hidden" name="total_pages" id="total_pages" value="{{ total_pages }}" />
+                <table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0"
+                style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th class="sorter-false all_checkbox_class" style="border-right:none!important; width:32px!important; min-width: 32px!important;"><input type="checkbox" class="checked_all" id="new_module_1"  > </th> 
+                        <th class="user_name" id="user_name">
+                            User Name
+                            <i class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="regularization_type" id="regularization_type">
+                            Regularization Type
+                            <i class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="regularization_from_date" id="regularization_from_date">Date From<i
+                            class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="regularization_to_date" id="regularization_to_date">Date To<i
+                            class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="mobile_no" id="mobile_no">Mobile No.<i
+                            class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="place" id="place">Place<i
+                            class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="reason" id="reason">Reason for leave<i
+                            class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="manager" id="manager">Manager<i
+                            class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="hod" id="hod">HOD<i
+                            class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                        <th class="status" id="status">Status<i
+                            class="fa fa-fw fa-sort float-right"></i>
+                            <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                            <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                        </th>
+                    </tr>
+                </thead>
+                <tbody id="tablebody">
+                    {% if regularizationReport %}
+                    {% for regularizationRecord in regularizationReport %}
+                    <tr  {% if forloop.first %} class="odd selected" {% endif %}>
+                        <td class="sorter-false checked_class {{regularizationRecord.regularization_status}}  {{regularizationRecord.level_id}}" >
+                            {% if role_id == 0 and regularizationRecord.regularization_status != 3 and regularizationRecord.regularization_status != 4 %}
+                            
+                            <input type="checkbox" class="checkbox" id="new_module_1 1" name="order_id[]" value="{{ regularizationRecord.id }}" onclick="checkBox()"> 
+                            {% else %} 
+                            {% if regularizationRecord.status == 0 %}
+                            {% if regularizationRecord.regularization_status == 1 and regularizationRecord.level_id == 2 %} 
+                            <input type="checkbox" class="checkbox " id="new_module_1 2" name="order_id[]" value="{{regularizationRecord.id}}"> 
+                            {% elif regularizationRecord.regularization_status == 2 %} 
+                            <input type="checkbox" class="checkbox " id="new_module_1 3" name="order_id[]" value="{{regularizationRecord.id}}"> 
+                            {% elif regularizationRecord.regularization_status == 3 %} 
+                            <input type="checkbox" class="checkbox  4{{regularizationRecord.status}}" id="new_module_1" name="order_id[]" value="{{regularizationRecord.id}}"> 
+                            {% else %}  
+                            {% endif %} 
+                            {% else %} 
+                            <input type="checkbox" disabled checked> 
+                            {% endif %}
+                            {% endif %}
+                        </td>
+                        
+                        <td class="user_name" >{{ regularizationRecord.user_name  }}</td>
+                        <td class="regularization_type" >{{ regularizationRecord.regularization_type_name  }}</td>
+                        
+                        <td class="regularization_from_date" >
+                            {% if regularizationRecord.from_date %}{{ regularizationRecord.from_date | date:"d/m/Y"}}{% else %}-{% endif %}{% if regularizationRecord.from_time %} {{ regularizationRecord.from_time }}{% endif %}
+                        </td>
+                        <td class="regularization_to_date" >
+                            {% if regularizationRecord.to_date %}{{ regularizationRecord.to_date | date:"d/m/Y"}}{% else %}-{% endif %}{% if regularizationRecord.to_time %} {{ regularizationRecord.to_time }}{% endif %}
+                        </td>
+                        <td class="mobile_no" >
+                            {% if regularizationRecord.mobile_no %}{{ regularizationRecord.mobile_no }}{% else %}-{% endif %}
+                        </td>
+                        <td class="place" >
+                            {% if regularizationRecord.place %}{{ regularizationRecord.place }}{% else %}-{% endif %}
+                        </td>
+                        <td class="reason_for_leave" >
+                            {% if regularizationRecord.reason_for_leave %}{{ regularizationRecord.reason_for_leave }}{% else %}-{% endif %}
+                        </td>
+                        <td class="manager" >
+                            {% if regularizationRecord.manager %}{{ regularizationRecord.manager }}{% else %}-{% endif %}
+                        </td>
+                        <td class="hod" >
+                            {% if regularizationRecord.hod %}{{ regularizationRecord.hod }}{% else %}-{% endif %}
+                        </td>
+                        <td class="status">  
+                            <a href="javascript:void(0)" onclick="getLeaveStatus('{{ regularizationRecord.id }}')">
+                                {% if role_id == 0 %} {% if regularizationRecord.regularization_status	 == 1 %} Initiated {% elif regularizationRecord.regularization_status == 2 %} Forwarded {% elif regularizationRecord.regularization_status == 3 %} Approved {% elif regularizationRecord.regularization_status == 4 %} Declined {% else %} {{regularizationRecord.regularization_status}}   {% endif %} {% else %} 
+                                {% if regularizationRecord.regularization_status == 4 %} Declined {% elif regularizationRecord.regularization_status == 3 %}Approved {% elif regularizationRecord.status == 0 %}{% if regularizationRecord.regularization_status == 1 and regularizationRecord.level_id == 2 %} Initiated {% elif regularizationRecord.regularization_status == 2 %} Forwarded {% else %} Pending for Forward {% endif %} {% else %} Pending for Approval {% endif %} {% endif %}
+                            </a>
+                        </td>
+                        
+                    </tr>
+                    {% endfor %}
+                    <tr id="loading" style="display: none;">
+                        <td class="text-center" colspan="10"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                        </td>
+                    </tr>                        
+                    {% else %}
+                    <tr>
+                        <td colspan="10" style="text-align: center;">No Record Found...</td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- *************************************Modal********************************** -->
+<div class="overlayModal" id="leaveModal" data-keyboard="false" data-backdrop="static" style="display: none;"></div>
+<div class="overlayModal" id="addUserModal" data-keyboard="false" data-backdrop="static">
+    
+</div>
+<script>
+    
+    function checkBox(){
+        
+        if ($('.checkbox:checked').length == $('.checkbox').length) {        
+            $('.checked_all').prop('checked', true);
+        }
+        else{        
+            $('.checked_all').prop('checked', false);
+        }
+        
+    }
+    
+    function updateRegularizationStatus(level_id, regularization_status, remark=''){
+        
+        var regularizationID = [];
+       
+        $('.checkbox').each(function (index, obj) {
+            if (this.checked === true) {
+                var id = parseInt($(this).val());
+                regularizationID.push(id);
+            }
+        });
+        {% if role_id == 0 %}
+        level_id = parseInt($('#regularization_status').val())+1;        
+        {% else %}
+        level_id = level_id
+        {% endif %}
+        if(regularizationID.length > 0){
+            showLoader();
+            
+            $.ajax({
+                url: "{% url 'src:update-regularization-status' %}",
+                method: 'POST',                
+                data: { level_id:level_id, regularization_status:regularization_status, remark:remark, regularization_id: regularizationID, csrfmiddlewaretoken: '{{ csrf_token }}'},
+                success: function (data) {
+                    if (data.error == false) {
+                        console.log(data.message)
+                        
+                        openToaster("success", data.message);
+                        
+                        setTimeout(() => {
+                            window.location.reload();
+                        }, 1000);
+                    }
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+    }
+    
+    
+    function getRegularizationRecord(){
+        var user_id    = $('#user_id').val();
+        var regularization_status    = $('#regularization_status').val();
+        
+        $('#tablebody').html('<tr><td colspan="9"><div style="text-align:center"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div></td></tr>');
+            $.ajax({
+                url: "{% url 'src:ajax-regularization-report-list' %}",
+                method: 'GET',
+                data: { user_id:user_id,regularization_status:regularization_status},
+                success: function (data) {
+                    $('#tablebody').html(data);
+                    $('#addOrgTable').trigger('update');
+                    $('#tablebody > tr').removeAttr('class')
+                },
+                error: function (err) {
+                    alert(err.message);
+                    // window.location.reload();
+                }
+            });
+        }
+        
+    
+        
+    function exports(type){
+    var columns     = $('#show_columns').val();    
+    var user_id   = $('#user_id').val();
+    var regularization_status = $('#regularization_status').val();
+    if(regularization_status == ''){
+        regularization_status = 0
+        // alert("Select Status From dropdown Box");
+        // return false;
+    }
+    if(user_id){ user_id = user_id; }else{ user_id = '0' }
+   
+            
+            if(columns == ''){
+                openToaster("danger", "Please select at-least one column");
+            } else {
+                if(type == 'excel'){
+                    var url = "{% url 'src:export-regularization-report-to-xlsx' 'columns' 'userId'  'regularization_status' %}";
+                    url = url.replace('columns',columns).replace('userId',user_id).replace('regularization_status',regularization_status);
+                    console.log(url);
+                    window.location.href = url;
+                } else {
+                    var url = "{% url 'src:export-leave-report-to-pdf'  'columns' 'userId' 'regularization_status' %}";
+                    url = url.replace('columns',columns).replace('userId',user_id).replace('regularization_status',regularization_status);
+                    console.log(url);
+                    window.location.href = url;
+                }
+            }
+            
+    }
+    function freezeColumn(id, colNo) {
+        $('#' + id).addClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function (index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter", "false");
+        });
+        $('#' + id + ' #freeze').show();
+        $('#' + id + ' #unfreeze').hide();
+    }
+    
+    function unfreezeColumn(id, colNo) {
+        $('#' + id).removeClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function (index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter");
+        });
+        $('#' + id + ' #unfreeze').show();
+        $('#' + id + ' #freeze').hide();
+    }
+    
+    function toggleFreeze(inputid, colid, colNo) {
+        var checkbox = document.getElementById(inputid);
+        
+        if (checkbox.checked == true) {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+            });
+            $('#' + colid + ' #freeze').show();
+            $('#' + colid + ' #unfreeze').hide();
+        } else {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").removeClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function (index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("sorter-false");
+            });
+            $('#' + colid + ' #unfreeze').show();
+            $('#' + colid + ' #freeze').hide();
+        }
+    }
+    
+    function showHideColumns(inputid, colNo) {
+        var checkbox_val = [];
+        var checkbox = document.getElementById(inputid);
+        if (checkbox.checked == true) {
+            $('.'+inputid).hide();
+        }else{
+            $('.'+inputid).show();
+        }
+        $("input:checkbox[class=colCheck]").each(function () {
+            if(!$(this).is(':checked')){
+                checkbox_val.push($(this).attr("id"))
+            }
+        });
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+    }
+    
+    $(document).ready(function () {
+        setHeightWidth();
+        
+        $("#regularization_from_datepicker").datepicker({  
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+0",
+            dateFormat: 'dd/mm/yy' 
+        });
+        
+        $("#regularization_to_datepicker").datepicker({  
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+0",
+            // maxDate: 0,
+            dateFormat: 'dd/mm/yy' 
+        });
+        
+        $('#addOrgTable').tablesorter({
+            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+            widgetOptions: {
+                resizable_addLastColumn: true,
+                resizable: false,
+                resizable_widths: ["10%", "10%", "10%", "10%", "10%","10%", "10%", "10%","10%"],
+                stickyHeaders_attachTo: ".primaryContainerBG",
+                filter_external: '.search',
+                filter_columnFilters: false,
+            }
+        });
+        $("#addOrgTable tbody tr").click(function () {
+            $(this).addClass("selected").siblings().removeClass("selected");
+        });
+        $(".deptRow").click(function () {
+            $(this).addClass("deptSelected").siblings().removeClass("deptSelected");
+        });
+        
+        
+        $(".primaryContainerBG").scroll(function () {
+            var divTable = $(".primaryContainerBG");
+            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+        });
+        
+        $(".mobileCode").mask("+00");
+        $(".phoneCode").mask("000");
+        $(".landLineNo").mask("00000000");
+        $(".mobileNo").mask("0000000000");
+        $(".pincode").mask("000000");
+    });
+    
+    $(document).ready(function () {
+        var checkbox_val = ["user_name","regularization_type","regularization_from_date","regularization_to_date","mobile_no","place","reason","manager","hod","status"];
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+        
+        $(".colCheck").change(function () {
+            if ($(".colCheck:not(:checked)").length == $(".colCheck").length) {
+                //do something
+                $(".iconHide").css("background-image", "url(/static/img/png/hide.png)");
+            } else {
+                $(".iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+            }
+        });
+        
+        $(".colFreezeCheck").change(function () {
+            if ($(".colFreezeCheck:not(:checked)").length == $(".colFreezeCheck").length) {
+                //do something
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/unfreeze.svg)");
+            } else {
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/freeze.svg)");
+            }
+        });
+        
+        $('.checked_all').on('change', function() {     
+            $('.checkbox').prop('checked', $(this).prop("checked")); 
+            if($('.checkbox:checked').length > 0){
+                $('#forward').show();
+            }else{
+                $('#forward').hide();
+            }             
+        });
+        
+        $('.checkbox').change(function(){ 
+            if($('.checkbox:checked').length == $('.checkbox').length){
+                //alert($('.checkbox').length + $('.checkbox:checked').length);
+                $('.checked_all').prop('checked',true);
+            }else{
+                $('.checked_all').prop('checked',false);
+            }
+            if($('.checkbox:checked').length > 0){
+                $('#forward').show();
+            }else{
+                $('#forward').hide();
+            }
+        }); 
+        
+        {% if regularizationReport %}
+        $(".checked_all").attr("disabled", false);
+        {% else %}    
+        $(".checked_all").attr("disabled", true);
+        {% endif %}
+        
+        {% if role_id == 0 %}
+        $(".all_checkbox_class").css("display", "none");
+        $(".checked_class").css("display", "none");
+        {% endif %}
+        jQuery(".main-table").clone(true).appendTo('#table-scroll').addClass('clone');
+        jQuery(".main-tableModal").clone(true).appendTo('#table-scrollModal').addClass('clone');
+    });
+    
+    $(window).resize(function () {
+        setHeightWidth();
+    });
+    
+    $(document).on('click', '.pagination a', function (event) {
+        event.preventDefault();
+        var page = $(this).attr('href').split('page=')[1];
+        
+        $('li').removeClass('active');
+        $(this).parent().addClass('active');
+        ajaxOrganizationList(page);
+    });
+</script>
+            
+<script>
+    function updateRegularizationRemarks(level_id, regularization_status) {
+        $('#addUserModal').html('');
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:update-regularization-remark' %}",
+            method: 'GET',
+            data: { level_id:level_id, regularization_status:regularization_status },
+            success: function (data) {
+                hideLoader();
+                $("#addUserModal").show();
+                $('#addUserModal').html(data);                
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    };
+</script>
+{% endblock %}

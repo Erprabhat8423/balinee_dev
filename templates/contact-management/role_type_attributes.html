@@ -1,0 +1,66 @@
+{% load static %}
+
+
+<div class="row" id="infoPills">
+	<input type="hidden" name="is_role_outsider" value="{{is_outsider}}">
+	<div class="col-sm-12 p-0">
+		<ul class="nav nav-tabs" id="attr_tab_bar">
+			{% for role_attribute in role_attributes %}
+			<li class="infoTabs {% if forloop.counter == 1  %} activeInfoTabs {% endif %}" id="tab{{role_attribute.attribute_id}}" onclick="handleTabChange('{{role_attribute.attribute_id}}')">{{role_attribute.attribute}}  <span class="" id="badge_{{role_attribute.attribute_id}}" style="    background-color: #ffb400;color:black"></span></a>
+			</li>
+			{% endfor %}
+		</ul>
+	</div>
+</div>
+<div class="" id="attr_tabs">
+	{% for role_attribute in role_attributes %}
+	<div class="col-md-12 p-0 h-100  attr_details {% if forloop.counter == 1  %} activeTab {% endif %}" id="tab{{role_attribute.attribute_id}}Tab">
+		{% with template_name=role_attribute.attribute_id|stringformat:"s"|add:".html" %}
+		{% include "contact-management/edit-attribute-controls/"|add:template_name with attribute=role_attribute  %}
+		{% endwith %}
+	</div>
+	{% endfor %}
+		
+		
+</div>
+
+<script>
+
+	
+	
+	
+	$(document).ready(function() {
+
+		$('.activeInfoTabs').trigger('click');
+
+		if({{is_outsider}}==0){
+			$('#isOutsider').hide();
+		}else{
+			$('#isOutsider').show();
+		}
+		
+	});
+	
+	function handleTabChange(id){
+		$('.attr_details').removeClass('activeTab').hide();
+		$('.infoTabs').removeClass('activeInfoTabs');
+
+		$('#tab'+id).addClass('activeInfoTabs');
+		$('#tab'+id+'Tab').addClass('activeTab').show();
+	}
+
+	$(document).ready(function() {
+		$("#role_attribute_id").select2({
+			multiple: true,
+		});
+		
+		
+	})
+	
+</script>
+
+
+
+
+
+

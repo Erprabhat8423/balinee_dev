@@ -1,0 +1,144 @@
+{% load static %}
+
+<div class="md-modal centered" style="height:400px;">
+        <div class="modal-header" id="headerStep1">
+            <div class="col-12 p-0">
+                <div class="row">
+                    <div class="col-6">
+                        <h5 class="mt-md-2">Pay Band Mapping ({{role.role_name}}) &nbsp;&nbsp;</h5>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-save float-right" type="button" onclick="saveRoleMapping()" >
+                            Save & Proceed
+                        </button>
+                        <button class="btn btn-close float-right" type="button" onclick="manipulateModal('addUserModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+            <span style="margin-left: 10%; "><b>Unmapped</b></span><span style="margin-left: 52%;"><b>Mapped</b></span>
+            <div class="row" style="overflow:scroll; height:400px;">
+                <div class="col-md-12 p-0 h-100 w-100" id="step1">
+                    <div class="row">
+                        <div class="col-md-6" style="border-right: 1px solid rgb(95, 93, 93);">
+                            <ul class="list-group" id="entity_list">
+                                {% for pay_band in pay_bands %}
+                                <li id="pay_band_{{pay_band.id}}" class="list-group-item" onclick="move('{{pay_band.id}}','{{pay_band.pay_band}}')"><a href="javascript:;">{{pay_band.pay_band}}</a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <form id="mappingForm">
+                                {% csrf_token %}
+
+                                {% if mapping %}
+                                <input type="hidden" name="pay_band_id" value="{{mapping.entity_id}}" >
+                                {% else %}
+                                <input type="hidden" name="pay_band_id" >
+                                {% endif %}
+                                
+                                <input type="hidden" name="role_id" value="{{role.id}}">
+                                <input type="hidden" name="entity_type" value="pay_band">
+                                <ul class="list-group" id="mapped_section">
+                                    {% if mapping %}
+                                    <li id="pay_band_{{mapping_pay_band.id}}" class="list-group-item" onclick="move('{{mapping_pay_band.id}}','{{mapping_pay_band.pay_band}}')"><a href="javascript:;">{{mapping_pay_band.pay_band}}</a></li>
+                                    {% endif %}
+                                </ul>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        function move(pay_band_id,pay_band){
+            var list = `
+            <li id="pay_band_`+pay_band_id+`" class="list-group-item" onclick="moveBack(`+pay_band_id+`,'`+pay_band+`')">
+                <a href="javascript:;" >
+                    `+pay_band+`
+                </a>
+            </li>`;
+            $('#mapped_section').html(list);
+            $('[name="pay_band_id"]').val(pay_band_id);
+            
+            var refreshed_list = ``;
+            {% for pay_band in pay_bands %}
+            var current_id = '{{pay_band.id}}';
+            if(current_id != pay_band_id){
+                refreshed_list += `
+                <li id="pay_band_{{pay_band.id}}" class="list-group-item" onclick="move('{{pay_band.id}}','{{pay_band.pay_band}}')">
+                    <a href="javascript:;">
+                        {{pay_band.pay_band}}
+                    </a>
+                </li>
+                `;
+            }
+            {% endfor %}
+            $('#entity_list').html(refreshed_list);
+            
+        }
+        
+        function moveBack(pay_band_id,pay_band){
+            
+            $('#mapped_section').html('');
+            $('[name="pay_band_id"]').val('');
+            var refreshed_list = ``;
+            {% for pay_band in pay_bands %}
+            refreshed_list += `
+            <li id="pay_band_{{pay_band.id}}" class="list-group-item" onclick="move('{{pay_band.id}}','{{pay_band.pay_band}}')">
+                <a href="javascript:;" onclick="move('{{pay_band.id}}','{{pay_band.pay_band}}')">
+                    {{pay_band.pay_band}}
+                </a>
+            </li>
+            `;
+            {% endfor %}
+            $('#entity_list').html(refreshed_list);
+            
+        }
+        
+        function saveRoleMapping(){
+            showLoader();
+            if(validateForm()){
+                hideLoader();
+                return false;
+            }else{
+                $.ajax({
+                    url: "{% url 'src:save-role-pay-band-mapping' %}",
+                    method: 'POST',
+                    data: $('#mappingForm').serialize(),
+                    success: function (data) {
+                        hideLoader();
+                        if(data.flag){
+                            $('#addUserModal').html('');
+                            $('#addUserModal').hide();
+                            openToaster("success", data.message);
+                        }else{
+                            openToaster("danger", data.message);
+                        }
+                    },
+                    error: function (err) {
+                        hideLoader();
+                        console.log(err)
+                    }
+                }).always(function() {
+                    hideLoader();
+                });
+            }
+        }
+        
+        function validateForm(){
+            error = false;
+            if($('[name="pay_band_id"]').val() == ""){
+                error = true;
+                openToaster("warning", "Please choose leave policy");
+            }
+            return error;
+        }
+    </script>

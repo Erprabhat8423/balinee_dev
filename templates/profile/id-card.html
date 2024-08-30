@@ -1,0 +1,334 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+	<title>636*1011</title>
+
+
+
+</script>
+	<style type="text/css">
+		body
+		{
+			font-family: sans-serif, ui-sans-serif;
+		}
+
+
+
+		.id-card-container{
+			height: 1011px;
+			width: 636px;
+			background: #FFF;
+			border: 1px solid #CCC;
+			margin:0 auto;
+			position: relative;
+		}
+		.id-card-strip
+		{
+			background: #bec3ca;
+			width: 176px;
+			height: 1011px;
+			margin-left: 51px;
+		}
+		.profile-image{
+        width: 100%;
+        height: 100%;            
+        position: absolute;
+        top: 0;
+        left: 0;
+   	 	}
+   	 	.profile-details{
+		    border-radius: 5px;
+			background-color: rgb(250, 250, 250);
+			opacity: 0.8;
+			position: absolute;
+			left: 271px;
+			top: 308px;
+			width: 365px;
+			height: 553px;
+			z-index: 4;
+   	 	}
+   	 	.profile-qr-code{
+   	 	  border-width: 2px;
+		  border-color: rgb(241, 241, 241);
+		  border-style: solid;
+		  border-radius: 5px;
+		  background-color: rgb(255, 255, 255);
+		  position: absolute;
+		  left: 305px;
+		  top: 663px;
+		  width: 270px;
+		  height: 298px;
+		  z-index: 15;
+   	 	}
+   	 	.qr-code-image-css
+   	 	{
+   	 		padding: 14px;	
+   	 	}
+   	 	.college-website{
+   	 		width: 267px;
+		    text-align: right;
+		    font-size: 23px;
+		    color: #0058ff;
+   	 	}
+   	 	.college-logo
+   	 	{
+		  position: absolute;
+		  left: 336px;
+		  top: 52px;
+		  width: 188px;
+		  height: 236px;
+		  z-index: 58;
+   	 	}
+   	 	.student-first-name{ 
+			  position: absolute;
+			  left: 304px;
+			  top: 337px;
+			  width: 310px;
+			  height: 43px;
+			  z-index: 56;
+			  font-size: 35px;
+   			  color: #24366f;
+   			  font-weight: 550;
+
+   	 	}
+   	 	.student-middle-last-name{
+   	 		
+			  position: absolute;
+			  left: 304px;
+			  top: 380px;
+			  width: 310px;
+			  height: 45px;
+			  z-index: 57;
+			  font-size: 35px;
+   			  color: #000;
+   	 	}
+   	 	.student-branch-container{
+			  position: absolute;
+			  left: 293px;
+			  top: 435px;
+			  width: 343px;
+			  height: 40px;
+			  z-index: 33;
+			  background: #ff9700;
+   	 	}
+   	 	.student-branch-container-strip {
+		  position: absolute;
+		  left: 293px;
+		  top: 475px;
+		  width: 343px;
+		  height: 4px;
+		  z-index: 32;
+		  background: #ffc342;
+		}
+		.branch-style{
+			font-size: 21px;
+			font-weight: 600;
+			color: #FFF;
+			padding-left: 10px;
+			padding-top: 7px;
+		}
+		.student-registration_no-icon{
+			  position: absolute;
+			  left: 296px;
+			  top: 491px;
+			  width: 33px;
+			  height: 33px;
+			  z-index: 54;
+		}
+		.student-phone-icon{
+			  position: absolute;
+			  left: 296px;
+			  top: 532px;
+			  width: 33px;
+			  height: 33px;
+			  z-index: 54;
+		}
+		.student-address-icon{
+			position: absolute;
+			left: 297px;
+			top: 573px;
+			width: 33px;
+			height: 32px;
+			z-index: 57
+		}
+		.student-registration_no{
+			  position: absolute;
+			  left: 339px;
+			  top: 494px;
+			  width: 281px;
+			  height: 31px;
+			  z-index: 59;
+			  font-size: 22px
+			}
+		.student-phone{
+			  position: absolute;
+			  left: 339px;
+			  top: 534px;
+			  width: 281px;
+			  height: 31px;
+			  z-index: 59;
+			  font-size: 22px
+			}
+		.student-address{
+			position: absolute;
+			  left: 339px;
+			  top: 575px;
+			  width: 281px;
+			  height: 31px;
+			  z-index: 59;
+			  font-size: 22px
+		}
+		.blood_Group_sec1{
+		 background-color: rgb(255, 255, 255);
+		  box-shadow: 4.822px 9.887px 13px 0px rgba(0, 0, 0, 0.15);
+		  position: absolute;
+		  left: 41px;
+		  top: 808px;
+		  width: 62px;
+		  height: 53px;
+		  z-index: 19;
+		  border-radius: 25px 0px 0px 25px;
+		}
+		.blood_Group_sec2{
+		  background-color: rgb(255, 255, 255);
+		  position: absolute;
+		  left: 99px;
+		  top: 808px;
+		  width: 62px;
+		  height: 43px;
+		  z-index: 19;
+		  border-radius: 0px 25px 25px 0px;
+		  font-size:26px;
+		  padding-top: 10px
+		}
+		.student_id_card_valid_till {
+		  border-width: 2px;
+		  border-color: rgb(241, 241, 241);
+		  border-style: solid;
+		  border-radius: 20px;
+		  background-color: rgb(255, 255, 255);
+		  position: absolute;
+		  left: 37px;
+		  top: 879px;
+		  width: 216px;
+		  height: 110px;
+		  z-index: 58;
+		}
+		.card-issued-on{
+		  font-size: 14.5px;
+		  color: rgb(158, 158, 158);
+		  line-height: 1.2;
+		  position: absolute;
+		  left: 54.141px;
+		  top: 892px;
+		  z-index: 61
+		}
+		.card-issued-on-date{
+		  position: absolute;
+		  left: 53px;
+		  top: 911px;
+		  width: 120px;
+		  height: 27px;
+		  z-index: 66;
+		  font-size: 20px;
+		  font-weight: bold;
+		}
+
+		.card-valid-till{
+		  font-size: 14.5px;
+		  color: rgb(158, 158, 158);
+		  line-height: 1.2;
+		  position: absolute;
+		  left: 54.141px;
+		  top: 939px;
+		  z-index: 61
+		}
+		.card-valid-till-date{
+		  position: absolute;
+		  left: 53px;
+		  top: 956px;
+		  width: 120px;
+		  height: 27px;
+		  z-index: 66;
+		  font-size: 20px;
+		  font-weight: bold;
+		}
+
+
+		.resizable {
+  display: inline-block;
+  background: red;
+  resize: both;
+  overflow: hidden;
+  line-height: 0;
+  }
+
+.resizable img {
+  width: 100%;
+  height: 100%;
+}
+
+
+	</style>
+</head>
+<body>
+			<div class="id-card-container">
+					<div class="id-card-strip"></div>	
+
+					<!-- Student Picture -->
+					<div class="profile-image" >
+						<img src="/static/id_card_design/studentc.png" draggable="true">
+					</div>
+				<!-- 	COLLEGE LOGO -->
+					<div class="profile-image college-logo">
+						<img src="/static/id_card_design/college-logo.png">
+					</div>	
+				<!-- 	STUDENT PROFILE -->
+					<div class="profile-image profile-details">
+					</div>
+
+					<div class="profile-image student-first-name">Abhishek</div>
+					<div class="profile-image student-middle-last-name"> Kumar Mishra</div>
+					<div class="student-branch-container">
+						<div class="branch-style">Mechanical Automobile</div>
+					</div>
+					<div class="student-branch-container-strip"></div>
+
+					<div class="student-registration_no-icon"><img src="/static/id_card_design/roll-no.png"></div>
+					<div class="student-registration_no">455/322/2021/002</div>
+
+					<div class="student-phone-icon"><img src="/static/id_card_design/call.png"></div>
+					<div class="student-phone">+91-8299224866</div>
+
+					<div class="student-address-icon"><img src="/static/id_card_design/Address.png"></div>
+					<div class="student-address">1/91, Viram Khand, Gomti Nagar, Lucknow, U.P. 22610 India</div>
+
+				<!-- 	QR CODE SECTION -->
+
+					<div class="profile-image profile-qr-code qr-code-image-css">
+						<img src="/static/id_card_design/qr.png">
+						<div class="college-website">bipevns.org</div>
+					</div>
+					
+				<!-- 	Blood group SECTION -->	
+					<div class="profile-image blood_Group_sec1">
+						<img src="/static/id_card_design/bgico.png">
+					</div>
+					<div class="profile-image blood_Group_sec2">
+						A+
+					</div>
+				<!-- 	Blood group SECTION -->	
+					<div class="profile-image student_id_card_valid_till">	
+					</div>
+					<div class="card-issued-on">Issued on</div>
+					<div class="card-issued-on-date">23/11/2021</div>
+
+					<div class="card-valid-till">Valid till</div>
+					<div class="card-valid-till-date">23/11/2024</div>
+					
+			</div>
+
+
+</body>
+</html>

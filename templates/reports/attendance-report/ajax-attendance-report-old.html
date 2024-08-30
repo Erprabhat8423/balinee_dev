@@ -1,0 +1,44 @@
+{% load static %}
+{% if users %}{{users}}
+{% for user in users %}
+<tr>
+                                <td style="width:15%" class="date">{{user.date}}</td>
+                                <td style="width:15%" class="employee_name">{{user.name}} <b> ({{user.role_name}})</b></td>
+                                <td style="width:15%" class="employee_code">{{user.emp_sap_id}}</td>
+                                <td style="width:15%" class="day_start">{{user.start_time}}
+                                    <a href="javascript:void(0)" onclick="getGeoTaggedMap('{{ user.id }}','{{ user.start_latitude }}','{{ user.start_longitude }}','{{ user.date }} {{ user.start_time }}','start')">
+                                        <img src="{% static 'img/svg/viewonMap.svg' %} " class="tableRowIcon">
+                                     </a>
+                                </td>
+                                <td style="width:10%" class="day_end">
+                                    {% if user.end_time is not None %}
+                                    {{user.end_time}}
+                                    {% if user.attendance_type == 2%}
+                                    <span style="color: red;font-weight: bold;">(Auto Logout)</span>
+                                    {%else%}
+                                    <a href="javascript:void(0)" onclick="getGeoTaggedMap('{{ user.id }}','{{ user.end_latitude }}','{{ user.end_longitude }}','{{ user.date }} {{ user.end_time }}','end')">
+                                        <img src="{% static 'img/svg/viewonMap.svg' %} " class="tableRowIcon">
+                                    </a>
+                                    {% endif %}
+                                    {% endif %}
+                                </td>
+                                        <td style="width:10%" class="total_working_hour">
+                                            {{user.working_hours}}
+                                        </td>
+                                        <td style="width:10%" class="covered_distance">
+                                            {{user.distance_travelled}}
+                                        </td>
+                                        <td style="width:10%" class="tagged_add">
+                                            {{user.added_employee_count}} / {{user.tagged_employee_count}}
+                                        </td>
+                                    </tr>
+        
+{% endfor %}
+{% else %}
+<tr>
+<td colspan="8" style="text-align: center;">
+No Record Found...
+</td>
+</tr>
+{% endif %}
+

@@ -1,0 +1,198 @@
+{% load helper_tags %}
+
+{% load static %}
+
+
+
+
+                            <!-- <div class="col-md-4 p-md-0">
+                                <h6><b>Number of Students&nbsp;&nbsp;</b><span>({{counter}})</span></h6>
+                            </div> -->
+                        <div class="row py-4 mb-0 sticky_section bg-white" id="topRow"  style="position: sticky; top:0; z-index: 1001;">
+                          
+                            <div class="col-md-12 h-100 p-0 commonTableBg" id="ajax-div" style="height: 100vh;"> </div>
+                            <div class="col-md-10 " id ="scount"  >
+                                <h6><b>Number of Students: &nbsp;&nbsp;</b><span><b>{{table_head}}</b>&nbsp;&nbsp;({{counter}})</span></h6>
+                            </div>
+                            <div class="col-md-2">
+                                            <button class="btn iconBox iconExport btn-lg float-right" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"> </button>
+                                            <div class="dropdown-menu dropdown-menu-right logoutContainer" aria-labelledby="dropdownMenuButton">
+                                                <input type="hidden" name="show_columns" id="show_columns" value="" >
+                                                <a class="dropdown-item" onclick="exportsReport()" href="javascript:void(0)">Export Students List Excel
+                                                    <img src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons ml-1" /> 
+                                                </a>
+                                            </div>
+                                </div>
+                        </div>
+                       
+
+
+                        {% comment %} <div class="col-md-10 primaryContainerBG h-100 p-0 commonTableBg" id="ajax-div" style="height: 70vh;">     {% endcomment %}
+                        <table id ="addOrgTable" class="detail-table table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+                             <thead  id="tbl_head" style="background-color:  #F5F5F5; z-index:1">
+                                <tr class="tablesorter-stickyHeader bg-white" style="position: sticky; top: 75; z-index: 1000;">
+                                    <th class="s_no" id="s_no">
+                                        S.No
+                                        <i class="fa fa-fw fa-sort float-right"></i>
+                                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                    </th>
+                                    <th class="name" id="name">
+                                        Name
+                                        <i class="fa fa-fw fa-sort float-right"></i>
+                                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                    </th>
+                                 <th class="regs_no" id="regs_no">
+                                        Registration number
+                                        <i class="fa fa-fw fa-sort float-right"></i>
+                                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                    </th>
+                                    <th class="branch" id="branch">
+                                        Branch
+                                        <i class="fa fa-fw fa-sort float-right"></i>
+                                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                    </th>
+                                    <th class="semester" id="semester">
+                                        Semester
+                                        <i class="fa fa-fw fa-sort float-right"></i>
+                                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                    </th>
+                                    <!-- <th class="start_datetime" id="start_datetime">
+                                        Start Datetime
+                                        <i class="fa fa-fw fa-sort float-right"></i>
+                                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                    </th>
+                                    <th class="end_datetime" id="end_datetime">
+                                        End Datetime
+                                        <i class="fa fa-fw fa-sort float-right"></i>
+                                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                    </th> -->
+                                </tr>
+                            </thead>
+                            
+                            <tbody id="registrationDetails">
+                                {% if registered_student1 %}
+                                {% for regs in registered_student1 %}
+                                <tr  {% if forloop.first %} class="odd selected" {% endif %}>
+                                    <td class="table_student_name" >
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">{{forloop.counter}}</span> 
+                                    </td>
+                                    <td class="first_name">
+                                        <span class="mr-2">{{regs.full_name}}</span>
+                                    </td>
+                                    <td class="regs_no">
+                                        {{regs.reg_no}}
+                                    </td>
+                                    {% comment %} {% for attendance in attendance %}
+                                    {% if   regs.id ==  attendance.student_id %}
+                                    <td class="table_course" >
+                                    {{attendance.start_datetime}}
+                                    </td>
+                                    <td class="table_course">
+                                    {{attendance.end_datetime}}
+                                    </td>
+                                     {% endif %}
+                                    {% endfor %}  {% endcomment %}
+
+
+                                    {% for branch  in branch %}
+                                    {% if regs.branch_id == branch.id|slugify %}
+                                    <td class="branch">
+                                            <span class="col-sm-10 col-10 pl-0 pr-2">
+                                                {{branch.abbr}}
+                                            </span>
+                                    </td>
+                                    {% endif %}
+                                    {% endfor %}
+
+                                    {% for semester in semester %}
+                                    {% if regs.semester_id == semester.semester_id %}
+                                    <td class="semester" onclick="getStudentDetail('{{ student.id }}')">
+                                        
+                                            <span class="col-sm-10 col-10 pl-0 pr-2">
+                                                {{semester.sem_name}}
+                                          
+                                        </div>
+                                    </td>
+                                    {% comment %} {% else %}
+                                    {{semester_id}} {% endcomment %}
+                                    {% endif %}
+
+                                    {% endfor %}        
+                            </tr>
+                            {% endfor %}
+                            <tr id="loading" style="display: none;">
+                                <td class="text-center" colspan="6"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr>
+                                <td colspan="6" style="text-align: center;">No Record Found...</td>
+                            </tr>
+                            {% endif %}
+                        </tbody>
+                    </table>
+                {% comment %} </div> {% endcomment %}
+                    
+                    
+ <script>
+    function exportsReport(){
+        debugger;
+        let studentArray = []
+        {% for regs in registered_student1 %}
+            studentArray.push({{regs.id}})
+        {%endfor%}
+        studentArray = JSON.stringify(studentArray);
+        var from_date = $('#from_date').val();
+        var to_date = $('#to_date').val();
+        var branch   = $('[name="course[]"]').val();
+        branch = JSON.stringify(branch);
+        var semester = $('[name="filter_sem[]"]').val();
+        semester = JSON.stringify(semester);
+        var currentdate = new Date(); 
+        var datetime = currentdate.getDate() + "-" + (currentdate.getMonth()+1)  + "-" + currentdate.getFullYear()
+        var previousdate = new Date();
+        var previousdatetime = currentdate.getDate() + "-" + (currentdate.getMonth())  + "-" + currentdate.getFullYear()
+        url = "{% url 'src:attendance/export-attendance-stats-reports' 'list' 'branch'  'semester' 'from_date' 'to_date' %}"
+        url = url.replace('list', studentArray)
+        if (branch != ''){
+            url= url.replace('branch',branch);
+        }
+        else{
+            url= url.replace('branch', 0 );
+        }
+        if(semester != ''){
+            url = url.replace('semester',semester);
+        }
+        else{
+            url=url.replace('semester',0);
+        }
+        if (from_date != ''){
+            url = url.replace('from_date', from_date);
+        }
+        else {
+            url = url.replace('from_date', previousdatetime);
+        }
+        //console.log("url:" ,url )
+        if (to_date != ''){
+            url = url.replace('to_date', to_date);
+        }
+        else {
+            url = url.replace('to_date', datetime);
+        }
+        
+
+        console.log("URL: ", url)
+        window.location.href = url;    
+    }
+ 
+
+   
+
+ </script>

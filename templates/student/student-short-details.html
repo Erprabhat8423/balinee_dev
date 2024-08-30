@@ -1,0 +1,293 @@
+{% load static %}
+{% if student_details %}
+
+<div class="row" style="height: 85%;">
+    <div class="col-md-12 p-0">
+        
+        <div class="row">
+            <div class="col-md-2 p-md-0">
+              
+                {% if student_details.profile_image is not None %}
+                <img src="{{ student_details.profile_image }}" style="height: 100px;
+                max-height: 110px;
+                width: 100%;
+                transform: scale(1) !important;
+                border-radius: 5%;">
+                {% else %}
+                <img src="{% static 'img/png/default_icon.png' %}" style="width: 100%;">
+                {% endif %}
+            </div>
+            <div class="col-md-10 p-md-0">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6><b>{{student_details.first_name}} {% if student_details.middle_name is not None %}{{student_details.middle_name}} {% endif %}{{student_details.last_name}} </b></h6>
+                        <h6 class="smallText"><span style="color: #0052a0;">SBAT Id - {% if student_details.sbat_id %}
+                                    {{student_details.sbat_id}}
+                                    {%else%}
+                                    --
+                                    {%endif%}</span>
+                                
+                                </h6>
+                    </div>
+                    <div class="col-md-4 p-md-0 text-right">
+                        <h5>{% if user.last_login is not None %}{% if user.auth_token is None %}WEB{% else %}APP{% endif %}{% endif %}&nbsp;&nbsp;<img src="{% static 'img/svg/web.svg' %}"></h5>
+                        {% if first_employee.last_ip %}{{first_employee.last_ip}}{% endif %}
+                    </div>
+                </div>
+                <br clear="all">
+                <div class="row">
+                    <div class="col-md-1 p-md-0">
+                        <img src="{% static 'img/svg/contactNo.svg' %}" class="profileIconSize" />
+                    </div>
+                    <div class="col-md-4 p-md-0">
+                        <h6 class="smallText">Contact No.</h6>
+                        <h6 class="largeText">
+                            {% if student_details.primary_contact_no %}
+                            {{student_details.primary_contact_no}}</h6>
+                            {%else%}
+                            --
+                            {%endif%}
+                    </div>
+                     <div class="col-md-3 p-md-0">
+                                <h6 class="smallText">Percentage</h6>
+                                <h6 class="largeText"> 
+                                    {% if student_details.sbat_percentage %}
+                                    {{student_details.sbat_percentage}}
+                                    {%else%}
+                                    --
+                                    {%endif%}
+                                </h6>
+                            </div>
+                    <div class="col-md-4 p-md-0">
+                        <h6 class="smallText">Registration Id</h6>
+                        <h6 class="largeText"> 
+                            {% if student_details.reg_no %}
+                            {{student_details.reg_no}}
+                            {%else%}
+                            --
+                            {%endif%}
+                        </h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-12 p-md-0 mt-md-3">
+                <div class="row mb-md-2">
+                    <div class="col-md-3 p-md-0">
+                        <div class="row">
+                            <div class="col-md-2 p-md-0">
+                                <img src="{% static 'img/svg/gender.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 p-md-10">
+                                <h6 class="smallText">Gender</h6>
+                                <h6 class="largeText">{{student_details.gender}}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-5 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/@.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 p-md-0">
+                                <h6 class="smallText">Email ID(Official)</h6>
+                                <h6 class="largeText">{{ student_details.email }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/bloodgroup.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 p-md-0">
+                                <h6 class="smallText">Blood Group</h6>
+                                <h6 class="largeText">{% if student_details.blood_group %}{{student_details.blood_group}}{% else %}-{% endif %}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    
+
+                    <div class="col-md-3 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 p-md-0">
+                                <h6 class="smallText">Cast Category</h6>
+                                <h6 class="largeText">{% if student_details.caste_category %}{{student_details.caste_category}}{% else %}-{% endif %}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-5 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 p-md-0">
+                                <h6 class="smallText">Income Category</h6>
+                                <h6 class="largeText">{% if student_details.income_category %}{{student_details.income_category}}{% else %}-{% endif %}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 p-md-0">
+                                <h6 class="smallText">Session</h6>
+                                <h6 class="largeText">{% if student_details.session %}{{student_details.session}}{% else %}-{% endif %}</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mb-md-2">
+                    <div class="col-md-12 p-md-0">
+                        <div class="row">
+                            <div class="col-1 p-0 mt-1 mb-2">
+                                <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-11 p-md-0">
+                                <h6 class="smallText">Correspondance Address</h6>
+                                <h6 class="largeText">{% if student_details.address_hno %} {{student_details.address_hno}}{%endif%}
+                                    {% if student_details.address_locality %} {{student_details.address_locality}}{%endif%}
+                                    {% if student_details.tehsil_name %}, {{student_details.tehsil_name}},{% endif %} 
+                                    {% if student_details.state_name %}{{student_details.state_name}}{%endif%}
+                                    {% if student_details.country_name %}{{student_details.country_name}}{%endif%}
+                                    {% if student_details.cros_pincode %}{{student_details.cros_pincode}}{%endif%}
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-md-2">
+                    <div class="col-md-12 p-md-0">
+                        <div class="row">
+                            <div class="col-1 p-0 mt-1 mb-2">
+                                <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-11 p-md-0">
+                                <h6 class="smallText">Permanent Address</h6>
+                                <h6 class="largeText">{% if student_details.per_address_hno %} {{student_details.per_address_hno}}{%endif%}
+                                    {% if student_details.per_address_locality %} {{student_details.per_address_locality}}{%endif%}
+                                    {% if student_details.per_tehsil_name %}, {{student_details.per_tehsil_name}},{% endif %} 
+                                    {% if student_details.per_state_name %}{{student_details.per_state_name}},{% endif %} 
+                                    {% if student_details.per_country_name %}{{student_details.per_country_name}},{% endif %} 
+                                    {% if student_details.per_pincode %}{{student_details.per_pincode}}{%endif%}
+                                </h6>
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown-divider"></div>
+                <div class="row mb-md-2">
+                    <div class="col-md-6 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/org.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 p-md-0">
+                                <h6 class="smallText">College</h6>
+                                <h6 class="largeText">{{student_details.college_name|safe }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/depart_no.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 p-md-0">
+                                <h6 class="smallText">Course</h6>
+                                <h6 class="largeText">{{student_details.course_type_name }}</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mb-md-2">
+                    <div class="col-md-6 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 p-md-0">
+                                <h6 class="smallText">Branch</h6>
+                                <h6 class="largeText">{{student_details.branch_name }}</h6>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 p-md-0">
+                                <h6 class="smallText">Semester</h6>
+                                <h6 class="largeText">{% if semester %}{{semester}} {%elif year %} {{year}} {%else%} -- {%endif%}</h6>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 p-md-0">
+                                <h6 class="smallText">Section</h6>
+                                <h6 class="largeText">
+                                    {%if student_details.section_name%}
+                                    {{student_details.section_name}}
+                                    {%else%}
+                                     --
+                                    {%endif%}
+                                  
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 p-md-0">
+                        <div class="row">
+                            <div class="col-2 p-0">
+                                <img src="{% static 'img/svg/dob.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-10 p-md-0">
+                                <h6 class="smallText">Date Of Birth</h6>
+                                <h6 class="largeText">
+                                    {%if student_details.dob%}
+                                    {{student_details.dob}}
+                                    {%else%}
+                                     --
+                                    {%endif%}
+                                   
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 p-md-0">
+                                <div class="row">
+                                    <div class="col-2 p-0">
+                                        <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-10 p-md-0">
+                                        <h6 class="smallText">Admission Form No.</h6>
+                                        <h6 class="largeText">
+                                            {%if student_details.form_no%}
+                                            {{student_details.form_no}}
+                                            {%else%}
+                                             --
+                                            {%endif%}
+                                           
+                                    </div>
+                                </div>
+                            </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+No Record Found
+{% endif %}

@@ -1,0 +1,14 @@
+{% load static %}
+
+{% if activity_list is not None %}
+{% for role_activity in activity_list %}
+<li><h6 class="largeText">{{role_activity.activity}} 
+    &nbsp;<a href="javascript:void(0)" data-activity="{{role_activity.activity}}" onclick="editRoleActivity(this, '{{role_activity.id}}')"><img height="12" src="{% static 'img/svg/editcopy.svg' %}" /></a> 
+    &nbsp;<a href="javascript:void(0)" onclick="deleteRoleActivity(this, '{{role_activity.id}}')"><img height="12" src="{% static 'img/svg/trash.svg' %}" /></a>
+</h6>
+</li>
+{% endfor %}
+{% else %}
+<li><h6 class="largeText">No Activities found!</h6></li>
+
+{% endif %}

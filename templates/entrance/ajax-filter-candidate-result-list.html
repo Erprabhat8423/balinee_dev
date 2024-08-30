@@ -1,0 +1,215 @@
+{% load static %}
+<input type="hidden" name="page" id="page" value="2" />
+<input type="hidden" name="page_status" id="page_status" value="0" />
+<input type="hidden" name="total_pages" id="total_pages" value="{{ total_pages }}" />
+<input type="hidden" id="total_filtered_results" value="{{ total_results }}" />
+
+<table id="addOrgTable" class="detail-table table table-borderless table-striped table-hover mt-0"
+  style="width: 100%;">
+  <thead>
+      <tr>
+          <th class="table_student_name" id="table_student_name">
+            <input type="checkbox" id="check-all" onchange="selectAll()">
+          </th>
+          <th class="table_student_name" id="table_student_name">
+            S.No
+          </th>
+          <th class="table_student_name" id="table_student_name">
+            Student Name
+          </th>
+          <th class="table_student_name" id="table_contact">
+            Contact
+          </th>
+          <th class="table_student_name" id="table_contact">
+            Quiz Date
+          </th>
+          <th class="table_student_name" id="table_date">
+            Status
+          </th>
+          <th class="table_course" id="table_course">
+            Total Questions
+          </th>
+          <th class="table_phone_no" id="table_entrance_status">
+            Total Attempted
+          </th>
+          <th class="table_phone_no" id="table_result">
+            Total Skipped
+          </th>
+          <th class="table_phone_no" id="table_result">
+            Total Correct
+          </th>
+          <th class="table_phone_no" id="table_result">
+            Total Wrong
+          </th>
+          <th class="table_phone_no" id="table_result">
+            Percentage
+          </th>
+      </tr>
+  </thead>
+  
+  <tbody id="tablebody">
+      {% if enrolled %}
+      {% for student in enrolled %}
+    
+      <tr  {% if forloop.first %} class="odd selected" id="next" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')" {% endif %} >
+    
+        <th class="table_student_checkbox" id="table_student_checkbox">
+            <input type="checkbox" class="selected_candidate" value="{{ student.candidate_id }}:{{ student.quiz_start_datetime|date:"Y-m-d" }}">
+        </th>
+    
+        <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')">
+            {{ forloop.counter }}
+        </td>
+    
+        <td class="table_student_name" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')">
+            <div class="row">
+                <span class="col-sm-10 col-10 pl-0 pr-2">{{ student.student_name }}</span> 
+                
+                <div class="col-sm-2 col-2 px-0" id="is_notified_{{ student.candidate_id }}">
+                    {% if student.is_notified == 1 %}
+                    <img src="{% static 'img/svg/Verified.svg' %}" alt="" width="15">
+                    {% else %}
+                    <img src="{% static 'img/svg/notVerified.svg' %}" alt="" width="15">
+                    {% endif %}
+                </div>
+            </div>
+        </td>
+    
+        <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')">
+            {{ student.contact }}
+        </td>
+        
+        <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')">
+            {{ student.quiz_start_datetime|date:"d/m/Y" }}
+        </td>
+        
+        <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')">
+            {% if student.quiz_end_datetime %} Completed {% else %} Incompleted {%endif%}
+        </td>
+        
+        <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')">
+            {{ student.total_questions }}
+        </td>
+    
+        <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')">
+            {{ student.total_attempted }}
+        </td>
+    
+        <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')">
+            {{ student.total_skipped }}
+        </td>
+        
+        <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')">
+            {{ student.total_correct }}
+        </td>
+    
+        <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')">
+            {{ student.total_wrong }}
+        </td>
+    
+        <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')">
+            {{ student.percentage }}%
+        </td>
+    
+      {% endfor %}
+      <tr id="loading" style="display: none;">
+        <td class="text-center" colspan="6"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+        </td>
+      </tr>
+      {% else %}
+      <tr>
+        <td colspan="11" id="next" style="text-align: center;" onclick="getStudentDetail('0', '0')">No Record Found...</td>
+      </tr>
+      {% endif %}
+    </tbody>
+
+<!--  <tbody id="tablebody">-->
+<!--      {% if enrolled %}-->
+<!--      {% for student in enrolled %}-->
+
+<!--      <tr  {% if forloop.first %} class="odd selected" id="next"  onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_end_datetime|date:"Y-m-d" }}')" {% endif %}>-->
+<!--            <td class="table_student_checkbox" id="table_student_checkbox">-->
+<!--              <input type="checkbox" class="selected_candidate" value="{{ student.candidate_id }}:{{ student.quiz_end_datetime|date:"Y-m-d" }}">-->
+<!--            </td>-->
+<!--            <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_end_datetime|date:"Y-m-d" }}')">-->
+<!--                {{ forloop.counter }}-->
+<!--            </td>-->
+<!--            <td class="table_student_name" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_end_datetime|date:"Y-m-d" }}')">-->
+<!--              <div class="row">-->
+<!--                  <span class="col-sm-10 col-10 pl-0 pr-2">{{ student.student_name }}</span> -->
+                  
+<!--                  <div class="col-sm-2 col-2 px-0" id="is_notified_{{ student.candidate_id }}">-->
+<!--                      {% if student.is_notified == 1 %}-->
+<!--                      <img src="{% static 'img/svg/Verified.svg' %}" alt="" width="15">-->
+<!--                      {% else %}-->
+<!--                      <img src="{% static 'img/svg/notVerified.svg' %}" alt="" width="15">-->
+<!--                      {% endif %}-->
+<!--                  </div>-->
+<!--              </div>-->
+<!--          </td>-->
+<!--          <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_end_datetime|date:"Y-m-d" }}')">-->
+<!--              {{ student.contact }}-->
+<!--          </td>-->
+<!--          <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_end_datetime|date:"Y-m-d" }}')">-->
+<!--            {{ student.quiz_end_datetime|date:"d/m/Y" }}-->
+<!--          </td>-->
+<!--          <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_end_datetime|date:"Y-m-d" }}')">-->
+<!--              {{ student.total_questions }}-->
+<!--          </td>-->
+<!--          <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_end_datetime|date:"Y-m-d" }}')">-->
+<!--              {{ student.total_attempted }}-->
+<!--          </td>-->
+<!--          <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_end_datetime|date:"Y-m-d" }}')">-->
+<!--              {{ student.total_skipped }}-->
+<!--          </td>-->
+<!--          <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_end_datetime|date:"Y-m-d" }}')">-->
+<!--              {{ student.total_correct }}-->
+<!--          </td>-->
+<!--          <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_end_datetime|date:"Y-m-d" }}')">-->
+<!--              {{ student.total_wrong }}-->
+<!--          </td>-->
+<!--          <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_end_datetime|date:"Y-m-d" }}')">-->
+<!--              {{ student.percentage }}%-->
+<!--          </td>-->
+<!--      {% endfor %}-->
+<!--      <tr id="loading" style="display: none;">-->
+<!--        <td class="text-center" colspan="11"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>-->
+<!--        </td>-->
+<!--      </tr>-->
+<!--      {% else %}-->
+<!--      <tr>-->
+<!--        <td colspan="11" id="next" style="text-align: center;" onclick="getStudentDetail('0', '0')">No Record Found...</td>-->
+<!--      </tr>-->
+<!--      {% endif %}-->
+<!--</tbody>-->
+</table>
+
+{% block script %}
+<script>
+  $(document).ready(function() {
+    $("#next").click()
+    // $('#check-all').change( function () {
+    //     if ($('#check-all').is(':checked')) {
+    //         $(".selected_candidate").prop('checked', true)
+    //         console.log("Selected")
+    //     }
+    //     else {
+    //         $(".selected_candidate").prop('checked', false)
+    //         console.log("Unselected")
+    //     }
+    // });
+  })
+</script>
+
+<script>
+  function selectAll() {
+    if ($('#check-all').is(':checked')) {
+        $(".selected_candidate").prop('checked', true)
+      }
+      else {
+        $(".selected_candidate").prop('checked', false)
+      } 
+  }
+</script>
+
+{% endblock %}

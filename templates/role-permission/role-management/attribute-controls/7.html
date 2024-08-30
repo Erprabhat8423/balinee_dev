@@ -1,0 +1,99 @@
+
+			<table class="table table-striped detail-table" id="table_7">
+				<thead>
+					<tr>
+						<th>Fields</th>
+						<th>Optional/Mandatory <br>
+							<div class="switch_box">
+								<input type="checkbox"  class="switch_1 check_optional_field" value="7">
+							</div>
+						</th>
+						<th>Hide/Show</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td><label for="finger_1">Finger 1</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="7[]"  class="switch_1 optional_field"  value="finger_1" {% if 'finger_1' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_7[]"  class="switch_1"   value="finger_1" {% if 'finger_1' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+
+					<tr>
+						<td><label for="finger_2">Finger 2</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="7[]"  class="switch_1 optional_field"  value="finger_2" {% if 'finger_2' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_7[]"  class="switch_1"   value="finger_2" {% if 'finger_2' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+
+					<tr>
+						<td><label for="finger_3">Finger 3</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="7[]"  class="switch_1 optional_field"  value="finger_3"  {% if 'finger_3' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_7[]"  class="switch_1"   value="finger_3" {% if 'finger_3' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+
+					<tr>
+						<td><label for="finger_4">Finger 4</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="7[]"  class="switch_1 optional_field"  value="finger_4" {% if 'finger_4' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_7[]"  class="switch_1"   value="finger_4" {% if 'finger_4' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+
+					<tr>
+						<td><label for="finger_5">Finger 5</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="7[]"  class="switch_1 optional_field"  value="finger_5" {% if 'finger_5' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_7[]"  class="switch_1"   value="finger_5" {% if 'finger_5' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+
+					
+
+				</tbody>
+			</table>
+
+
+			<input type="hidden" name="optional_{{attribute.id}}" id="optional_{{attribute.id}}" value="{% if attribute.fields %}{{attribute.fields|join:", " }}{% endif %}"> 
+			<input type="hidden" name="hidden_{{attribute.id}}" id="hidden_{{attribute.id}}" value="{% if attribute.hidden_fields %}{{attribute.hidden_fields|join:", " }}{% endif %}"> 
+
+

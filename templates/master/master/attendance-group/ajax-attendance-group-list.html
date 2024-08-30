@@ -1,0 +1,148 @@
+{% load static %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="row mb-2" id="topRow">
+            <div class="col-md-5 p-md-0">
+                <h6><b>Working Shift &nbsp;&nbsp;</b></h6>
+            </div>
+            <div class="col-md-7 p-md-0">
+                <div class="row" >
+                    <div class="col-md-12 p-md-0 text-right">
+                        <input class="searchTable master_type_search" placeholder="Search" type="search" data-column="all" id="attendance_group_types_filter" onkeyup="master_search_bar(this)">
+                        <button type="button" class="btn iconBox iconAddNew" title="Add New Shift" onclick="addMaster('working_shift')">                            
+                        </button>
+                        <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                            <button class="btn iconBox iconHide" title="Hide" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                            aria-labelledby="dropdownMenuButton">
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="" 
+                                onclick="showHideColumns(this,'attendance_group',2)"
+                                />
+                                <label class="mb-0" for="attendance_group">Working Shift</label>
+                            </a>
+                            
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="" 
+                                onclick="showHideColumns(this,'start_time',2)"
+                                />
+                                <label class="mb-0" for="start_time">Start Time</label>
+                            </a>
+
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="" 
+                                onclick="showHideColumns(this,'end_time',2)"
+                                />
+                                <label class="mb-0" for="end_time">End Time</label>
+                            </a>
+                            
+                        </div>
+                    </div>
+                    
+                    <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                        <button class="btn iconBox iconUnFreeze" title="Stick" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                        aria-labelledby="dropdownMenuButton">
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="" id="attendance_group" data-id="1"
+                            onclick="toggleFreeze(this.id,'attendance_group',1)" />
+                            <label class="mb-0" for="attendance_group">Working Shift</label>
+                        </a>
+                        
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="" id="start_time" data-id="1"
+                            onclick="toggleFreeze(this.id,'start_time',1)" />
+                            <label class="mb-0" for="start_time">Start Time</label>
+                        </a>
+
+                        <a class="dropdown-item columnHideItem">
+                            <input type="checkbox" class="colFreezeCheck" name="" id="end_time" data-id="1"
+                            onclick="toggleFreeze(this.id,'end_time',1)" />
+                            <label class="mb-0" for="end_time">End Time</label>
+                        </a>
+                        
+                    </div>
+                </div>
+                
+                
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<div class="row border-redius-17 h-100" id="tableBox">
+    <div class="col-md-12 col-12 primaryContainerBG h-100 px-0" id="masterListTable">
+            <table id="addOrgTable" class="detail-table table table-borderless table-striped table-hover mt-0" >
+            <thead>
+                <tr>
+                    <th class="attendance_group">
+                        Working Shift
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    
+                    <th class="start_time">
+                        Start Time
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+
+                    <th class="end_time">
+                        End Time
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    
+                    
+                    <th data-sorter="false">Action</th>
+                </tr>
+            </thead>
+            <tbody id="tablebody">
+                {% if attendance_groups %}
+                {% for attendance_group in attendance_groups %}
+                <tr>
+                    <td class="attendance_group" name="attendance_group" id="attendance_group">{{ attendance_group.attendance_group }}</td>
+                    <td class="start_time" name="start_time" id="start_time">{{ attendance_group.start_time }}</td>
+                    <td class="end_time" name="end_time" id="end_time">{{ attendance_group.end_time }}</td>
+                    <td>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <a href="javascript:void(0)"  onclick="editMaster('working_shift','{{attendance_group.id}}')"  >
+                                    <img src="{% static 'img/svg/editcopy.svg' %}" title="Edit" />
+                                </a> 
+                            </div>
+                            <div class="col-md-5">
+                                <label class="switch">
+                                    <input type="checkbox" class="checkbox" name="is_active"
+                                    {% if attendance_group.status == 1 %} checked="" {% else %}
+                                    {% endif %}
+                                    onclick="changeMasterStatus('working_shift', '{{ attendance_group.id }}')">
+                                    <span class="slider round" title="Enable/Disable"></span>
+                                </label>
+                                
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr id="loading" style="display: none;">
+                    <td class="text-center" colspan="4">
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align: center;">No Record Found...</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+</div>
+</div>

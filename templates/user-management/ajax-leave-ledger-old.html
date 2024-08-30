@@ -1,0 +1,47 @@
+<div class="col-md-12 p-0  p-0 h-100 w-100" id="leave">
+    <div class="row">
+      <div class="col-md-12">
+        <button class="btn btn-save float-right" type="button" onclick="addLeaveLedger('{{employee.id }}')" >
+          Add
+        </button>
+          <table class="table table-striped table-borderless" style="font-size: 1rem;">
+            <thead>
+              <tr>
+                <th>Leave Policy</th>
+                <th>Leave Policy Type</th>
+                <th>No Of Leave (Year)</th>
+                {% comment %} <th>No Of Leave (Month)</th> {% endcomment %}
+                <th> Credit Leave</th>
+                <th> Debit Leave</th>
+                <th> Balance Leave</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if leave_ledger %}
+              {% for leave in leave_ledger %}
+              <tr>
+                <td>{{ leave.leave_policy_name }}</td>
+                <td>{{ leave.laave_type_name}}</td>
+                <td>{{ leave.year_leave_count}}</td>
+                {% comment %} <td>{{ leave.month_leave_counts}}</td> {% endcomment %}
+                {% if leave.credit %}
+                <td>{{ leave.credit}}</td>
+                {% else %}
+                <td>-</td>
+                {% endif %}
+                {% if leave.debit %}
+                <td>{{ leave.debit}}</td>
+                {% else %}
+                <td>-</td>  
+                {% endif %}
+                <td>{{ leave.balance}}</td>
+              </tr>
+              {% endfor %}
+              {% else %}
+              <th colspan="5" class="text-center">No Record Found</th>
+              {% endif %}
+            </tbody>
+          </table>
+      </div>
+    </div>
+  </div>

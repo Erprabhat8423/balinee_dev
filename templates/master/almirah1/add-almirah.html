@@ -1,0 +1,161 @@
+{% load static %}
+<div class="modal-AddOrganisation centered">
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-md-3 p-md-0" style="background-repeat: no-repeat;text-align: center;background-color: #0073e0;background-position: bottom left;background-size: 80%;">
+                <div class="transformImage">
+                    <img src="{% static 'img/svg/master/salaryAdd.svg' %}" class="w-50" />
+                    <h4 class="modalColHead">Add Almirah Type</h4>
+                </div>
+            </div>
+            
+            <div class="col-md-9 p-md-4">
+                <form id="addForm" method="POST" autocomplete="off" action="" aria-label="Salary Addition Type">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b>Almirah details </b></h5>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <button class="btn btn-save float-right" type="button" onclick="saveAlmirah()">
+                                Save
+                            </button>
+                            <button class="btn btn-close float-right" type="button"
+                            onclick="manipulateModal('addProductModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row mt-md-3">
+                   <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>College Name</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <select class="inputField selectField"  style="width: 100%;"  name="college_id" id="college_id">
+                            <option value="">Select Collage</option>
+                             {% for college in college %}
+                                <option value="{{college.id}}">{{college.organization_name}}</option>
+                            {% endfor %}
+                        </select> 
+                        <label class="error_msg float-right"></label>
+                    </div>
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Room Name</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <select class="inputField selectField"  style="width: 100%;"  name="room_id" id="room_id">
+                            <option value="">Select Room</option>
+                            {% comment %} {% for room in room %}
+                                <option value="{{room.id}}">{{room.room}}</option>
+                            {% endfor %} {% endcomment %}
+                        </select>
+                       
+                        <label class="error_msg float-right"></label>
+                    </div>
+                </div>
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Almirah</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField alpha" type="text" placeholder="Almirah*" name="almirah" id="almirah" maxlength="50" />
+                        <label class="error_msg float-right"></label>
+                    </div>
+                </div>
+                
+                
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+   
+    function saveAlmirah() {
+        showLoader();
+        if(validateForm()){
+            hideLoader();
+            return false;
+        }else{
+            $.ajax({
+                url: "{% url 'src:add-almirah' %}",
+                method: 'POST',
+                data: $('#addForm').serialize(),
+                success: function (data) {
+                    hideLoader();
+                    if(data.flag){
+                        $("#addProductModal").html('');
+                        $("#addProductModal").hide();
+                        getList('almirah_type');
+                        openToaster("success", data.message);
+                    }else{
+                        openToaster("danger", data.message);
+                    }
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            }).always(function() {
+                // hideLoader();
+            });
+        } 
+    }
+    
+    
+    function validateForm(){
+        error = 0;
+        $('.error_msg ').text('');
+        $('.inputField').css("border", "");
+        
+        if($.trim($('[name="room_id"]').val()) == ""){
+            $('[name="room_id"]').parent().find('.error_msg').text('Please select room');
+            $('[name="room_id"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+        
+        if($.trim($('[name="almirah"]').val()) == ""){
+            $('[name="almirah"]').parent().find('.error_msg').text('Please enter almirah');
+            $('[name="almirah"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        if($.trim($('[name="college_id"]').val()) == ""){
+            $('[name="college_id"]').parent().find('.error_msg').text('Please choose college name');
+            $('[name="college_id"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+        if(error > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    $('#college_id').change(function(){
+    var college_id =$(this).val()
+    $.ajax({
+            url:"{%  url 'src:get-college-room-no' %}",
+            method:"POST",
+            data:{college_id:college_id,csrfmiddlewaretoken:$('input[name=csrfmiddlewaretoken]').val(),   
+          },
+          success:function(data){      
+         
+           $('#room_id').html(data.output)
+          }
+        })
+})
+</script>

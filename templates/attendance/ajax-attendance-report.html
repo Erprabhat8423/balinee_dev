@@ -1,0 +1,276 @@
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/tablesorter.theme.blue.min.css' %}">
+<style>
+    #ui-datepicker-div{
+        z-index: 999 !important;
+    }
+    .sunday{
+        background-color:#fd8823;
+        border-radius: 1.5px;
+        vertical-align: middle;
+        padding: 0.3em 0.6em 0.3em;
+        margin-top: 2%;
+        text-align: center;
+    }
+    .holiday{
+        background-color:#c7fd2370;
+        border-radius: 1.5px;
+        vertical-align: middle;
+        padding: 0.3em 0.6em 0.3em;
+        margin-top: 2%;
+        text-align: center;
+    }
+    .present{
+        background-color:#7EC857;
+        border-radius: 1.5px;
+        vertical-align: middle;
+        padding: 0.3em 0.6em 0.3em;
+        margin-top: 2%;
+        text-align: center;
+    }
+    .absent{
+        background-color:#FF4859; 
+        border-radius: 1.5px; 
+        vertical-align: middle; 
+        padding: 0.3em 0.6em 0.3em; 
+        margin-top: 2%; 
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+
+<div class="row" id="containerHeight" style="width:100%;">
+    <div class="col-md-12 px-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            {% csrf_token %}
+            <div class="row py-2 px-0">
+                <div class="col-md-12 px-0">
+                    {% comment %} <h1 class="h4 font-weight-bold d-flex justify-content-center">Registration Stats</h1>
+                    <table class="detail-table table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th class="table_student_name" id="">
+                                    Annotation
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th class="table_student_name" id="table_father_name">
+                                    Number of Students
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablebody">
+
+                            <tr id="reg_list" class="odd selected" onclick="getRegistrationZone('0','Registered Students');">
+                                <td class="table_student_name">
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">Registered Students</span> 
+                                    </div>
+                                </td>
+                                <td id="total_registered" class="table_father_name">{{total_registered}}</td>
+                            </tr>
+                            <tr onclick="getRegistrationZone('1','Unregistered Students');">
+                                <td class="table_student_name" >
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">Unregistered Students</span> 
+                                    </div>
+                                </td>
+                                <td id="total_unregistered" class="table_father_name">{{total_unregistered}}</td>
+                            </tr>
+
+                            <tr class="odd selected" onclick="getRegistrationZone('2','Today Registration');">
+                                <td class="table_student_name" >
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">Today's Registration</span> 
+                                    </div>
+                                </td>
+                                <td id="today_registered" class="table_father_name">{{today_registered}}</td>
+                            </tr>
+                        </tbody>
+                    </table> {% endcomment %}
+                </div>
+            </div>
+
+            <div class="row p-2">
+                <div class="col-md-12 px-1">
+                    <h1 class="h4 font-weight-bold d-flex justify-content-center">Daily Attendance Report</h1>
+                    <table id="attendanceZoneTable" class="w-100 detail-table table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th class="table_student_name" id="table_student_name">
+                                    S.No
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th class="table_student_name" id="table_father_name">
+                                    Branch
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th class="table_college" id="table_college">
+                                    Registered Students
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th class="table_college" id="table_college">
+                                    0%
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th class="table_college" id="table_college">
+                                    0-30%
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th class="table_college" id="table_college">
+                                    31-50%
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th class="table_college" id="table_college">
+                                    51-80%
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th class="table_college" id="table_college">
+                                    81-90%
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th class="table_college" id="table_college">
+                                    90%+
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                 <th class="table_college" id="table_college">
+                                    Never Attended
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="tablebody">
+
+                                {% if response %}
+                             {% for response in response %}
+
+                            <tr {% if forloop.first %}
+                                class="odd selected"
+                                {% else %}
+                                class="odd"
+                                {% endif %}>
+
+                                <td class="table_student_name" onclick="getAttendanceReport('1', 'Registered Students', {{response.branch_id}});">
+                                    <div class="row">
+                                        <span class="col-sm-10 col-10 pl-0 pr-2">{{forloop.counter}}</span> 
+                                    </div>
+                                </td>
+                                <td class="table_father_name" id="reg_list"  onclick="getAttendanceReport('1', 'Registered Students', {{response.branch_id}});">
+                                    {{response.branch}}
+                                </td>
+                                    <td class="table_father_name" onclick="getAttendanceReport('1', 'Registered Students', {{response.branch_id}});">
+                                        {{response.registered}}
+                                    </td>
+                                <td class="table_college" id="reg_list" onclick="getAttendanceReport('3', 'First time(0%)', {{response.branch_id}});">
+                                    {{response.first}}({{response.first_percent}})
+                                   
+                                </td>
+                                <td class="table_college" onclick="getAttendanceReport('4', 'Very Poor(0-30%)', {{response.branch_id}});">
+                                    {{response.very_poor}}( {{response.very_poor_percent}})
+                                </td>
+                                <td class="table_college" onclick="getAttendanceReport('5', 'Poor(31-50%)', {{response.branch_id}});">
+                                    {{response.poor}}({{response.poor_percent}})
+                                </td>
+                                <td class="table_college" onclick="getAttendanceReport('6', 'Moderate(51-80%)', {{response.branch_id}});">
+                                    {{response.moderate}}({{response.moderate_percent}})
+                                </td>
+                                <td class="table_college" onclick="getAttendanceReport('7', 'Good(81-90%)', {{response.branch_id}});">
+                                    {{response.good}}({{response.good_percent}})
+                                </td>
+
+                                <td class="table_college" onclick="getAttendanceReport('8', 'Excellent(90%)', {{response.branch_id}});">
+                                    {{response.excellent}}({{response.excellent_percent}})
+                                </td>
+                                 <td class="table_college" onclick="getAttendanceReport('9', 'Never Attended',{{response.branch_id}});">
+                                    {{response.zero}}({{response.zero_percent}})
+                                </td>
+                            </tr>
+                            {% endfor %}
+                             {% else %}
+                        <tr>
+                            <td colspan="6" style="text-align: center;">No Record Found...</td>
+                        </tr>
+                        {% endif %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block script %}
+
+<script>
+    $(document).ready(function () {
+    $("#reg_list").click()
+    })
+
+
+    function getCourseOption(value){
+        if(value != ""){
+            url = "{% url 'src:get-college-course-options' '1' %}";
+            url = url.replace('1',value);
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    $('#filter_course').html(data.options);
+                },
+                error: function (err) {
+                    alert(err.message);
+                }
+            });
+            
+        }else{
+            $('#filter_course').html(`<option value="">View By Course</option>`);
+        }
+    }   
+    
+    $(document).ready(function () {
+        $("[name='from_date']").datepicker({  
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-2:+0",
+            maxDate: 0,
+            dateFormat: 'dd/mm/yy' 
+        });
+    });
+    
+    
+</script>
+{% endblock %}

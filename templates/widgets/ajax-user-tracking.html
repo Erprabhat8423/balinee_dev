@@ -1,0 +1,150 @@
+{% load static %}
+
+<div class="col-md-8 primaryContainerBG h-100 p-0">
+    <div id="map" style="height: 100%;"></div>
+</div>
+
+
+<div class="col-md-4 h-100">
+    <div class="primaryContainerBG h-100" id="detailsBox">
+      <div class="row my-3">
+        <div class="col-md-7">
+          <img src="{% static 'img/svg/add-visit-plan.svg' %}" class="profileIconSize mr-2" />
+          Total visits
+        </div>
+        <div class="col-md-4">
+          {{ total_school_visits }}
+        </div>
+      </div>
+
+      {% if total_students %}
+      <div class="row my-3">
+        <div class="col-md-7">
+          <img src="{% static 'img/svg/order/status.svg' %}" class="profileIconSize mr-2" />
+          Total high school strength
+        </div>
+        <div class="col-md-4">
+          {{ total_students }}
+        </div>
+      </div>
+      {%endif%}
+
+      <table id="addOrgTable" class="detail-table table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+        <thead>
+          <tr>
+              <th class="table_student_name">
+                  Employee Name
+              </th>
+              <th class="table_student_name">
+                  Total count
+              </th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for each_faculty in all_faculty %}
+            <tr>
+              <td class="table_student_name">
+                {{each_faculty.username}}
+              </td>
+              <td class="table_father_name">
+                {{each_faculty.total_visits}}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+</div>
+</div>
+
+<script>
+    function initMap() {
+        var map;
+          var bounds = new google.maps.LatLngBounds();
+          var mapOptions = {
+            center: new google.maps.LatLng(25.4343, 80.2332),
+            zoom: 8,
+        };
+
+          // var customer_icon = '/static/img/gif/userLocation.gif';
+          var customer_icon = {
+            url: '/static/img/png/locationMarker.png',
+            scaledSize: new google.maps.Size(30, 40)
+          }
+          map = new google.maps.Map(document.getElementById("map"), mapOptions);
+          
+          var markers = [];
+          var id = []
+          var name = []
+          var infoWindowContent = [];
+          {% for coordinates in all_coordinates %}
+          markers.push(['{{coordinates.latitude}}', '{{coordinates.longitude}}']);
+          id.push('{{coordinates.id}}')
+          name.push('{{ coordinates.name }}')
+
+          img = '/static/img/png/default_app_icon.png';
+          
+
+          {% endfor %}
+
+          // var infoWindow = new google.maps.InfoWindow(), marker, i;
+
+          for( i = 0; i < markers.length; i++ ) {
+            var position = new google.maps.LatLng(markers[i][0], markers[i][1]);
+            console.log("Markers: ", name[i])
+
+            bounds.extend(position);
+            marker = new google.maps.Marker({
+              position: position,
+              map: map,
+              title: name[i],
+              icon: customer_icon
+            });
+
+            google.maps.event.addListener(marker, 'click', (function(marker, i) {
+              return function() {
+                // infoWindow.setContent(infoWindowContent[i][0]);
+                // infoWindow.open(map, marker);
+                viewVisitDetails(id[i])
+              }
+            })(marker, i));
+
+            map.fitBounds(bounds);
+          }
+
+          // Override our map zoom level once our fitBounds function runs (Make sure it only runs once)
+          var boundsListener = google.maps.event.addListener((map), 'bounds_changed', function(event) {
+            this.setZoom(8);
+            google.maps.event.removeListener(boundsListener);
+          });
+    }
+
+    function viewVisitDetails(id){
+        user_id = $('#user_id option:selected').val();
+        visit_type = $('#visit_type option:selected').val();
+
+        var url = "{% url 'src:school-visit-details' %}";
+        $.ajax({
+        url: url,
+        method: 'POST',
+        data: { 
+            user_id: user_id,
+            id: id,
+            visit_type: visit_type,
+            csrfmiddlewaretoken: '{{ csrf_token }}'
+        },
+        success: function (data) {
+            $('#detailsBox').html('');
+            $('#detailsBox').html(data);
+        },
+        error: function (err) {
+        }
+        });
+    }
+    
+</script>
+
+
+
+<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyCNCcTQduJoNRebWEf7zgqlpe1YJibSuGI&callback=initMap&libraries=&v=weekly"></script>
+

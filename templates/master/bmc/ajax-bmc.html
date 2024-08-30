@@ -1,0 +1,86 @@
+{% load static %}
+
+<div class="row">
+    <div class="col-md-12">
+        <div class="row mb-2" id="topRow">
+            <div class="col-md-5 p-md-0">
+                <h6><b>BMC &nbsp;&nbsp;</b></h6>
+            </div>
+            <div class="col-md-7 p-md-0">
+                <div class="row" >
+                    <div class="col-md-12 p-md-0 text-right">
+                        <input class="searchTable master_type_search" placeholder="Search" type="search" data-column="all" id="bmc_type_filter" onkeyup="master_search_bar(this)">
+                        <button type="button" class="btn iconBox iconAddNew" title="Add New BMC Type" onclick="addMaster('bmc')"></button>      
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+
+<div class="row border-redius-17 h-100" id="tableBox">
+    <div class="col-md-12 col-12 primaryContainerBG h-100 px-0" id="masterListTable">
+            <table id="addOrgTable" class="detail-table table table-borderless table-striped table-hover mt-0"
+            style="width: 100%;">
+            <thead>
+                <tr> 
+                    <th class="name">
+                        Name
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    <th class="mpp_code">
+                        BMC Code
+                        <i class="fa fa-fw fa-sort float-right"></i>
+                        <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                        <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                    </th>
+                    
+                    
+                    <th data-sorter="false">Action</th>
+                </tr>
+            </thead>
+            <tbody id="tablebody">
+                {% if bmc %}
+                {% for bmc_once in bmc %}
+                <tr>
+                    <td class="college_type">{{ bmc_once.name }}</td>
+                    <td class="room_type">{{ bmc_once.bmc_code }}</td>
+                   
+                    <td> 
+                        <div class="row">
+                            <div class="col-md-3">
+                                    <a href="javascript:void(0)"  onclick="editMaster('bmc','{{bmc_once.id}}')"  >
+                                        <img src="{% static 'img/svg/editcopy.svg' %}" title="Edit" />
+                                    </a> 
+                            </div>
+                            <div class="col-md-5">
+                                    <label class="switch">
+                                        <input type="checkbox" class="checkbox" name="is_active"
+                                        {% if bmc_once.status == 1 %} checked="" {% else %}
+                                        {% endif %}
+                                        onclick="changeMasterStatus('bmc','{{ bmc_once.id }}')">
+                                        <span class="slider round" title="Enable/Disable"></span>
+                                    </label>
+                                    
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr id="loading" style="display: none;">
+                    <td class="text-center" colspan="3">
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4" style="text-align: center;">No Record Found...</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+</div>
+</div> 

@@ -1,0 +1,641 @@
+{% load static %}
+{% block style %}
+<link href="{% static 'css/entrance-styles.css' %}" rel="stylesheet" />
+<link rel="icon" type="image/png" href="{% static 'img/favicon.ico' %}" />
+
+<style>
+	.attended {
+		background-color: #3644c9 !important;
+	}
+
+	.attended-checkbox {
+		background-color: #fff !important;
+		border: 2px solid #fcba47;
+		border-radius: '5px';
+	}
+
+	.skipped {
+		background-color: #ff0000 !important;
+	}
+
+	.skipped-checkbox {
+		background-color: #fcba47 !important;
+		border: 2px solid #fcba47;
+		border-radius: '5px';
+	}
+
+</style>
+{%endblock%}
+
+        <div id="layoutDefault">
+            <div id="layoutDefault_content" class="insbg">
+                <main>
+                
+                    <!-- Page Header-->
+                    <header class="">
+                       
+                        <div class="page-header-ui-content pt-0">
+                        
+                            <div class="container-fluid p-0">
+                             
+                                <div class="row">
+                                
+                                   <div class="col-md-5">
+                                   <div class="optionsec">
+                                   	 	<div class="questionsection">
+                                   	 		<h3>Total <span class="hilight">No.of {{total_questions}}<br>Questions</span> to Attempt</h3>
+                                   	 		<div class="qsoption">
+												<ul class="optionnlist">
+												{%if candidate_quest %}
+													{% for i in candidate_quest.question_answers %}
+														{% if 10 > forloop.counter %}
+															<li>
+																<label onclick="ajaxQuest('{{ forloop.counter }}', '{{ candidate_id }}')" class="container1"><span {% if i.answer != 0 and i.answer < 5 %} class="num attended" {%elif i.answer == 5%} class="num skipped" {% endif %} id="num-{{ forloop.counter }}">0{{ forloop.counter }}</span><br>
+																	<input id="checkbox-{{ forloop.counter }}" type="checkbox" disabled {% if i.answer != 0 and i.answer < 5 %} class="attended-checkbox" checked {% elif i.answer == 5%} class="skipped-checkbox" {% endif %}>
+																	<i class="checkmark"></i>
+																</label>
+															</li>
+														{%else%}
+															<li>
+																<label onclick="ajaxQuest('{{ forloop.counter }}', '{{ candidate_id }}')"  class="container1"><span {% if i.answer != 0 and i.answer < 5 %} class="num attended" {%elif i.answer == 5%} class="num skipped" {% endif %} id="num-{{ forloop.counter }}">{{ forloop.counter }}</span><br>
+																	<input id="checkbox-{{ forloop.counter }}" type="checkbox" disabled {% if i.answer != 0 and i.answer < 5 %} checked {% endif %}>
+																	<i class="checkmark" {% if i.answer != 0 and i.answer < 5 %} class="checkmark attended-checkbox" {%else%} class="checkmark skipped-checkbox" {% endif %}></i>
+																</label>
+															</li> 
+															<!-- "renderQuestionwithID('{{ forloop.counter }}', '{{ i.id }}')" -->
+														{% endif %}
+													{% endfor %}
+												{% endif %}
+												</ul>
+                                   	 		</div>
+
+                                   	 		<div class="timersec">
+                                   	 		<h1 class="timetile">Time Left</h1>
+                                   	 		<h1 id="showtime" class="timecount font-weight-bold" style="color: #f30000;"></h1>
+
+                                   	 		<ul class="quesins">
+                                   	 			<li class="skip">Ques. Skipped</li>
+                                   	 			<li class="att">Ques. Attended</li>
+                                   	 			<li class="une">Ques. Unexplored</li>
+                                   	 		</ul>
+                                   	 		</div>
+                                   	 	</div>
+                                   </div>
+                                  
+                                   </div>
+                                   <div class="col-md-7">
+                                   <div class="row">
+                                   	<div class="col-md-12">
+                                   
+                                   <div class="questionarea" id="_selected_answer">
+										<h2 class="hilight" id="hilight"></h2>
+										<ul class="anslist mb-20" id="selected_answer">
+											<h3> {{ first_question.question }}</h3>
+											<li> <label for='answer-1' class='btn'> <input type='radio' name='choices' id='answer-1' value=1> <span class='mx-2'>{{ first_question.option_1}}</span> </label> </li>
+											<li> <label for='answer-2' class='btn'> <input type='radio' name='choices' id='answer-2' value=2> <span class='mx-2'>{{ first_question.option_2}}</span> </label> </li>
+											<li> <label for='answer-3' class='btn'> <input type='radio' name='choices' id='answer-3' value=3> <span class='mx-2'>{{ first_question.option_3}}</span> </label> </li>
+											<li> <label for='answer-4' class='btn'> <input type='radio' name='choices' id='answer-4' value=4> <span class='mx-2'>{{ first_question.option_4}}</span> </label> </li>
+										</ul>
+
+										<div class="col-md-12">
+											<div class="row mt-5 navfooter pt-10">
+												{% if pos == 1 %}
+												<div class='col-md-6 col-6' align='left'>
+													<a style='cursor:no-drop; opacity: 0.4;'>
+														<img src="{% static 'entrance-assets/img/arrow l.svg' %}"/>&nbsp;Previous
+													</a>
+												</div>
+												{% else %}
+												<div class='col-md-6 col-6' align='left'>
+													<a style='cursor:pointer;' id="previous">
+														<img src="{% static 'entrance-assets/img/arrow l.svg' %}"/>&nbsp;Previous
+													</a>
+												</div>
+												{% endif %}
+
+												{% if pos >= 30 %}
+													<div class='col-md-6 col-6' align='right'>
+														<button onclick='quizSubmission()' style='cursor:pointer;' type='button' class='btn btn-lg p-3 btn-primary submitfinal col-md-5 fw-500 me-sm-3 mb-3 mb-sm-0 btnshow'>Submit &nbsp;<img src='{% static 'entrance-assets/img/submit.svg' %}'></button>
+													</div>
+												{%else%}
+													<div class='col-md-6 col-6' align='right'>
+														<a style='cursor:pointer;' id="next">Next &nbsp;<img src="{% static 'entrance-assets/img/arrow r.svg' %}"/></a>
+													</div>
+												{%endif%}
+
+											   	<!-- <div class='col-md-6 col-6' align='right'>
+													<a style='cursor:pointer;' id="next">Next &nbsp;<img src="{% static 'entrance-assets/img/arrow r.svg' %}"/></a>
+												</div> -->
+										   </div>
+										</div>
+
+                                   	</div>
+                                   	</div>
+                                   		
+                                  
+                                   </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </header>
+                    
+                </main>
+            </div>
+      
+        </div>
+
+
+		<section class="otpverfy" id="_otpbox">
+			<div class="container">
+			
+			<div class="otpformsec mt-10">
+
+			<form>
+				<div class="row">
+				
+				<div class="col-md-12">
+				<ul class="otplist">
+					<li>
+						<div class="udesign">
+							<div class="row markssec">
+								<div class="col-md-4 col-4">
+									<div class="marknum">
+									<h2 id="tot_ques"></h2>
+									<div class="progress">
+										<div class="progress-bar" role="progressbar" style="width: 100%; background-color: #000;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+									</div>
+									<h3>Total <br>Question.</h3></div>
+								</div>
+								
+								<div class="col-md-4 col-4">
+									<div class="marknum">
+										<h2 id="tot_attempt"></h2>
+										<div class="progress">
+											<div class="progress-bar" role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+										</div>
+										<h3>Total<br>Attended.</h3>
+									</div>
+								</div>
+								
+								<div class="col-md-4 col-4">
+									<div class="marknum">
+										<h2 id="tot_skipped"></h2>
+										<div class="progress">
+											<div class="progress-bar" role="progressbar" style="width: 100%; background-color: #eb3f09;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+										</div>
+										<h3>Total <br>Skipped</h3>
+									</div>
+								</div>
+							</div>
+							<hr>
+							<h1 class="testfoo">Are you sure want to <span class="fw-700">Submit?</span></h1>
+						</div>
+					</li>
+					<li class="btlist mt-4 mb-4 mr-1">
+						<div align="right">
+						<a onclick="deniedSubmission()" class="btn btn-md bg-white col-md-3 col-3 text-black-25 fw-500 me-sm-3 mb-3 mb-sm-0">No</a>
+							<a onclick="confirmSubmission()" class="btn btn-md col-md-3 col-3 btn-primary fw-500 me-sm-3 mb-3 mb-sm-0">Yes</a>
+						</div>
+					</li>
+				</ul>
+				
+				</div>
+			</div>
+				</form>
+				</div>
+			</div>
+		</section>
+
+		<div class="loaderModal" id="loader">
+            <!-- <img src="{% static 'img/loader.gif' %}" class="centered loader"> -->
+            <img src="{% static 'entrance-assets/img/gif/loader.gif' %}" class="centered loader">
+        </div>
+
+{% block script %}
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="https://unpkg.com/aos%403.0.0-beta.6/dist/aos.js"></script>
+
+<script src="{% static 'js/entrance-script.js' %}"></script>
+<script src="{% static 'js/entrance-custom.js' %}"></script>
+
+<script>
+
+function showLoader() {
+                console.log("Show Loader")
+                $("#loader").show();
+                $("#bodyContainer").addClass('isBlurred');
+            }
+
+            function hideLoader() {
+                console.log("Hide Loader")
+                $("#loader").hide();
+                $("#bodyContainer").removeClass('isBlurred');
+            }
+	valid_options = [1,2,3,4]
+	raw_attemped_data = "{{ candidate_quest.question_answers | safe }}"
+	asd_attemped_data = raw_attemped_data.replaceAll("'", "\"")
+	attemped_data = JSON.parse(asd_attemped_data)
+
+	$(document).ready(function() {
+		document.cookie = "id=" + {{candidate_id}} + ";" + (60*60) + ";path=/"
+
+		q = {{ attempts | safe }}
+		$("#answer-"+String(q['answer'])).attr('checked', true)
+
+		$("#hilight").html("<h1 class='hilight text-weight-bold'>Ques. No. " + {{ pos }} +"</h1>");
+
+		$('#num-{{ pos }}').addClass('attended')
+		$('#num-{{ pos }}').removeClass('skipped')
+
+		$(".attended-checkbox").removeClass("attended-checkbox")
+		$('#checkbox-{{ pos }}').removeAttr('checked')
+
+		$(".attended-checkbox").removeClass("attended-checkbox")
+		$('#checkbox-{{ pos }}').removeAttr('checked')
+		$('#checkbox-{{ pos }} ~ .checkmark').removeClass('skipped-checkbox')
+		$('#checkbox-{{ pos }} ~ .checkmark').addClass('attended-checkbox')
+	});
+
+	$("#next").on("click", function() {
+		ans = $("input[name='choices']:checked").val()
+		if (ans === undefined) {
+			ans = 5
+		}
+		ans = parseInt(ans)
+		if (valid_options.includes(ans)) {
+			$('#num-{{ pos }}').removeClass('skipped')
+			$('#num-{{ pos }}').addClass('attended')
+
+			$('#checkbox-{{ pos }}').attr('checked', true)
+			$('#checkbox-{{ pos }} ~ .checkmark').removeClass('skipped-checkbox')
+			$('#checkbox-{{ pos }} ~ .checkmark').addClass('attended-checkbox')
+		}
+		else {
+			$('#num-'+parseInt({{ pos }})).removeClass('attended')
+			$('#num-'+parseInt({{ pos }})).addClass('skipped')
+			$('#checkbox-'+parseInt({{ pos }})+' ~ .checkmark').removeClass('attended-checkbox')
+			$('#checkbox-'+parseInt({{ pos }})+' ~ .checkmark').addClass('skipped-checkbox')
+		}
+
+		_pos = parseInt({{ pos }}) + 1
+		_pre = parseInt({{ pos }}) - 1
+		candidate_id = {{ candidate_id }}
+
+		ajaxQuest(_pos, candidate_id, 1)
+		saveQuiz(candidate_id, {{ pos }}, 1)
+	});
+
+
+	$("#previous").on("click", function() {
+		_pos = parseInt({{ pos }}) - 1
+		_pre = parseInt({{ pos }}) + 1
+		candidate_id = {{ candidate_id }}
+		ans = $("input[name='choices']:checked").val()
+		if (ans === undefined) {
+			ans = 5
+		}
+		ans = parseInt(ans)
+		if (valid_options.includes(ans)) {
+			$('#num-'+parseInt({{ pos }})).removeClass('skipped')
+			$('#num-'+parseInt({{ pos }})).addClass('attended')
+			$('#checkbox-'+parseInt({{ pos }})).attr('checked', true)
+
+			$('#checkbox-'+parseInt({{ pos }})+' ~ .checkmark').removeClass('skipped-checkbox')
+		}
+		else {
+			$('#num-'+parseInt({{ pos }})).removeClass('attended')
+			$('#num-'+parseInt({{ pos }})).addClass('skipped')
+
+			$('#checkbox-'+parseInt({{ pos }})+' ~ .checkmark').removeClass('attended-checkbox')
+			$('#checkbox-'+parseInt({{ pos }})+' ~ .checkmark').addClass('skipped-checkbox')
+		}
+		if ( _pos > 0) {
+			ajaxQuest(_pos, candidate_id, 1)
+			saveQuiz(candidate_id, {{ pos }}, -1)
+		}
+		else {
+			$("#previous").css({'opacity': '0.4', 'cursor': 'no-drop'})
+		}
+	});
+
+
+
+	function ajaxQuest(position, candidate_id, navigation_render) {
+		ans = $("input[name='choices']:checked").val()
+		if (ans === undefined) {
+			ans = 5
+		}
+		ans = parseInt(ans)
+		
+		if (navigation_render != 1) {
+			saveQuiz(candidate_id, {{ pos }}, position - {{ pos }})
+		}
+
+		// if (navigation_render != 1) {
+		// 	if (position < {{ pos }}) {
+		// 		saveQuiz(candidate_id, {{ pos }}, {{ pos }} - position)
+		// 	}
+		// 	else{
+		// 		saveQuiz(candidate_id, {{ pos }}, position - {{ pos }} )
+		// 	}
+		// }
+		$.ajax({
+			url: '/ajax-quest',
+			method: "POST",
+			data: {
+				position: parseInt(position),
+				candidate_id: parseInt({{ candidate_id }}),
+				id: parseInt({{ first_question.id }}),
+				answer: parseInt(ans)
+			},
+
+			success: function(data) {
+				$('#_selected_answer').html('')
+				$('#_selected_answer').html(data)
+				
+				ans = parseInt(ans)
+				if (valid_options.includes(ans)) {
+					$('#num-{{ pos }}').removeClass('skipped')
+					$('#num-{{ pos }}').addClass('attended')
+					$('#checkbox-{{ pos }}').attr('checked', true)
+					$('#checkbox-{{ pos }} ~ .checkmark').removeClass('skipped-checkbox')
+				}
+				else {
+					$('#num-{{ pos }}').removeClass('attended')
+					$('#num-{{ pos }}').addClass('skipped')
+					$('#checkbox-{{ pos }} ~ .checkmark').addClass('skipped-checkbox')
+				}
+			}
+		});
+	}
+
+	function saveQuiz(candidate_id, position, navigator) {
+		ans = $("input[name='choices']:checked").val()
+		if (ans === undefined || ans == 'undefined' || ans == '' ) {
+			ans = 5
+		}
+
+		for (let key in attemped_data){
+			if (attemped_data[key]['question_id'] == {{ first_question.id }}) {
+				attemped_data[key]['answer'] = parseInt(ans)
+				updated_key = attemped_data[key]
+			}			
+		}
+
+		time_left = $("#showtime").html()
+		$.ajax({
+			url: '/quiz-save',
+			method: "POST",
+			data: {
+				position: parseInt(position),
+				candidate_id: parseInt({{ candidate_id }}),
+				id: parseInt({{ first_question.id }}),
+				time_left: time_left,
+				answer: parseInt(ans),
+				updated_key: JSON.stringify(updated_key),
+				all_answers: JSON.stringify(attemped_data),
+				navigator: navigator
+			},
+
+			success: function(data) {
+				console.log("Successfully saved option")
+			}
+		});
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	let hasKeyValue2 = (json,key,value)=>{
+		return json.indexOf('"'+key+'":"'+value+'"')>-1;
+	}
+
+	$("#selected_answer").on("click", "a", function(e){
+		e.preventDefault();
+		var $this = $(this).parent();
+		$this.css('visibility', 'visible')
+		$("#sizevalue").val($this.data("value"));
+		var a = $("#sizevalue").val()
+	})
+
+	var pos = 0, test, test_status, question, choice, choices, chA, chB, chC, correct = 0;
+	var navPos = 1;
+	var ques_no = 0;
+	raw_data = "{{ all_questions | safe }}"
+	asd_raw_data=raw_data.replaceAll("'", "\"")
+	questions = JSON.parse(asd_raw_data)
+
+	raw_attemped_data = "{{ candidate_quest.question_answers | safe }}"
+	asd_attemped_data = raw_attemped_data.replaceAll("'", "\"")
+	attemped_data = JSON.parse(asd_attemped_data)
+
+	all_selections = []
+
+	function _(x) {
+      return document.getElementById(x);
+    }
+
+	var totalsec = parseInt({{time_left}});
+	var totalsecoriginal = totalsec;
+	var f = new Date();
+
+	$(document).ready(function(){
+
+		starttime();
+		function starttime() {
+			showtime();
+			var showcurtime = moment();
+			var curtimeformat = showcurtime.format('h:mm:ss a');
+			var showendtime = showcurtime.add(totalsec, 's');
+			var endtimeFormat = showendtime.format('h:mm:ss a');
+		}
+	});
+
+	function showtime() {
+		totalsec--;	
+		var min = parseInt(totalsec / 60, 10);
+		var sec = totalsec - (min * 60);
+
+		if (totalsec < 0 ) {
+			document.getElementById("showtime").innerHTML = "00:00:00"
+
+		}
+		else {
+			if (parseInt(sec) < 10) {
+				document.getElementById("showtime").style.color = "f30000"
+				if (parseInt(min) < 10){
+					document.getElementById("showtime").innerHTML = "00:0"+ min +":0"+ sec;
+				}
+				else if (parseInt(min) > 9) {
+					document.getElementById("showtime").innerHTML = "00:"+ min +":0"+ sec;
+				}
+			}
+			else if (parseInt(sec) > 9) {
+				document.getElementById("showtime").style.color = "f30000"
+				if (parseInt(min) < 10){
+					document.getElementById("showtime").innerHTML = "00:0"+ min +":"+ sec;
+				}
+				else if (parseInt(min) > 9) {
+					document.getElementById("showtime").innerHTML = "00:"+ min +":"+ sec;
+				}
+			}
+
+			if (parseInt(sec) == 0){
+				if (parseInt(min) < 10){
+					document.getElementById("showtime").innerHTML = "00:0"+min +":0"+ sec;
+				}
+				else if (parseInt(min) > 9) {
+					document.getElementById("showtime").innerHTML = "00:"+min +":0"+ sec;
+				}
+				if (parseInt(min) == 0) {
+					clearTimeout(tim);
+					// alert("Time Up");
+					confirmSubmission();
+				} 
+				else {
+					document.getElementById("showtime").innerHTML = "00:"+ min +":"+ sec;
+					// tim = setTimeout("showtime()", 1000);
+				}
+			}
+			tim = setTimeout("showtime()", 1000);
+
+		}
+	}
+
+</script>
+
+<script>
+	function quizSubmission() {
+	debugger
+	ans = $("input[name='choices']:checked").val()
+	// all_selections.push({"question_id": questions[questions.length -1]['id'], "selected_option": ans})
+	saveQuiz({{candidate_id}}, {{ pos }}, 0)
+
+	attempted = 0
+	skipped = 0
+	visited_id = []
+	for (let final_count in attemped_data) {
+		if (parseInt(attemped_data[final_count]['answer']) > 0) {
+			if (parseInt(attemped_data[final_count]['answer']) != 5 && parseInt(attemped_data[final_count]['answer']) != 0) {
+				attempted++
+			}
+			else if ( parseInt(attemped_data[final_count]['answer']) == 5) {
+				skipped++
+			}
+		}
+		visited_id.push(attemped_data[final_count]['id'])
+	}
+
+	$('#tot_ques').html(attemped_data.length)
+	$('#tot_attempt').html(attempted)
+	$('#tot_skipped').html(skipped)
+
+	$('#_otpbox').show()
+}
+
+function deniedSubmission() {
+	$('#_otpbox').hide()
+}
+
+function confirmSubmission() {
+	time_left = document.getElementById("showtime").innerHTML
+	_all_selections = JSON.stringify(all_selections)
+	$.ajax({
+		url: "/quiz-submit",
+		method: "POST",
+		data: {
+			candidate_id: {{candidate_id}},
+			selections : _all_selections,
+			time_left: time_left
+		},
+		success: function(data) {
+			document.cookie = 'id=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+			window.onbeforeunload = null
+			location.reload(true);
+		}
+	})
+}
+</script>
+
+<script>
+	  //   selected_answer.innerHTML += "<li data-value='1' id='answer-1'> <a style='min-width: 300px;' href='javascript::void();' class='btn'><span>a) "+chA+"</span> </a> </li>" //" <input type='radio' name='choices' value='1'> " + chA + "<br>";
+    //   selected_answer.innerHTML += "<li data-value='2' id='answer-2'> <a style='min-width: 300px;' href='javascript::void();' class='btn'><span>b) "+chB+"</span> </a> </li>" // "<input type='radio' name='choices' value='2'> " + chB + "<br>";
+    //   selected_answer.innerHTML += "<li data-value='3' id='answer-3'> <a style='min-width: 300px;' href='javascript::void();' class='btn'><span>c) "+chC+"</span> </a> </li>" // "<input type='radio' name='choices' value='3'> " + chC + "<br>";
+    //   selected_answer.innerHTML += "<li data-value='4' id='answer-4'> <a style='min-width: 300px;' href='javascript::void();' class='btn'><span>d) "+chD+"</span> </a> </li>" // "<input type='radio' name='choices' value='4'> " + chD + "<br><br>";
+
+
+
+	// function checkAnswerDynamic(q_id, ques_no) {
+	// 	// pos++;
+	// 	_pos = ques_no
+	// 	navPos++;
+	// 	ans = $("#sizevalue").val()
+
+	// 	JsonStringSel = JSON.stringify(all_selections)
+	// 	if (hasKeyValue2(JsonStringSel,'question_id', String(q_id))?true:false == false) {
+	// 		for (let each_quest in all_selections) {
+	// 			if (all_selections[each_quest]['question_id'] == q_id) {
+	// 				next_quest = each_quest+1
+	// 				all_selections.pop(all_selections[each_quest])
+	// 			}
+	// 		}
+	// 		each_selection = {"question_id": q_id, "selected_option": ans}
+	// 		all_selections.push(each_selection)
+	// 	}
+
+	// 	if (ans == "") {
+	// 		$('.qsoption ul li span#num-'+_pos).css('background', '#f30000');
+	// 		$('li .container1 #checkbox-'+_pos).attr('checked', false)
+	// 		$('#checkbox-'+_pos).siblings('i').css({'background-color': '#fcba47', 'border': '2px solid #fcba47', 'border-radius': '5px'})
+
+	// 	}
+	// 	else {
+	// 		$('.qsoption ul li span#num-'+_pos).css('background', '#3644c9');
+	// 		$('li .container1 #checkbox-'+_pos).attr('checked', true)
+	// 		$('li .container1 input:checked ~ .checkmark').css({'background-color': '#fcba47', 'border': '2px solid #fcba47', 'border-radius': '5px'})
+	// 	}
+
+	// candidate_id = {{ candidate_id}}
+	// time_count = document.getElementById("showtime").innerHTML
+
+	//   $.ajax({
+	// 	  url: '/quiz-save',
+	// 	  method: "POST",
+	// 	  data: {
+	// 		candidate_id: candidate_id,
+	// 		selections: JSON.stringify(all_selections),
+	// 		time_left: time_count
+	// 	  },
+	// 	  success: function(data) {
+	// 		  console.log("Success")
+	// 		  renderQuestionwithID(_pos++, next_quest);
+	// 	  },
+	// 	  error: function(err) {
+	// 		  console.log(err)
+	// 	  }
+	//   })
+    // }
+</script>
+
+<script>
+
+</script>
+{% endblock %}
+
+
+

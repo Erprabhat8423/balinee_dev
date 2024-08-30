@@ -1,0 +1,53 @@
+{% load static %}
+        <table id="addOrgTable" class="table table-bordered table-hover mt-0" style="width: 100%;">
+            <thead>
+                <tr>
+                    <th class="sorter-false"> Sr. No. </th>
+                    <!-- <th> Registration Number  </th> -->
+                    <th nowrap=""> Employee Name  </th>
+                    {% for months in month_list %}
+                    <th class="sorter-false" colspan="3" style=" padding: 1px; text-align: center;"> {{months}} </th>
+                    {% endfor %}
+                    <th style="text-align: center;"> Total Present </th>
+                    <th style="text-align: center;"> Total Absent  </th>
+                </tr>
+            </thead>
+            <tbody>
+                {% if employees %}
+                {% for student in employees %}
+                <tr>
+                    <td >{{forloop.counter}}.</td>
+                    <td nowrap="">{% if student.first_name %}{{ student.first_name }}{% endif %} {% if student.middle_name %}{{ student.middle_name }}{% endif %} {% if student.last_name %} {{ student.last_name }}{% endif %}<br><span style="font-size: 10px;">({{ student.emp_sap_id }})</span></td>
+                    {% for attendance in student.attendances %}
+                    
+                        <td class="sorter-false"  colspan="3" style=" padding: 1px; text-align: center; margin-top: 3%; vertical-align:middle;">
+                            {% if attendance.attendance_status == 'P' %}
+                            <span class="present" title="{{attendance.in_time|date:'H:i' }} - {% if attendance.out_time != '' %}{{attendance.out_time|date:'H:i'}} {% else %}Not marked{% endif %}">{{attendance.attendance_status}}</span>
+                            {% elif attendance.attendance_status == 'SUN' %}
+                            <span class="sunday">{{attendance.attendance_status}}</span>
+                            {% elif attendance.attendance_status == 'A' %}
+                            <span class="absent">{{attendance.attendance_status}}</span>
+                            {% else %}
+                                <span class="holiday">{{attendance.attendance_status}}</span>
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                    <td style="text-align: center;">{{student.present_count}}({{student.attendance_percentage|floatformat}}%)</td>
+                    <td style="text-align: center;">{{student.absent_count}}</td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    
+                    
+                    <th colspan="100" style=" padding: 0px; text-align: center;"> No Record Found...
+                    </th>
+                    
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+
+<script>
+    $('#attendance_percentage').text('{{attendance_percentage|floatformat}}%')
+</script>

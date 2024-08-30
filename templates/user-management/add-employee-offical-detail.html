@@ -1,0 +1,594 @@
+{% load static %}
+<form name="addOfficalDetailsForms" id="addOfficalDetailsForms" method="POST" autocomplete="off" action="" enctype="multipart/form-data">
+    {% csrf_token %}
+    <input type="hidden" name="last_user_id" id="last_user_id" value="{{ last_user_id }}" >
+    <div class="modal-AddUser centered">
+        <div class="modal-header" id="headerStep1">
+            <div class="col-12 p-0">
+                <div class="row">
+                    <div class="col-6">
+                        <button class="iconCover" onclick="editEmployeeBasicDetail('{{ last_user_id }}')">
+                            <img src="{% static 'img/svg/backarrow.svg' %}" style="width: 1rem" />
+                        </button>
+                        <h5 class="mt-md-2" style="display: inline">
+                            &nbsp;&nbsp; Official Details
+                        </h5>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-save float-right" type="submit">
+                            Save & Proceed
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+            <div class="row">
+                
+                <div class="col-md-12 p-0 h-100 w-100" id="step1">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-md-12 p-0">
+                                    <img src="{% static 'img/svg/org.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                        Organisation*
+                                    </h6>
+                                </div>
+                                <div class="col-md-12 p-0 mt-2">
+                                    <select class="inputField selectField" style="width: 100% !important;" name="organization_id" id="organizaton_id" onchange="getOption(this.value, 'department_id', '1')">
+                                        <option value="">Select Organisation</option>
+                                        {% for oganization in oganizations %}
+                                        <option value="{{oganization.id}}">{{oganization.organization_name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label class="error_msg float-right" id=""></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-md-12 p-0">
+                                    <img src="{% static 'img/svg/depart_no.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                        Department*
+                                    </h6>
+                                </div>
+                                <div class="col-md-12 p-0 mt-2">
+                                    <select class="inputField selectField" style="width: 100% !important;" name="department_id" id="department_id" onchange="getOption(this.value, 'role_id', '1')">
+                                        <option value="">Select Department</option>
+                                    </select>
+                                    <label class="error_msg float-right" id=""></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-md-12 p-0">
+                                    <img src="{% static 'img/svg/role.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                        Roles*
+                                    </h6>
+                                </div>
+                                <div class="col-md-12 p-0 mt-2">
+                                    <select class="inputField selectField" style="width: 100% !important;" name="role_id" id="role_id" onchange="getReportingUsers(this.value)">
+                                        <option value="">Select Role</option>
+                                    </select>
+                                    <label class="error_msg float-right" id=""></label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-md-12 p-0">
+                                    <img src="{% static 'img/svg/address.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                        Reporting To*
+                                    </h6>
+                                </div>
+                                <div class="col-md-12 p-0 mt-2">
+                                    <select class="inputField selectField" style="width: 100% !important;" name="reporting_to_id" id="reporting_to_id" >
+                                        <option value="">Select reporting to user</option>
+                                    </select>
+                                    <label class="error_msg float-right" id="bank_account_no_error"></label>
+
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-md-12 p-0">
+                                    <img src="{% static 'img/svg/dateofJoiniing.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                        Date of Joining*
+                                    </h6>
+                                </div>
+                                <div class="col-md-12 p-0 mt-2">
+                                    <input class="inputField"
+                                    placeholder="Enter Date of Joining" name="date_of_joining" id="date_of_joining">
+                                    <label class="error_msg float-right" id=""></label>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-md-12 p-0">
+                                    <img src="{% static 'img/svg/dateofJoiniing.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                        Date of relieving
+                                    </h6>
+                                </div>
+                                <div class="col-md-12 p-0 mt-2">
+                                    <input class="inputField" placeholder="Enter Date of relieving" name="date_of_relieving" id="date_of_relieving">
+                                    <label class="error_msg float-right" id=""></label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-md-12 p-0">
+                                    <img src="{% static 'img/svg/aadhaar.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                        Employee ID*
+                                    </h6>
+                                </div>
+                                <div class="col-md-12 p-0 mt-2">
+                                    <input class="inputField" type="text" placeholder="Enter Employee ID" name="emp_sap_id"
+                                    id="emp_sap_id" maxlength="10" />
+                                    <label class="error_msg float-right" id="emp_sap_id_error"></label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-md-12 p-0">
+                                    <img src="{% static 'img/svg/aadhaar.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                        Job Type*
+                                    </h6>
+                                </div>
+                                <div class="col-md-12 p-0 mt-2">
+                                    <!-- <input class="inputField" type="text" placeholder="Enter Employee ID" name="emp_sap_id"
+                                    id="emp_sap_id" maxlength="10" />
+                                    <label class="error_msg float-right" id="emp_sap_id_error"></label> -->
+
+                                    <select class="inputField selectField" style="width: 100% !important;" name="contract_type" id="contract_type">
+                                        <option value="">Select Job Type </option>
+                                        {% for contract_type in contract_type %}
+                                        <option value="{{contract_type.id}}">{{contract_type.contract_type}}</option>
+                                        {% endfor %}
+                                        
+                                    </select>
+                                    <label class="error_msg float-right" id=""></label>
+
+                                </div>
+                            </div>
+                        </div>
+                        <!--<div class="col-md-4">-->
+                        <!--    <div class="row">-->
+                        <!--        <div class="col-md-12 p-0 mt-0">-->
+                        <!--            <img src="{% static 'img/svg/shift.svg' %}" class="profileIconSize" />&nbsp;&nbsp;-->
+                        <!--            <h6 class="mt-2 mb-0" style="display: inline-block;">-->
+                        <!--                Total leave*-->
+                        <!--            </h6>-->
+                        <!--        </div> -->
+                        <!--        <div class="col-md-12 p-0 mt-2">-->
+                        <!--            <label class="error_msg float-right" id=""></label>-->
+                        <!--                <input class="inputField" type="number" placeholder="Enter Employee Leave" value="{% if employee_basic_details.leave_count %}{{employee_basic_details.leave_count}}{% endif %}" name="total_leave"-->
+                        <!--                id="total_leave" maxlength="10" />-->
+                        <!--            <label class="error_msg float-right" id="emp_sap_id_error"></label>-->
+                        <!--        </div> -->
+                               
+                        <!--    </div>   -->
+                        <!--</div>-->
+                        
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-md-12 p-0">
+                                    <img src="{% static 'img/svg/aadhaar.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                        Week Of day
+                                    </h6>
+                                </div>
+                                <div class="col-md-12 p-0 mt-2">
+                                    <select class="inputField selectField" style="width: 100% !important;" name="week_of_day[]" id="week_of_day" multiple>
+                                        <option value="Monday">Monday</option>
+                                        <option value="Tuesday">Tuesday</option>
+                                        <option value="Wednesday">Wednesday</option>
+                                        <option value="Thursday">Thursday</option>
+                                        <option value="Friday">Friday</option>
+                                        <option value="Saturday">Saturday</option>
+                                        <option value="Sunday" selected>Sunday</option>
+                                    </select>
+                                    <label class="error_msg float-right" id=""></label>
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-md-12 p-0 mt-0">
+                                    <img src="{% static 'img/svg/shift.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                        Is Login on Document Scan App?
+                                    </h6>
+                                </div> 
+                                <div class="col-md-12 p-0 mt-2">
+                                    <label class="error_msg float-right" id=""></label>
+                                         <select class="inputField selectField" style="width: 100% !important;" name="login_status" id="login_status">
+                                            <option value="0" >No</option>
+                                            <option value="1" >Yes</option>
+                                        </select>
+                                    <label class="error_msg float-right" id="emp_sap_id_error"></label>
+                                </div> 
+                               
+                            </div>   
+                        </div>
+                        <!-- <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-md-12 p-0">
+                                    <img src="{% static 'img/svg/aadhaar.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                        Aadhaar Card No *
+                                    </h6>
+                                </div>
+                                <div class="col-md-12 p-0 mt-2">
+                                    <input class="inputField numeric" type="text" placeholder="Aadhaar Card No." name="aadhaar_nubmer"
+                                    id="aadhaar_nubmer" maxlength="12" />
+                                    <label class="error_msg float-right" id=""></label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="row">
+                                <div class="col-md-12 p-0">
+                                    <img src="{% static 'img/svg/PAN.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                        PAN card No*
+                                    </h6>
+                                </div>
+                                <div class="col-md-12 p-0 mt-2">
+                                    <input class="inputField alpha_numeric" type="text" placeholder="Enter PAN Card No" name="pan_number"
+                                    id="pan_number"  maxlength="10" />
+                                    <label class="error_msg float-right" id=""></label>
+                                </div>
+                            </div>
+                        </div> -->
+                        
+                    </div>
+                    
+                    
+                    <div class="row mt-3" >
+                        <div class="col-md-12">
+                            <img src="{% static 'img/svg/Bank.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                            <h5 class="mt-2 mb-0 lightGrey" style="display: inline-block;">
+                                Bank Details
+                            </h5>
+                        </div>
+                    </div>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-3">
+                            <div class="row">
+                                <div class="col-md-12 p-0">
+                                     <img src="{% static 'img/svg/bank_name.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">Bank Name</h6>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 p-0 mt-2">
+                                    <select class="inputField selectField" style="width: 100% !important;" name="bank_name" id="bank_name">
+                                        <option value="" >Select Bank</option>
+                                        {% for bank in banks %}
+                                        <option value="{{bank.id}}" >{{bank.bank_name}}</option>
+                                        {% endfor %}
+                                    </select>
+                                    <label class="error_msg float-right" id="bank_name_error"></label>
+
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div class="col-md-3">
+                            <div class="row">
+                                <div class="col-md-12 p-0">
+                                   <img src="{% static 'img/svg/Account_no.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                        Bank Account No
+                                    </h6>
+                                </div>
+                                <div class="col-md-12 p-0 mt-2">
+                                    <input class="inputField" type="text" placeholder="Enter Account No" name="bank_account_no"
+                                    id="bank_account_no" maxlength="20" value=""/>
+                                    <label class="error_msg float-right" id="bank_account_no_error"></label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-3">
+                            <div class="row">
+                                <div class="col-md-12 p-0">
+                                    <img src="{% static 'img/svg/IFSC.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                        IFSC Code 
+                                    </h6>
+                                </div>
+                                <div class="col-md-12 p-0 mt-2">
+                                    <input class="inputField" type="text" placeholder="Enter IFSC Code" name="ifsc_code"
+                                    id="ifsc_code" maxlength="15" value=""/>
+                                    <label class="error_msg float-right" id="bank_account_no_error"></label>
+
+                                    
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-3">
+                            <div class="row">
+                                <div class="col-md-12 p-0">
+                                    <img src="{% static 'img/svg/bank_address.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="mt-2 mb-0" style="display: inline-block;">Bank Address</h6>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12 p-0 mt-2">
+                                    <input class="inputField" type="text" placeholder="Enter Bank Branch" name="bank_address"
+                                    id="bank_addresss" maxlength="100" value=""/>
+                                    <label class="error_msg float-right" id="bank_account_no_error"></label>
+                                </div>
+                            </div>   
+                        </div>
+  
+                    </div>
+                   
+                    <br clear="all"> 
+                </div>
+                
+            </div>
+        </div>
+        
+        
+        <nav class="navbar fixed-bottom" id="modalFooter">
+            <div class="dropdown-divider w-100"></div>
+            <div class="col-3 offset-9 p-0">
+                <ul id="stepFooter">
+                    <li id="li1" class="selectedstep">
+                        <button class="btn btn-step activeStep" id="stepBtn1">
+                            &#10004;
+                        </button>
+                    </li>
+                    <li id="li2" class="selectedstep">
+                        <button class="btn btn-step activeStep" id="stepBtn2">
+                            &#10004;
+                        </button>
+                    </li>
+                    <li id="li3">
+                        <button class="btn btn-step" id="stepBtn3">
+                            &#10004;
+                        </button>
+                    </li>
+                    <li id="li4">
+                        <button class="btn btn-step" id="stepBtn4">
+                            &#10004;
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </nav>
+    </div>
+</form>
+
+
+<script>
+    $(document).ready(function () {
+        $("#date_of_joining").datepicker({
+            weekStart: 1,
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+0",
+            daysOfWeekHighlighted: "6,0",
+            autoclose: true,
+            todayHighlight: true,
+            dateFormat: 'dd/mm/yy',
+        });
+        $("#date_of_relieving").datepicker({
+            weekStart: 1,
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+0",
+            daysOfWeekHighlighted: "6,0",
+            autoclose: true,
+            todayHighlight: true,
+            dateFormat: 'dd/mm/yy',
+        });
+    });
+    $('#addOfficalDetailsForms').submit(function(e){
+        debugger
+        console.log()
+        showLoader();
+        if(validateForm()){
+            hideLoader();
+            return false;
+        }
+        else{            
+            showLoader();
+            e.preventDefault();
+            $form = $(this)
+            var formData = new FormData(this);
+            
+            $.ajax({
+                url: "{% url 'src:add-employee-official-detail' %}",
+                type: 'POST',
+                data: formData,
+                success: function (response) {
+                    if (response.error == true) {
+                        hideLoader();
+                        $(".text-danger").html('');
+                        var data = response.message;
+                        $.each(data, function (index, value) {
+                            console.log(index);
+                            console.log(value);
+                            $('#' + index).html(value);
+                        });
+                    } else {
+                        $('#addUserModal').html('');
+                        hideLoader();
+                        $('#addUserModal').html(response);
+                        
+                        $('.timepicker').mdtimepicker({
+                            timeFormat: 'hh:mm:ss.000',
+                            format: 'h:mm tt',     
+                            theme: 'blue',       
+                            readOnly: true,      
+                            hourPadding: false    
+                        });
+                    }
+                },
+                cache: false,
+                contentType: false,
+                processData: false
+            });
+        }
+        
+    });
+    
+    function validateForm(){
+        debugger
+        error = 0;
+        $('.error_msg').text('');
+        
+        $('#organization_id').css("border", "");
+        if ($('[name="organization_id"]').val() == null || $('[name="organization_id"]').val() == "") {
+            $('[name="organization_id"]').parent().find('.error_msg').text("Please select organization*");
+            $('[name="organization_id"]').siblings(".select2-container").css("border-radius", "0.6rem").css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        
+        $('#department_id').css("border", "");
+        if ($('[name="department_id"]').val() == null || $('[name="department_id"]').val() == "") {
+            $('[name="department_id"]').parent().find('.error_msg').text("Please select department*");
+            $('[name="department_id"]').siblings(".select2-container").css("border-radius", "0.6rem").css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        
+        $('#role_id').css("border", "");
+        if ($('[name="role_id"]').val() == null || $('[name="role_id"]').val() == "") {
+            $('[name="role_id"]').parent().find('.error_msg').text("Please select role*");
+            $('[name="role_id"]').siblings(".select2-container").css("border-radius", "0.6rem").css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        
+        $('#reporting_to_id').css("border", "");
+        if ($('[name="reporting_to_id"]').val() == null || $('[name="reporting_to_id"]').val() == "") {
+            $('[name="reporting_to_id"]').parent().find('.error_msg').text("Please select Reporting to User*");
+            $('[name="reporting_to_id"]').siblings(".select2-container").css("border-radius", "0.6rem").css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+
+        // }
+        $('#date_of_joining').css("border", "");
+        if ($('[name="date_of_joining"]').val() == null || $('[name="date_of_joining"]').val() == "") {
+            $('[name="date_of_joining"]').parent().find('.error_msg').text("Please enter date of joining*");
+            $('[name="date_of_joining"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        $('[name="emp_sap_id"]').css("border", "");
+        if ($('[name="emp_sap_id"]').val() == null || $('[name="emp_sap_id"]').val() == "") {
+            $('[name="emp_sap_id"]').parent().find('.error_msg').text("Please enter employee id*");
+            $('[name="emp_sap_id"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        
+        $('[name="contract_type"]').css("border", "");
+        if ($('[name="contract_type"]').val() == null || $('[name="contract_type"]').val() == "") {
+            $('[name="contract_type"]').parent().find('.error_msg').text("Please select working shift*");
+            $('[name="contract_type"]').siblings(".select2-container").css("border-radius", "0.6rem").css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+
+         $('[name="bank_name"]').css("border", "");
+        if ($('[name="bank_name"]').val() == null || $('[name="bank_name"]').val() == "") {
+            $('[name="bank_name"]').parent().find('.error_msg').text("Please enter bank name id*");
+            $('[name="bank_name"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        $('[name="bank_account_no"]').css("border", "");
+        if ($('[name="bank_account_no"]').val() == null || $('[name="bank_account_no"]').val() == "") {
+            $('[name="bank_account_no"]').parent().find('.error_msg').text("Please enter bank Account number name id*");
+            $('[name="bank_account_no"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        $('[name="ifsc_code"]').css("border", "");
+        if ($('[name="ifsc_code"]').val() == null || $('[name="ifsc_code"]').val() == "") {
+            $('[name="ifsc_code"]').parent().find('.error_msg').text("Please enter bank IFSC code name id*");
+            $('[name="ifsc_code"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+        $('[name="bank_address"]').css("border", "");
+        if ($('[name="bank_address"]').val() == null || $('[name="bank_address"]').val() == "") {
+            $('[name="bank_address"]').parent().find('.error_msg').text("Please enter bank IFSC code name id*");
+            $('[name="bank_address"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+
+        if(error > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
+    
+    function getOption(val, id, flag){
+        if(id == 'department_id'){
+            $('[name="'+id+'"]').html('<option value="" selected>Select Department</option>')
+            $('[name="role_id"]').html('<option value="" selected>Select Role</option>')
+        }else if(id == 'role_id'){
+            $('[name="'+id+'"]').html('<option value="" selected>Select Role</option>')
+        }else{
+            $('[name="'+id+'"]').html('<option value="" selected>Select Town</option>')
+        }
+        
+        if(id != ""){
+            $.ajax({
+                url: "{% url 'src:get-options-list' %}",
+                method: 'POST',
+                data:{id: id, val:val, flag:flag, csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+                success: function (data) {
+                    $('[name="'+id+'"]').html(data.options)
+                    $(".selectField").select2();
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        } 
+    }
+    
+    
+    function getReportingUsers(role_id){
+        if(role_id != ""){
+            url = "{% url 'src:get-reporting-user-options' 1 %}";
+            url = url.replace(1,role_id)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    $('#reporting_to_id').html(data)
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }else{
+            $('#reporting_to_id').html('')
+        }
+    }
+</script>

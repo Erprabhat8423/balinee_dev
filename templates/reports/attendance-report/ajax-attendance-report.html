@@ -1,0 +1,114 @@
+{% load static %}
+{% if users %}{{users}}
+{% for user in users %}
+
+
+<tr>
+    <td style="width:15%" class="date">{{user.date}}</td>
+    <td style="width:15%" class="employee_name">{{user.name}} <b> ({{user.role_name}})</b></td>
+    <td style="width:15%" class="employee_code">{{user.emp_sap_id}}</td>
+    <td style="width:15%" class="day_start">{{user.start_time}}
+        <a href="javascript:void(0)" onclick="getGeoTaggedMap('{{ user.id }}','{{ user.start_latitude }}','{{ user.start_longitude }}','{{ user.date }} {{ user.start_time }}','start')">
+            <img src="{% static 'img/svg/viewonMap.svg' %} " class="tableRowIcon">
+            </a>
+    </td>
+    <td style="width:10%" class="day_end">
+        {% if user.end_time is not None %}
+        {{user.end_time}}
+        {% if user.attendance_type == 2%}
+        <span style="color: red;font-weight: bold;">(Auto Logout)</span>
+        {%else%}
+        {{user.end_time}}
+        <a href="javascript:void(0)" onclick="getGeoTaggedMap('{{ user.id }}','{{ user.end_latitude }}','{{ user.end_longitude }}','{{ user.date }} {{ user.end_time }}','end')">
+            <img src="{% static 'img/svg/viewonMap.svg' %} " class="tableRowIcon">
+        </a>
+        {% endif %}
+        {% endif %}
+    </td>
+    <td style="width:10%" class="total_working_hour">
+        {{user.working_hours}}
+    </td>
+    <!--<td style="width:10%" class="covered_distance">-->
+    <!--    {{user.distance_travelled}}-->
+    <!--</td>-->
+    <!--<td style="width:10%" class="tagged_add">-->
+    <!--    {{user.added_employee_count}} / {{user.tagged_employee_count}}-->
+    <!--</td>-->
+    <td style="width:10%" onclick="viewdetail('{{ user.name }}','{{user.role_name}}','{{user.start_time}}','{{user.end_time}}','{{user.img}}')">
+          View  <img src="static/ATDview.svg" ></img>
+    </td>  
+    <td class="Action">
+        <img src="{% static 'img/svg/delete.svg' %}" class="tableRowIcon" onclick="deleteOrder('{{ user.id }}','{{user.date}}')"/>
+    </td>                                              
+        </tr>
+    
+        
+        
+{% endfor %}
+{% else %}
+<tr>
+<td colspan="8" style="text-align: center;">
+No Record Found...
+</td>
+</tr>
+{% endif %}
+
+
+<script src="{% static 'js/jquery-confirm.min.js' %}"></script>
+
+<script type="text/javascript">    
+    function viewdetails(id) {
+    debugger;
+        showLoader();
+        $('#addUserModal').html('');
+        url = "{% url 'src:view-details' 1 %}";
+        url = url.replace(1,id)
+        
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+ 
+                hideLoader();
+                $('#addUserModal').show();
+                $('#addUserModal').html(data);
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }   
+    
+    
+function viewdetail(name,designation,start_time,end_time,image){
+    debugger;
+html = `<table class="table table-hover">`;
+if (end_time != 'None'){ 
+    html += `<tr><td> `+name+` </td><td> `+designation+`</td></tr>
+			<tr><td> `+start_time+`</td><td> `+end_time+`</td></tr>            
+            </table>
+            <img src="`+image+`" height="70" width="100" style="display: 
+            block; margin-left: auto;margin-right: auto;width: 50%;">`
+}
+else {
+    html += `<tr><td> `+name+` </td><td> `+designation+`</td></tr>
+			<tr><td> `+start_time+`</td><td> `+'--'+`</td></tr>            
+            </table>
+            <img src="`+image+`" height="70" width="100" style="display: 
+            block; margin-left: auto;margin-right: auto;width: 50%;">`
+}
+
+
+$.confirm({
+    title: '',
+    content:' ' + html,
+    theme:'material',
+    animation:'zoom',
+    buttons: {
+        cancel: function () {
+        },
+    },
+});
+}
+
+</script>    

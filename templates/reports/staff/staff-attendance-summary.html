@@ -1,0 +1,267 @@
+{% extends 'layout/layout.html' %}
+
+{% block title %}
+{{page_title}} 
+{% endblock %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/tablesorter.theme.blue.min.css' %}">
+<style>
+    #ui-datepicker-div{
+        z-index: 999 !important;
+    }
+    .holiday{
+        background-color:#c7fd2370;
+        border-radius: 1.5px;
+        vertical-align: middle;
+        padding: 0.3em 0.6em 0.3em;
+        margin-top: 2%;
+        text-align: center;
+    }
+    .present{
+        background-color:#7EC857;
+        border-radius: 1.5px;
+        vertical-align: middle;
+        padding: 0.3em 0.6em 0.3em;
+        margin-top: 2%;
+        text-align: center;
+    }
+    .absent{
+        background-color:#FF4859; 
+        border-radius: 1.5px; 
+        vertical-align: middle; 
+        padding: 0.3em 0.6em 0.3em; 
+        margin-top: 2%; 
+        text-align: center;
+    }
+    .leave{
+        background-color:#cf3847; 
+        border-radius: 1.5px; 
+        vertical-align: middle; 
+        padding: 0.3em 0.6em 0.3em; 
+        margin-top: 2%; 
+        text-align: center;
+    }
+    .halfday{
+        background-color:#867979; 
+        border-radius: 1.5px; 
+        vertical-align: middle; 
+        padding: 0.3em 0.6em 0.3em; 
+        margin-top: 2%; 
+        text-align: center;
+    }
+</style>
+{% endblock %}
+
+
+<div class="row" id="containerHeight">
+    <div class="col-md-12 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-4 p-md-0">
+                    <h6>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-8 p-md-0 text-right">
+                    {% comment %} Attendance : <span id="attendance_percentage">{{attendance_percentage|floatformat:2}}%</span> &nbsp;&nbsp; {% endcomment %}
+                    <input class="inputField" style="width: 15% !important;" placeholder="month" name="filter_date" id="filter_date" value="{{ today_date }}" onchange="filterStaffAttendance()" readonly>
+                    <a onclick="exportsInExcel()" href="javascript:void(0)" id="order_export" class="btn iconBox col-md-6 p-md-0 iconExports" style="width: 200px; margin-right: 10px; padding:0.1rem!important;"></a>
+                    <button type="button" class="btn btn-addDept" onclick="aexportMonthlyReport()" style="margin-right: 5px;" >Export Monthly Performance Report   <img src="{% static 'img/svg/performance.svg' %}" class="logoutIcons" /> </button>
+                    
+                </div>
+            </div>
+            
+                        
+            <div class="row" id="tableBox">
+                <div class="col-md-12 primaryContainerBG h-100 p-10 commonTableBg" id="ajax-div">
+                    <table id="addOrgTable" class="table table-bordered table-hover mt-0" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th> Sr. No. </th>
+                                <th nowrap=""> Employee No.  </th>
+                                <th nowrap=""> Associate Name </th>
+                                <th nowrap=""> Father Name  </th>
+                                <th nowrap=""> Department  </th>
+                                <th nowrap=""> DOJ  </th>
+                                {% for months in month_list %}
+                                <th colspan="3" style=" padding: 1px; text-align: center;"> {{months}} </th>
+                                {% endfor %}
+                                <th style="text-align: center;"> Total Present </th>
+                                <th style="text-align: center;"> Total Absent  </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% if staffs %}
+                {% for staff in staffs %}
+                <tr>
+                    <td >{{forloop.counter}}.</td>
+                    <td>{{ staff.emp_sap_id }}</td>
+                    <td nowrap="" >
+                    <a href="{% url 'src:staff-attendance-reports' staff.id dateForMonthlyAttendance %}">{% if staff.first_name %}{{ staff.first_name }}{% endif %} {% if staff.middle_name %}{{ staff.middle_name }}{% endif %} {% if staff.last_name %} {{ staff.last_name }}{% endif %}</a> 
+                    <br><span style="font-size: 10px;">({{ staff.role_name }})</span></td>
+                    <td>{{ staff.father_name }}</td>
+                    <td>{{ staff.department_name }}</td>
+                    <td>{{ staff.date_of_joining }}</td>
+                    {% for attendance in staff.attendances %}
+                    
+                        <td class="sorter-false"  colspan="3" style=" padding: 1px; text-align: center; margin-top: 3%; vertical-align:middle;">
+                            {% if attendance.attendance_status == 'P' %}
+                            <span class="present" title="{{attendance.in_time|date:'H:i' }} - {% if attendance.out_time != '' %}{{attendance.out_time|date:'H:i'}} {% else %}Not marked{% endif %}">{{attendance.attendance_status}}</span>
+                            {% elif attendance.attendance_status == 'A' %}
+                            <span class="absent">{{attendance.attendance_status}}</span>
+                            {% elif attendance.attendance_status == 'H' %}
+                            <span class="halfday">{{attendance.attendance_status}}</span>
+                            {% elif attendance.attendance_status in leave_types %}
+                            <span class="leave">{{attendance.attendance_status}}</span>
+                            {% else %}
+                                <span class="holiday">{{attendance.attendance_status}}</span>
+                            {% endif %}
+                        </td>
+                    {% endfor %}
+                    <td style="text-align: center;">{{staff.present_count}} </td>
+                    <td style="text-align: center;">{{staff.absent_count}}</td>
+                </tr>
+                {% endfor %}
+                {% else %}
+                <tr>
+                    
+                    
+                    <th colspan="100" style=" padding: 0px; text-align: center;"> No Record Found...
+                    </th>
+                    
+                </tr>
+                {% endif %}
+                        </tbody>
+                    </table>
+                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
+
+{% block script %}
+
+<script>
+    
+    
+    function filterStaffAttendance(){
+        var date = $('#filter_date').val();
+        if(date != ""){
+            var loading_html =`<tr id="loading" style="display: none;">
+                <td class="text-center" colspan="8"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                </td>
+            </tr>`;
+            $('#addOrgTable').html(loading_html);
+            $('#loading').show();
+            
+            
+            $.ajax({
+                url: "{% url 'src:attendance/filter-staff-attendance-summary' %}",
+                method: 'GET',
+                data: {
+                    date:date,
+                },
+                success: function (data) {
+                    hideLoader();
+                    $('#ajax-div').html(data);
+                    $('#addOrgTable').tablesorter({
+                        theme: "blue",
+                        widgets: ["stickyHeaders"],
+                        widgetOptions: {
+                            stickyHeaders_attachTo: ".primaryContainerBG",
+                        }
+                    });
+                    $("#addOrgTable tbody tr").click(function () {
+                        $(this).addClass("selected").siblings().removeClass("selected");
+                    });
+                    
+                    $(".primaryContainerBG").scroll(function () {
+                        var divTable = $(".primaryContainerBG");
+                        $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                    });
+                    
+                    
+                },
+                error: function (err) {
+                    alert(err.message);
+                }
+            });
+        }else{
+            $('#ajax-div').html(`
+            <table id="addOrgTable" class="table table-bordered table-hover mt-0" style="width: 100%;">
+                <thead>
+                    <tr>
+                        <th> Sr. No. </th>
+                        <th nowrap=""> Employee Name  </th>
+                        {% for months in month_list %}
+                        <th colspan="3" style=" padding: 1px; text-align: center;"> {{months}} </th>
+                        {% endfor %}
+                        <th style="text-align: center;"> Total Present </th>
+                        <th style="text-align: center;"> Total Absent  </th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th colspan="100" style=" padding: 0px; text-align: center;"> No Record Found...
+                        </th>
+                    </tr>
+                </tbody>
+            </table>
+            `);
+        }
+    }
+    
+    
+    $(document).ready(function () {
+        $("#filter_date").datepicker({  
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+0",
+            maxDate: 0,
+            dateFormat: 'mm/yy' 
+        });
+        
+        
+    });
+    
+    function exportsInExcel(){
+            var filter_date = $('#filter_date').val();
+            
+            var url = "{% url 'src:export-staff-attendance-summary-report-to-xlsx'  'filter_date' %}";
+            
+            filter_date = filter_date.replace('/','-');
+            console.log(filter_date);
+            url = url.replace('filter_date',filter_date);
+            window.location.href = url;  
+
+            }
+
+
+function aexportMonthlyReport(){
+            var filter_date = $('#filter_date').val();
+            
+            var url = "{% url 'src:month-performance-report'  'months' 'year' %}";
+            
+            filter_date = filter_date.replace('/','-');
+            
+            filter_date = filter_date.split('-')
+            months = filter_date[0]
+            year = filter_date[1]
+            
+            console.log(filter_date);
+            url = url.replace('months',months).replace('year',year);
+            window.location.href = url;  
+
+            }
+ 
+</script>
+{% endblock %}
+

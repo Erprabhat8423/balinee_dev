@@ -1,0 +1,179 @@
+
+			<table class="table table-striped detail-table" id="table_5">
+				<thead>
+					<tr>
+						<th>Fields</th>
+						<th>Optional/Mandatory <br>
+							<div class="switch_box">
+								<input type="checkbox"  class="switch_1 check_optional_field" value="5">
+							</div>
+						</th>
+						<th>Hide/Show</th>
+					</tr>
+				</thead>
+				<tbody>
+
+					<tr>
+						<td><label>Bank Account Details</label></td>
+						<td></td>
+						<td></td>
+
+					</tr>
+
+					<tr>
+						<td><label for="bank">Bank Name</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox"  name="5[]"  class="switch_1 optional_field"   value="bank" {% if 'bank' not in attribute.fields %}checked{% endif %}
+								>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_5[]"  class="switch_1"   value="bank"  {% if 'bank' not in attribute.hidden_fields %}checked{% endif %}
+								>
+							</div>
+						</td>
+
+					</tr>
+
+					<tr>
+						<td><label for="bank">Bank Account No.</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox"  name="5[]"  class="switch_1 optional_field"   value="bank_account_no" {% if 'bank_account_no' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_5[]"  class="switch_1"   value="bank_account_no"  {% if 'bank_account_no' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+
+					<tr>
+						<td><label for="bank">Account holder name</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox"  name="5[]"  class="switch_1 optional_field"   value="account_holder_name" {% if 'account_holder_name' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_5[]"  class="switch_1"   value="account_holder_name" {% if 'account_holder_name' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+
+
+					<tr>
+						<td><label for="ifsc_code">IFSC Code</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox"  name="5[]"  class="switch_1 optional_field"   value="ifsc_code" {% if 'ifsc_code' not in attribute.fields %}checked{% endif %} >
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_5[]"  class="switch_1"   value="ifsc_code"  {% if 'ifsc_code' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+
+					<tr>
+						<td><label for="health_insurence">Health Insurance</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox"  name="5[]"  class="switch_1 optional_field"   value="health_insurence"  {% if 'health_insurence' not in attribute.fields %}checked{% endif %} >
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_5[]"  class="switch_1"   value="health_insurence"  {% if 'health_insurence' not in attribute.hidden_fields %}checked{% endif %} >
+							</div>
+						</td>
+
+					</tr>
+					<tr>
+						<td><label for="wage_tax">Wage tax and social security</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox"  name="5[]"  class="switch_1 optional_field"   value="wage_tax" {% if 'wage_tax' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_5[]"  class="switch_1"   value="wage_tax" {% if 'wage_tax' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+
+					<tr>
+						<td><label for="salary_saving_scheme">life-cycle savings or salary savings scheme?</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox"  name="5[]"  class="switch_1 optional_field"   value="salary_saving_scheme" {% if 'salary_saving_scheme' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_5[]"  class="switch_1"   value="salary_saving_scheme" {% if 'salary_saving_scheme' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+
+					<tr>
+						<td><label for="gstin">GSTIN</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox"  name="5[]"  class="switch_1 optional_field"   value="gstin" {% if 'gstin' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_5[]"  class="switch_1"   value="gstin" {% if 'gstin' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+					<tr>
+						<td><label for="salary_addition">Salary Additions</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox"  name="5[]"  class="switch_1 optional_field"   value="salary_addition" {% if 'salary_addition' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_5[]"  class="switch_1"   value="salary_addition" {% if 'salary_addition' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+
+					<tr>
+						<td><label for="salary_deduction">Salary Deductions</label></td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox"  name="5[]"  class="switch_1 optional_field"   value="salary_deduction" {% if 'salary_deduction' not in attribute.fields %}checked{% endif %}>
+							</div>
+						</td>
+						<td>
+							<div class="switch_box">
+								<input type="checkbox" name="hidden_attr_5[]"  class="switch_1"   value="salary_deduction" {% if 'salary_deduction' not in attribute.hidden_fields %}checked{% endif %}>
+							</div>
+						</td>
+
+					</tr>
+				</tbody>
+			</table>
+
+			<input type="hidden" name="optional_{{attribute.id}}" id="optional_{{attribute.id}}" value="{% if attribute.fields %}{{attribute.fields|join:", " }}{% endif %}"> 
+			<input type="hidden" name="hidden_{{attribute.id}}" id="hidden_{{attribute.id}}" value="{% if attribute.hidden_fields %}{{attribute.hidden_fields|join:", " }}{% endif %}"> 
+
+

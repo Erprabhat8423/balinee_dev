@@ -1,0 +1,497 @@
+{% extends 'layout/layout.html' %} 
+{% load helper_tags %} 
+{% block content %} 
+{% load static %} 
+
+{% block style %} 
+{% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-sm-12 h-100">
+        <div class="primaryContainer h-100 ajaxReportSection mt-4" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-sm-3"><h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6></div>
+                <div class="col-sm-9 p-md-0 text-left">
+                    <select class="inputField selectField" style="width: 18% !important; padding: 0.3rem;" name="organization_id" id="organization_id" onchange="filterAttendance()">
+                        <option value="">Select Organization</option>
+                        {% for organization in organization %}
+                        <option value="{{organization.id}}">{{organization.organization_name}}</option>
+                        {% endfor %}
+                    </select>
+                    <select class="inputField selectField" style="width: 18% !important; padding: 0.3rem;" name="role_id" id="role_id" onchange="filterAttendance()">
+                        <option value="">Select Role</option>
+                        {% for role in roles %}
+                        <option value="{{role.id}}">{{role.role_name}}</option>
+                        {% endfor %}
+                    </select>
+                    <select class="inputField selectField" style="width: 18% !important; padding: 0.3rem;" name="employee_id" id="employee_id" onchange="filterAttendance()">
+                        <option value="">Select Employee</option>
+                        {% for employee in employee %}
+                        <option value="{{employee.id}}">{{employee.first_name}} {{employee.middle_name}} {{employee.last_name}}</option>
+                        {% endfor %}
+                    </select>
+                    <input type="search" style="width: 15% !important;" placeholder="Attendance Start Date" value="{% now 'd/m/Y' %}" class="searchTable" id="attendance_start_date" onchange="filterAttendance()" readonly>
+                    <input type="search" style="width: 15% !important;" placeholder="Attendance End Date" value="{% now 'd/m/Y' %}" class="searchTable" id="attendance_end_date" onchange="filterAttendance()" readonly>
+                    
+                    {% comment %} <input class="search searchTable report_search" style="width: auto;" placeholder="Search" type="search" data-column="all"> {% endcomment %}
+                    <div class="dropdown" style="display: inline-block;">
+                        <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"
+                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                        aria-labelledby="dropdownMenuButton">
+                        
+                        <input type="hidden" name="show_columns" id="show_columns" value="" >
+                        <a class="dropdown-item logoutItem" onclick="exports('excel')" href="javascript:void(0)">Export to Excel &nbsp;&nbsp;<img
+                            src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons" /> </a>
+                            <!-- <a class="dropdown-item logoutItem" onclick="exports('pdf')" href="javascript:void(0)">Export to Pdf &nbsp;&nbsp;<img
+                                src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons" /> </a> -->
+                            </div>
+                        </div>
+                    <div class="dropdown show-hide" style="display: inline-block;" id="hideColumn">
+                        <button class="btn iconBox iconHide" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div class="dropdown-menu dropdown-menu-right logoutContainer" aria-labelledby="dropdownMenuButton">
+                            
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="date" id="date" data-id="1" onclick="showHideColumns(this,'date',1)" />
+                                <label class="mb-0" for="date">Date</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="employee_name" id="employee_name" data-id="2" onclick="showHideColumns(this,'employee_name',2)" />
+                                <label class="mb-0" for="employee_name">Employee Name</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="employee_code" id="employee_code" data-id="3" onclick="showHideColumns(this,'employee_code',3)" />
+                                <label class="mb-0" for="employee_code">Employee code</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="day_start" id="day_start" data-id="4" onclick="showHideColumns(this,'day_start',4)" />
+                                <label class="mb-0" for="day_start">Day Start Time</label>
+                            </a>
+                            
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="day_end" id="day_end" data-id="5" onclick="showHideColumns(this,'day_end',5)" />
+                                <label class="mb-0" for="day_end">Day End Time</label>
+                            </a>
+                            
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="total_working_hour" id="total_working_hour" data-id="6" onclick="showHideColumns(this,'total_working_hour',6)" />
+                                <label class="mb-0" for="total_working_hour">Total working hours</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="covered_distance" id="covered_distance" data-id="7" onclick="showHideColumns(this,'covered_distance',7)" />
+                                <label class="mb-0" for="covered_distance">Total Covered Distance (in Km)</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colCheck" name="tagged_add" id="tagged_add" data-id="8" onclick="showHideColumns(this,'tagged_add',8)" />
+                                <label class="mb-0" for="tagged_add">No. of Tagged/Add User</label>
+                            </a>
+                            
+                        </div>
+                    </div>
+                    
+                    <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                        <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                        <div class="dropdown-menu dropdown-menu-right logoutContainer" aria-labelledby="dropdownMenuButton">
+                            
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="" id="lock_date" data-id="1" onclick="toggleFreeze(this.id,'date',1)" />
+                                <label class="mb-0" for="lock_date">Date</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="" id="lock_employee_name" data-id="2" onclick="toggleFreeze(this.id,'employee_name',2)" />
+                                <label class="mb-0" for="lock_employee_name">Employee Name</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="" id="lock_employee_code" data-id="3" onclick="toggleFreeze(this.id,'employee_code',3)" />
+                                <label class="mb-0" for="lock_employee_code">Employee code</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="" id="lock_day_start" data-id="4" onclick="toggleFreeze(this.id,'day_start',4)" />
+                                <label class="mb-0" for="lock_day_start">Day Start Time</label>
+                            </a>
+                            
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="" id="lock_day_end" data-id="5" onclick="toggleFreeze(this.id,'day_end',5)" />
+                                <label class="mb-0" for="lock_day_end">Day End Time</label>
+                            </a>
+                            
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="" id="lock_total_working_hour" data-id="6" onclick="toggleFreeze(this.id,'total_working_hour',6)" />
+                                <label class="mb-0" for="lock_total_working_hour">Total working hours</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="" id="lock_covered_distance" data-id="7" onclick="toggleFreeze(this.id,'covered_distance',7)" />
+                                <label class="mb-0" for="lock_covered_distance">Total Covered Distance (in Km)</label>
+                            </a>
+                            <a class="dropdown-item columnHideItem">
+                                <input type="checkbox" class="colFreezeCheck" name="" id="lock_tagged_add" data-id="8" onclick="toggleFreeze(this.id,'tagged_add',8)" />
+                                <label class="mb-0" for="lock_tagged_add">No. of Tagged/Add User</label>
+                            </a>
+
+
+                                                        
+                        </div>
+                    </div>
+                    
+                </div>
+            </div>
+            <div class="row" id="tableBox">
+                <div class="col-md-12 primaryContainerBG h-100 p-0 commonTableBg" id="ajaxReportData">
+                    <table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+                        <thead>
+                            <tr>
+                                <th style="width:15%" class="date">
+                                   Date
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th style="width:15%" class="employee_name">
+                                    Employee Name
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+
+                                <th style="width:15%" class="employee_code">
+                                    Employee Code
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                
+                                <th style="width:10%" class="day_start">
+                                    Day start Time
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th style="width:10%" class="day_end">
+                                    Day End Time
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th style="width:10%" class="total_working_hour">
+                                    Total working hours
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th style="width:10%" class="covered_distance">
+                                    Total Covered Distance (in Km)
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                <th style="width:15%" class="tagged_add">
+                                    No. of Tagged/Add User
+                                    <i class="fa fa-fw fa-sort float-right"></i>
+                                    <img src="{% static 'img/svg/unfreeze.svg' %}" class="float-right" id="unfreeze">
+                                    <img src="{% static 'img/svg/freeze.svg' %}" class="float-right" id="freeze">
+                                </th>
+                                
+                            </tr>
+                        </thead>
+                        <tbody id="tablebody">
+                            {% if users %}
+                            {% for user in users %}
+                            <tr>
+                                <td class="date">{{user.date}}</td>
+                                <td class="employee_name">{{user.name}} <b> ({{user.role_name}})</b></td>
+                                <td class="employee_code">{{user.emp_sap_id}}</td>
+                                <td class="day_start">{{user.start_time}}
+                                    <a href="javascript:void(0)" onclick="getGeoTaggedMap('{{ user.id }}','{{ user.start_latitude }}','{{ user.start_longitude }}','{{ user.date }} {{ user.start_time }}','start')">
+                                        <img src="{% static 'img/svg/viewonMap.svg' %} " class="tableRowIcon">
+                                     </a>
+                                </td>
+                                <td class="day_end">
+                                    {% if user.end_time is not None %}
+                                    {{user.end_time}}
+                                    {% if user.attendance_type == 2%}
+                                    <span style="color: red;font-weight: bold;">(Auto Logout)</span>
+                                    {%else%}
+                                    <a href="javascript:void(0)" onclick="getGeoTaggedMap('{{ user.id }}','{{ user.end_latitude }}','{{ user.end_longitude }}','{{ user.date }} {{ user.end_time }}','end')">
+                                        <img src="{% static 'img/svg/viewonMap.svg' %} " class="tableRowIcon">
+                                    </a>
+                                    {% endif %}
+                                    {% endif %}
+                                </td>
+                                        <td class="total_working_hour">
+                                            {{user.working_hours}}
+                                        </td>
+                                        <td class="covered_distance">
+                                            {{user.distance_travelled}}
+                                        </td>
+                                        <td class="tagged_add">
+                                            {{user.added_employee_count}} / {{user.tagged_employee_count}}
+                                        </td>
+                                    </tr>
+                                    
+                                    {% endfor %}
+                                    
+                                    {% else %}
+                                    <tr>
+                                        <td colspan="8" style="text-align: center;">
+                                            No Record Found...
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                     <!-- *************************************Modal********************************** -->
+        <div class="overlayModal" id="addUserModal" data-keyboard="false" data-backdrop="static">
+            
+        </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+</section>
+
+{% endblock content %} 
+{% block script %}
+
+<script>
+    $(document).ready(function(){
+        $("#attendance_start_date").datepicker({  
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+0",
+            maxDate: 0,
+            dateFormat: 'dd/mm/yy' 
+        });
+        $("#attendance_end_date").datepicker({  
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+0",
+            maxDate: 0,
+            dateFormat: 'dd/mm/yy' 
+        });
+
+        
+        var checkbox_val = ["date","employee_name","employee_code","day_start","day_end","total_working_hour","covered_distance","tagged_add"];
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+        
+        $(".colCheck").change(function() {
+            if ($(".colCheck:not(:checked)").length == $(".colCheck").length) {
+                //do something
+                $(".iconHide").css("background-image", "url(/static/img/png/hide.png)");
+            } else {
+                $(".iconHide").css("background-image", "url(/static/img/svg/hideblue.svg)");
+            }
+        });
+        
+        $(".colFreezeCheck").change(function() {
+            if ($(".colFreezeCheck:not(:checked)").length == $(".colFreezeCheck").length) {
+                //do something
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/unfreeze.svg)");
+            } else {
+                $(".iconUnfreeze").css("background-image", "url(/static/img/svg/freeze.svg)");
+            }
+        });
+        
+        
+        //    update tablesorter
+        updateTableSorter();
+        
+        $("#addOrgTable tbody tr").click(function() {
+            $(this).addClass("selected").siblings().removeClass("selected");
+        });
+        
+        $(".primaryContainerBG").scroll(function() {
+            var divTable = $(".primaryContainerBG");
+            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+        });
+        
+        
+    });
+
+    function getDateFormat(date){
+            var dateTemp = date.split('/');
+            date = dateTemp[2]+'-'+dateTemp[1]+'-'+dateTemp[0]
+            return date
+        }
+    function filterAttendance(){
+       var attendance_start_date = $("#attendance_start_date").val();
+       var attendance_end_date = $("#attendance_end_date").val();
+       var organization_id = $("#organization_id").val();
+       var employee_id = $("#employee_id").val();
+       var role_id = $("#role_id").val();
+        from_date = new Date(getDateFormat($("#attendance_start_date").val()));
+        to_date = new Date(getDateFormat($("#attendance_end_date").val()));
+        if(from_date > to_date ){
+            $('#tablebody').html('<td colspan="8" style="text-align: center;color:red">Start Date Must be Less Than End Date...</td>');
+            return false;
+        }else{
+            showLoader();
+        }
+        $.ajax({
+            url: "{% url 'src:ajax-attendance-reports' %}",
+            method: 'GET',
+            data: {
+                 attendance_start_date      : attendance_start_date ,
+                 attendance_end_date        : attendance_end_date , 
+                 role_id                    : role_id,
+                 organization_id            : organization_id,
+                 employee_id                : employee_id 
+                },
+            success: function (data) {
+                $('#tablebody').html(data);
+                $('#addOrgTable').trigger('update');
+                hideLoader();
+            },
+            error: function (err) {
+            }
+        });
+    }
+    
+    
+    function updateTableSorter(){
+        $('#addOrgTable').tablesorter({
+            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+            widgetOptions: {
+                resizable_addLastColumn: true,
+                resizable: false,
+                resizable_widths: ["15%", "15%", "15%","10%", "10%", "10%", "10%", "15%"],
+                stickyHeaders_attachTo: ".primaryContainerBG",
+                filter_external: '.report_search',
+                filter_columnFilters: false,
+            }
+        });
+    }
+    
+    function freezeColumn(id, colNo) {
+        $('#' + id).addClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function(index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter", "false");
+        });
+        $('#' + id + ' #freeze').show();
+        $('#' + id + ' #unfreeze').hide();
+    }
+    
+    function unfreezeColumn(id, colNo) {
+        $('#' + id).removeClass("frezedIcon frezedCell");
+        $("#addOrgTable tbody tr").each(function(index) {
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+            $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").attr("data-sorter");
+        });
+        $('#' + id + ' #unfreeze').show();
+        $('#' + id + ' #freeze').hide();
+    }
+    
+    function toggleFreeze(inputid, colid, colNo) {
+        var checkbox = document.getElementById(inputid);
+        
+        if (checkbox.checked == true) {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").addClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function(index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").addClass("sorter-false");
+            });
+            $('.' + colid + ' #freeze').show();
+            $('.' + colid + ' #unfreeze').hide();
+        } else {
+            $("#addOrgTable thead tr th:nth-child(" + colNo + ")").removeClass("frezedCell sorter-false");
+            $("#addOrgTable tbody tr").each(function(index) {
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("frezedCell");
+                $("#addOrgTable tbody tr td:nth-child(" + colNo + ")").removeClass("sorter-false");
+            });
+            $('.' + colid + ' #unfreeze').show();
+            $('.' + colid + ' #freeze').hide();
+        }
+    }
+    
+    function showHideColumns(element, el_class, colNo) {
+        var checkbox_val = [];
+        var checkbox = $(element);
+        if ($(element).is(':checked')) {
+            $('.' + el_class).hide();
+        } else {
+            $('.' + el_class).show();
+        }
+        $("input:checkbox[class=colCheck]").each(function() {
+            if (!$(this).is(':checked')) {
+                checkbox_val.push($(this).attr("id"))
+            }
+        });
+        checkbox_str = checkbox_val.join(',');
+        $('#show_columns').val(checkbox_str);
+    }
+    
+    function exports(type){
+        var columns = $('#show_columns').val();
+        
+        
+        var organization_id = $("#organization_id").val();
+        var attendance_start_date = getDateFormat($("#attendance_start_date").val());
+        var attendance_end_date = getDateFormat($("#attendance_end_date").val());
+        var role_id = $("#role_id").val();
+        var employee_id = $("#employee_id").val();
+
+        if(role_id==""){
+            role_id=0
+        }
+        if(organization_id==""){
+            organization_id=0
+        }
+        if(employee_id==""){
+            employee_id=0
+        }
+        if(columns == ''){
+            openToaster("danger", "Please select at-least one column");
+        } else {
+            if(type == 'excel'){
+                var url = "{% url 'src:export-attendance-report-to-xlsx' 'columns' 'attendance_start_date' 'attendance_end_date' 'role_id' 'organization_id' 'employee_id' %}";
+                url = url.replace('columns',columns).replace('attendance_start_date',attendance_start_date).replace('attendance_end_date',attendance_end_date).replace('role_id',role_id).replace('organization_id',organization_id).replace('employee_id',employee_id);
+                window.location.href = url;
+            } else {
+                
+            }
+        }
+            
+    }
+
+    function getGeoTaggedMap(id,lat,long,date_time,type) {
+        $('#addUserModal').html('');
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:user-geo-attendance' %}",
+            method: 'GET',
+            data: {id:id,lat:lat,long:long,date_time:date_time,type:type},
+            success: function (data) {
+                hideLoader();
+                $("#addUserModal").show();
+                $('#addUserModal').html(data);
+                
+                var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+                $("#addUserModalBody").height(mch);
+                $(".selectField").select2();
+                
+                $("#date_of_birth").datepicker({  
+                    changeMonth: true,
+                    changeYear: true,  
+                    yearRange: "-100:+0"
+                    ,maxDate: 0,
+                    dateFormat: 'dd/mm/yy' 
+                });
+                
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+    
+    function closeUserModal() {
+        $("#addUserModal").hide();
+    }
+    
+</script>
+
+{% endblock %}
+

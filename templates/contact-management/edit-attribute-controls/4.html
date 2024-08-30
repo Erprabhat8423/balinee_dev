@@ -1,0 +1,258 @@
+{% load static %}
+<div class="row ">
+	<div class="col-md-12">
+		<div class="row mt-3 wrapper">
+			{% if 'location' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/address.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Institution : {% if 'location' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<select name="location" class="form-control " id="location" data-placeholder="Choose Institution" onchange="searchDepartments(this.value)">
+						<option value="">Choose Institution</option>
+						{% if organizations %}
+						{% for organizations in organizations %}
+						<option value="{{organizations.id}}" {% if organizations.id == official_detail.location_id %} selected {% endif %}>{{organizations.organization_name}}</option>
+						{% endfor %}
+						{% endif %}
+
+					</select>
+					<label class="error_msg float-right" id="location_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'department' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/org.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Department : {% if 'department' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+				<input type="hidden" id="hidden_department" value="{% if official_detail.department_id is not None %}{{official_detail.department_id}}{% endif %}">
+					
+					<select name="department" class="form-control" id="department">
+						<option value="">Choose Department</option>
+
+					</select>
+					<label class="error_msg float-right" id="department_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			
+			{% if 'designation' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/profile.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Designation : {% if 'designation' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					{% comment %} <input type="hidden" id="hidden_designation" value="{% if official_detail.designation_id is not None %}{{official_detail.designation_id}}{% endif %}">
+					{% endcomment %}
+					<select name="designation" class="form-control" id="designation"> 
+						
+						{% if official_detail.designation_id is not None %} 
+					<option value="{{official_detail.designation_id}}">{{official_detail.designation}}</option>
+					{% else %}
+					<option value="">Choose Designation</option>
+					{% endif %}
+					</select>
+					<label class="error_msg float-right" id="designation_error"></label>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+
+	<div class="col-md-12">
+		<div class="row mt-3 wrapper">
+			{% if 'paygrade' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/rupee.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Paygrade : {% if 'paygrade' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<select name="paygrade" class="form-control" id="paygrade">
+						<option value="">Select Grade</option>
+						{% if pay_grades %}
+						{% for pay_grade in pay_grades %}
+						<option value="{{pay_grade.id}}" {% if official_detail.pay_grade|add:"0" == pay_grade.id %} selected {% endif %}>{{pay_grade.paygrade_code}}[{{pay_grade.paygrade}}]</option>
+						{% endfor %}
+						{% endif %}
+					</select>
+					<label class="error_msg float-right" id="paygrade_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'employment_term' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Employment Term : {% if 'employment_term' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<select name="employment_term" class="form-control select2" id="employment_term">
+						<option value="">Choose Employment Term</option>
+						<option value="Adhoc"  {% if official_detail.employment_term == "Adhoc" %} selected {% endif %}>Adhoc</option>
+						<option value="Permanent"  {% if official_detail.employment_term == "Permanent" %} selected {% endif %}>Permanent</option>
+					</select>
+					<label class="error_msg float-right" id="employment_term_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			
+			{% if 'additional_responsibility' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Additional Responsibilities : {% if 'additional_responsibility' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<select name="additional_responsibility[]" class="form-control select2" id="additional_responsibility">
+						<option value="">Choose Additional Responsibilities</option>
+						{% if additional_responsibilities %}
+						{% for additional_responsibility in additional_responsibilities %}
+						<option value="{{additional_responsibility.id}}" {% if official_detail.additional_responsibilities|add:"0" == additional_responsibility.id %} selected {% endif %}>{{additional_responsibility.responsibility}}</option>
+						{% endfor %}
+						{% endif %}
+					</select>
+					<label class="error_msg float-right" id="additional_responsibility_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+
+
+		</div>
+	</div>
+
+	<div class="col-md-12">
+		<div class="row mt-3 wrapper">
+			{% if 'working_hour' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Working Hour : {% if 'working_hour' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<select name="working_hour" class="form-control" id="working_hour">
+						<option value="">Select Working Hour</option>
+						{% if working_hours %}
+						{% for working_hour in working_hours %}
+						<option value="{{working_hour.id}}"{% if official_detail.working_hour == working_hour.id %} selected {% endif %}>{{working_hour.work_from}} - {{working_hour.work_to}}</option>
+						{% endfor %}
+						{% endif %}
+					</select>
+					<label class="error_msg float-right" id="working_hour_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'date_of_joining' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/calander-blue.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Date of joining : {% if 'date_of_joining' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField  date_of_joinings" type="text" name="date_of_joining" id="date_of_joining" value="{% if official_detail.date_of_joining is not None %}{{official_detail.date_of_joining|date:'d/m/Y'}}{% else %}{% now 'd/m/Y' %}{% endif %}" >
+					<label class="error_msg float-right" id="date_of_joining_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			
+			{% if 'previous_employer' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Previous employer : {% if 'previous_employer' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField  previous_employers" type="text" placeholder="Previous employer" name="previous_employer" id="previous_employer" maxlength="100" value="{% if official_detail.previous_employer is not None %}{{official_detail.previous_employer}}{% endif %}">
+					<label class="error_msg float-right" id="previous_employer_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+
+
+		</div>
+	</div>
+
+
+	<div class="col-md-12">
+		<div class="row mt-3 wrapper">
+			{% if 'experience' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Year of Experience(in yrs) : {% if 'experience' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField numeric experiences" type="text" placeholder="Year of Experience(in yrs)" name="experience" id="experience" maxlength="2" value="{% if official_detail.years_of_experience is not None %}{{official_detail.years_of_experience}}{% endif %}">
+					<label class="error_msg float-right" id="experience_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'login_id' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Login ID : {% if 'login_id' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField  login_ids" type="text" placeholder="Login ID" name="login_id" id="login_id" maxlength="50"  value="{% if user_details.emp_sap_id is not None %}{{user_details.emp_sap_id}}{% endif %}">
+					<label class="error_msg float-right" id="login_id_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			
+			{% if 'password' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/password.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Password : {% if 'password' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField  passwords" type="password" placeholder="Password" name="password" id="password" maxlength="20"  value="{% if user_detail.password is not None %}{{user_detail.password}}{% endif %}">
+					<label class="error_msg float-right" id="password_error"></label>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+
+	
+</div>

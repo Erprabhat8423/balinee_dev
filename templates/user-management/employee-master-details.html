@@ -1,0 +1,172 @@
+{% load static %}
+
+{% if master == 'room' %}
+<div id="rooms" draggable="false">
+<div class="row"><div class="col-md-12 pt-2 pb-0"><h6>Rooms</h6></div></div>
+                                                                
+<ul class="documentsec">
+{% for room in rooms %}
+<li>
+<div class="Foldersec" id="rom{{ room.id }}" onclick="getMasterData('{{ room.id }}', '{{room.room}}', 'room', '{{college_id}}', '{{last_user_id}}')"><img src="/static/img/png/rooms.png"><div class="doctitle">{{ room.room }}</div> </div>
+
+</li> 
+{% endfor %}
+</ul>
+</div>
+{% elif master == 'almira' %}
+<div id="almiras">
+<div class="row"><div class="col-md-12 pt-2 pb-0"><h6>Almira</h6></div></div>
+                                                                
+<ul class="documentsec">
+{% for almira in almiras %}
+<li>
+<div class="Foldersec" id="alm{{ almira.id }}" onclick="getMasterData('{{ almira.id }}', '{{almira.almirah}}', 'almira', '{{college_id}}', '{{last_user_id}}')"><img src="/static/img/png/Almirah.png"><div class="doctitle">{{ almira.almirah }}</div> </div>
+
+</li> 
+{% endfor %}
+</ul>
+</div>
+{% elif master == 'rack' %}
+<div id="racks">
+<div class="row"><div class="col-md-12 pt-2 pb-0"><h6>Racks</h6></div></div>
+                                                                
+<ul class="documentsec">
+{% for rack in racks %}
+<li>
+<div class="Foldersec" id="alm{{ rack.id }}" onclick="getMasterData('{{ rack.id }}', '{{rack.rack}}', 'rack', '{{college_id}}', '{{last_user_id}}')"><img src="/static/img/png/Rack.png"><div class="doctitle">{{ rack.rack }}</div> </div>
+
+</li> 
+{% endfor %}
+</ul>
+</div>
+{% elif master == 'file' %}
+<div id="newfolder">
+    <div class="row"><div class="col-md-6 pt-2 pb-0"><h6>Files</h6></div><div class="col-md-6"><button type="button" class="btn border pull-right border-primary py-0 pt-1" style="max-height: 50px; color: #007bff;" onclick="addFolder('{{last_user_id}}', '{{room_id}}', '{{almira_id}}', '{{rack_id}}')">Create File <img src="/static/img/svg/documents/createfile.svg" class="profileIconSize mb-1"></button>
+    </div></div>
+                                                                
+    <ul class="documentsec">
+    {% for file in files %}
+      <li>
+        <div class="Foldersec" id="fol{{ file.id }}" onclick="getMasterData('{{ file.id }}', '{{file.file_name}}', 'file', '{{college_id}}', '{{last_user_id}}')"><img src="/static/img/png/folder.png"><div class="doctitle">{{file.file_name}}</div> </div>
+      </li> 
+    {% endfor %}
+      
+    </ul>
+</div>
+{% elif master == 'folder_files' %}
+<div id="getfiles"  class="bgicondrop">
+    <input type="hidden" id="id" value="{{file_id}}">  
+    <input type="hidden" id="type" value="file">  
+    <input type="hidden" id="college_id" value="{{college_id}}">  
+    <input type="hidden" id="master_name" value="{{file_name}}">  
+    <input type="hidden" id="room_id" value="{{room_id}}">  
+    <input type="hidden" id="room_name" value="{{room_name}}">  
+    <input type="hidden" id="almira_id" value="{{almira_id}}">
+    <input type="hidden" id="almira_name" value="{{almira_name}}">
+    <input type="hidden" id="rack_id" value="{{rack_id}}">
+    <input type="hidden" id="rack_name" value="{{rack_name}}">                                                                         
+  <!-- <div class="row"><div class="col-md-6 pt-2 pb-0">  <img src="/static/img/png/folder.png" style="width: 22px;"> <span class="pl-1" id="foldername"></span></div></div> -->
+  <ul class="documentsec drsec ui-sortable" id="sortable2">
+    {% for file in folder_files %}
+      <li id="doc{{ file.id }}" >
+        <div class="Filesec" ><a href="{{file.document_path}}" target="_blank"><div class="Viewicon"></div></a><img src="/static/img/png/pdf.png"><div class="doctitle">{{file.document_name}}</div> </div>
+      
+      </li> 
+    {% endfor %}
+     
+  </ul>
+  
+  </div>
+{% endif %}
+
+<script>
+    {% if master == 'almira' %}
+        var html = `<a href="javascript:void(0)" onclick="getMasterData('', '', 'room_list', '{{college_id}}', '{{last_user_id}}')">{{master_name}}</a>`;
+    {% elif master == 'rack' %}
+        var html = `<a href="javascript:void(0)" onclick="getMasterData('', '', 'room_list', '{{college_id}}', '{{last_user_id}}')">{{master_name}}</a>`;
+        html += ` / <a href="javascript:void(0)" onclick="getMasterData('{{room_id}}', '{{room_name}}', 'room', '{{college_id}}', '{{last_user_id}}')">{{almira_name}}</a>`;
+    {% elif master == 'file' %}
+        var html = `<a href="javascript:void(0)" onclick="getMasterData('', '', 'room_list', '{{college_id}}', '{{last_user_id}}')">{{room_name}}</a>`;
+        html += ` / <a href="javascript:void(0)" onclick="getMasterData('{{room_id}}', '{{room_name}}', 'room', '{{college_id}}', '{{last_user_id}}')">{{almira_name}}</a>`;
+        html += ` / <a href="javascript:void(0)" onclick="getMasterData('{{almira_id}}', '{{almira_name}}', 'almira', '{{college_id}}', '{{last_user_id}}')">{{rack_name}}</a>`;    
+    {% elif master == 'folder_files' %}
+        var html = `<a href="javascript:void(0)" onclick="getMasterData('', '', 'room_list', '{{college_id}}', '{{last_user_id}}')">{{room_name}}</a>`;
+        html += ` / <a href="javascript:void(0)" onclick="getMasterData('{{room_id}}', '{{room_name}}', 'room', '{{college_id}}', '{{last_user_id}}')">{{almira_name}}</a>`;
+        html += ` / <a href="javascript:void(0)" onclick="getMasterData('{{almira_id}}', '{{almira_name}}', 'almira', '{{college_id}}', '{{last_user_id}}')">{{rack_name}}</a>`;
+        html += ` / <a href="javascript:void(0)" onclick="getMasterData('{{rack_id}}', '{{rack_name}}', 'rack', '{{college_id}}', '{{last_user_id}}')">{{file_name}}</a>`;    
+    {% elif master == 'room' %}
+        var html = `Address`;
+    {% endif %}
+    $('#address_div').html(html);  
+</script>
+
+<script>
+  $(function () {
+      $("#rooms").draggable({ disabled: false });
+      $("ul.drsec").sortable({
+          connectWith: 'ul.drsec',
+          opacity: 0.6,
+          revert: true,
+          helper: function (e, item) {
+              console.log('parent-helper');
+              console.log(item);
+              if(!item.hasClass('selected1'))
+                 item.addClass('selected1');
+              var elements = $('.selected1').not('.ui-sortable-placeholder').clone();
+              var helper = $('<ul/>');
+              item.siblings('.selected1').addClass('hidden');
+              return helper.append(elements);
+          },
+          start: function (e, ui) {
+              
+              var elements = ui.item.siblings('.selected1.hidden').not('.ui-sortable-placeholder');
+              ui.item.data('items', elements);   
+              //var docid = $(ui.item).attr('data-filter-name'); 
+              //makeNewFile(docid);    
+          },
+          receive: function (e, ui) {
+              
+              ui.item.before(ui.item.data('items'));
+              var docid = $(ui.item).attr('data-filter-name');
+              var id = $('#id').val();
+              var type = $('#type').val();
+              var employee_id = $('#employee_id').val(); 
+              var college_id = $('#college_id').val();  
+              var master_name = $('#master_name').val(); 
+              var room_id = $('#room_id').val(); 
+              var room_name = $('#room_name').val(); 
+              var almira_id = $('#almira_id').val(); 
+              var almira_name = $('#almira_name').val(); 
+              var rack_id = $('#rack_id').val(); 
+              var rack_name = $('#rack_name').val();   
+              makeNewFile(docid, id, type, employee_id, college_id, master_name, room_id, room_name, almira_id, almira_name, rack_id, rack_name, '{{last_user_id}}');
+          
+          },
+          stop: function (e, ui) {
+              ui.item.siblings('.selected1').removeClass('hidden');
+              $('.selected1').removeClass('selected1');
+          },
+          update: function(e,ui){
+              ui.item.before(ui.item.data('items'));
+              var docid = $(ui.item).attr('data-filter-name');
+              updatePostOrder(docid);
+          }
+
+          
+      });
+     
+  
+      $("#sortable1, #sortable2").disableSelection();
+      $("#sortable1, #sortable2").css('minHeight', $("#sortable1, #sortable2").height() + "px");
+  });
+  
+  function updatePostOrder(e) {
+      var arr = [];
+      
+      $("#sortable2 li").each(function () {
+          arr.push($(this).attr('id'));
+      });
+      
+  }
+  
+</script>

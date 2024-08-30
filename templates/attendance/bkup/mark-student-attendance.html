@@ -1,0 +1,447 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Sansthaa ERP | Student Attendance</title>
+    <link rel="icon" type="image/png" href="{% static 'img/favicon_io/favicon.ico' %}" />
+    <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="{% static 'plugins/font-awesome-4.7.0/css/font-awesome.min.css' %}" />
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap-4.5.2-dist/css/bootstrap.min.css' %}" />
+    
+    <link rel="stylesheet" href="{% static 'css/global.css' %}" />
+    <link rel="stylesheet" href="{% static 'css/student-attendance-screen.css' %}" />
+    <link rel="stylesheet" href="/static/css/footer.css" />
+    
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="{% static 'js/Nitgen.js' %}"></script>
+    <script src="{% static 'js/llqrcode.js' %}"></script>
+    
+    <script type="text/javascript">
+        var student_id = null;
+        var attendance_type = 1;
+        var gCtx = null;
+        var gCanvas = null;
+        var c=0;
+        var stype=0;
+        var gUM=false;
+        var webkit=false;
+        var moz=false;
+        var v=null;
+        var vidhtml = '<video id="v" autoplay></video>';
+        
+        
+        
+        function captureToCanvas() {
+            if(stype!=1)
+            return;
+            if(gUM){
+                try{
+                    gCtx.drawImage(v,0,0);
+                    try{
+                        qrcode.decode();
+                    }
+                    catch(e){       
+                        console.log(e);
+                        setTimeout(captureToCanvas, 500);
+                    };
+                }
+                catch(e){       
+                    console.log(e);
+                    setTimeout(captureToCanvas, 500);
+                };
+            }
+        }
+        
+        
+        function load(){
+            if(isCanvasSupported() && window.File && window.FileReader){
+                initCanvas(800, 800);
+                qrcode.callback = read;
+                // document.getElementById("mainbody").style.display="inline";
+                setwebcam();
+            }else{
+                document.getElementById("mainbody").style.display="inline";
+                document.getElementById("mainbody").innerHTML='<p id="mp1">QR code scanner for HTML5 capable browsers</p><br>'+
+                '<br><p id="mp2">sorry your browser is not supported</p><br><br>'+
+                '<p id="mp1">try <a href="http://www.mozilla.com/firefox"><img src="firefox.png "/></a> or <a href="http://chrome.google.com"><img src="chrome_logo.gif"/></a> or <a href="http://www.opera.com"><img src="Opera-logo.png"/></a></p>';
+            }
+        }
+        
+        
+        
+        function isCanvasSupported(){
+            var elem = document.createElement('canvas');
+            return !!(elem.getContext && elem.getContext('2d'));
+        }
+        
+        function initCanvas(w,h){
+            gCanvas = document.getElementById("qr-canvas");
+            gCanvas.style.width = w + "%";
+            gCanvas.style.height = h + "%";
+            gCanvas.width = w;
+            gCanvas.height = h;
+            gCtx = gCanvas.getContext("2d");
+            gCtx.clearRect(0, 0, w, h);
+        }
+        
+        function success(stream){
+            
+            v.srcObject = stream;
+            v.play();
+            
+            gUM=true;
+            setTimeout(captureToCanvas, 500);
+        }
+        
+        
+        function setwebcam(){
+            var options = true;
+            if(navigator.mediaDevices && navigator.mediaDevices.enumerateDevices){
+                try{
+                    navigator.mediaDevices.enumerateDevices()
+                    .then(function(devices) {
+                        devices.forEach(function(device) {
+                            if (device.kind === 'videoinput') {
+                                if(device.label.toLowerCase().search("back") >-1)
+                                options={'deviceId': {'exact':device.deviceId}, 'facingMode':'environment'} ;
+                            }
+                            console.log(device.kind + ": " + device.label +" id = " + device.deviceId);
+                        });
+                        setwebcam2(options);
+                    });
+                }
+                catch(e)
+                {
+                    console.log(e);
+                }
+            }
+            else{
+                console.log("no navigator.mediaDevices.enumerateDevices" );
+                setwebcam2(options);
+            }
+            
+        }
+        
+        
+        function setwebcam2(options){
+            console.log('setwebcam2');
+            document.getElementById("result").innerHTML="";
+            if(stype==1){
+                setTimeout(captureToCanvas, 500);    
+                return;
+            }
+            var n=navigator;
+            document.getElementById("outdiv").innerHTML = vidhtml;
+            v=document.getElementById("v");
+            
+            if(n.mediaDevices.getUserMedia){
+                n.mediaDevices.getUserMedia({video: options, audio: false}).
+                then(function(stream){
+                    success(stream);
+                }).catch(function(error){
+                    console.log(error)
+                    gUM=false;
+                    return;
+                });
+            }
+            else if(n.getUserMedia){
+                webkit=true;
+                n.getUserMedia({video: options, audio: false}, success, error);
+            }
+            else if(n.webkitGetUserMedia){
+                webkit=true;
+                n.webkitGetUserMedia({video:options, audio: false}, success, error);
+            }
+            stype=1;
+            setTimeout(captureToCanvas, 500);
+        }
+        
+        
+        
+        
+        function read(result){
+            var result = atob(result);
+            var resultArr = result.split(",");
+            console.log(resultArr)
+            if(resultArr.length == 3){
+                student_id = resultArr[0];
+                url = "{% url 'src:attendance/get-student-data' '1' %}";
+                url = url.replace('1',resultArr[0]);
+                $.ajax({
+                    url: url,
+                    method: 'GET',
+                    success: function (data) {
+                        if(typeof data.flag !== "undefined" && !data.flag){
+                            alert(data.message);
+                            window.location.reload();
+                        }else{
+                            student_id = data.student_id;
+                            
+                            $('#audio_source').attr('src',data.audio);
+                            $('#help_section').hide();
+                            
+                            $('#student_section').html(data.student_html);
+                            $('#student_section').show();
+                            
+                            $('audio')[0].load();
+                            
+                            var promise = $('audio')[0].play();
+                            if (promise) promise.catch(error => {
+                                // Auto-play disabled show controls 
+                                $('audio').attr('controls', '');
+                            });
+                            
+                        }
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+            }else{
+                alert('invalid QR');
+                window.location.reload();
+            }
+            
+        }
+        
+        function verifyStudentThumb() {
+            
+            $('#scanning_idle').hide();
+            $('#scanning_thumb').show();
+            $('#scanning_success').hide();
+            $('#scanning_failed').hide();
+            
+            
+            var quality = 60; 
+            var timeout = 10; 
+            try {
+                var resultData =1;
+                var res = CaptureFinger();
+                if (res.httpStaus) {
+                    if (res.data.ErrorCode == "0") {
+                        $('#finger_iso').attr('src',"data:image/bmp;base64," + res.data.BitmapData);
+                        var isoTemplateDataLocal =  res.data.IsoTemplate;
+                        var url =  "{% url 'src:get-student-thumbs' '1' %}",
+                        url = url.replace('1',student_id);
+                        
+                        $.ajax({
+                            url: url,
+                            type: "GET",
+                            success: function (data) {
+                                error = false;
+                                student_details = data.student_details
+                                var studentFinger = [student_details.finger_iso_1, student_details.finger_iso_2];
+                                var dataCnt = studentFinger.length;
+                                for(var i=0; i<dataCnt; i++){
+                                    var isoTemplateDataServer = studentFinger[i];
+                                    if(isoTemplateDataServer!=''){
+                                        var res = VerifyFinger(isoTemplateDataServer, isoTemplateDataLocal);
+                                        if (res.httpStaus) {
+                                            if (res.data.Status==true) {
+                                                // verified
+                                            }else{
+                                                // failed
+                                                error = true;
+                                            }
+                                        }
+                                    }
+                                }
+                                
+                                if(error){
+                                    $('#scanning_idle').hide();
+                                    $('#scanning_thumb').hide();
+                                    $('#scanning_success').hide();
+                                    $('#scanning_failed').show();
+                                    
+                                    $('#audio_source').attr('src','/media/attendance_audio/thumb_verification/error.mp3');
+                                    $('audio')[0].load();
+                                    
+                                    var promise = $('audio')[0].play();
+                                    if (promise) promise.catch(error => {
+                                        // Auto-play disabled show controls 
+                                        $('audio').attr('controls', '');
+                                    });
+
+                                    // verifyStudentThumb();
+                                    setTimeout(function(){  verifyStudentThumb(); },3500);
+                                    
+                                    // alert('Authentication failed.');
+                                    
+                                }else{
+                                    
+                                    $('#scanning_idle').hide();
+                                    $('#scanning_thumb').hide();
+                                    $('#scanning_success').show();
+                                    $('#scanning_failed').hide();
+                                    
+                                    markStudentAttendance();
+                                    // alert('Authentication successful.');
+                                    
+                                }
+                                
+                            },
+                            error: function (jqXHR, ajaxOptions, thrownError) {
+                                console.log(getHttpError(jqXHR));
+                            },
+                        });
+                        
+                    }
+                    
+                }
+                else {
+                    alert(res.err);
+                }
+                
+            }
+            catch (e) {
+                alert(e);
+            }
+            return false;
+        } 
+        
+        function markStudentAttendance(){
+            url = "{% url 'src:attendance/mark-student-attendance'  %}";
+            $.ajax({
+                url: url,
+                type: 'POST',
+                data:{'student_id':student_id,csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+                success: function (data) {
+                    console.log(data)
+                    if(data.flag){
+                        
+                        $('#audio_source').attr('src','/media/attendance_audio/thumb_verification/success.mp3');
+                        $('audio')[0].load();
+                        
+                        var promise = $('audio')[0].play();
+                        if (promise) promise.catch(error => {
+                            // Auto-play disabled show controls 
+                            $('audio').attr('controls', '');
+                        });
+                        
+                        setTimeout(function(){ window.location.reload(); },3500);
+                        
+                        
+                    }else{
+                        alert(data.message);
+                        
+                    }
+                    
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+        
+        
+    </script>
+    <style>
+        .iconAlignment {
+    text-align: right;
+}
+.socialMediaIcon {
+    width: 1rem;
+    margin: 0 0.5rem;
+    cursor: pointer;
+}
+.footerText {
+    font-size: 0.85rem;
+    font-family: sans-serif;
+    font-weight: 500;
+}
+.lightGrey {
+    color: #727272;
+}
+.blackFont {
+    color: #151515;
+}
+    </style>
+</head>
+<body class="comingSoon">
+    
+    <audio controls onended="verifyStudentThumb()" id="audio" style="display: none;">
+        <source id="audio_source"  src="/media/attendance_audio/null.mp3" type="audio/mpeg">
+        </audio>
+        <div class="mt-4 px-4" id="">
+            <div class="row border-redius-17 box-shadow-bg" id="containerHeight">
+                <div class="col-md-6 col-12  px-0 h-100">
+                    <div class="primaryContainerBG h-100 p-4 border-r-r"   id="">
+                        <div class="row h-100   camera-scan " id=" mainbody" >
+                            
+                                {% csrf_token %}
+                                <div class=" out-div" id="outdiv"></div>
+                                <div id="result"></div>
+                                <canvas id="qr-canvas" style="display: none;"></canvas>
+                                <script type="text/javascript"> load();</script> 
+                                <div class="camera-scan-box" >
+                                </div>
+                                <img src="{% static 'img/png/ScanBox.png' %} " alt="" class="scan-box-img"> 
+                           
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-6 col-12  px-0 h-100 ">
+                    <div class="primaryContainerBG border-r-l h-100 py-3" id="">
+                        <div class="row h-100 " id="" >
+                          
+                            <div class="h-100  px-4">
+                                <img src="{% static 'img/png/HELP.png' %} " alt="" class="help_section"  id="help_section">
+                            </div>
+
+                            <div class="col-sm-12  border-left col-12 px-0 " id="student_section"  style="display: none;">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <footer class="footer footer-bottom" id="footer">
+            <div class="row">
+              <div class="col-sm-10  pr-0">
+                <div class="row">
+                    <span class="footerText lightGrey">©copyright</span>
+                    <span class="footerText">
+                      2020. <span class="blackFont">A Product of </span>
+                        <a href="#">Sort String </a>
+                        <span class="blackFont">Solutions LLP </span> 
+                        <a href="https://sortstring.com/privacy-policy" target="_blank">
+                            <span class="footerText lightGrey">- Privacy Poilcy</span>
+                        </a>
+                        <a href="https://sortstring.com/contact" target="_blank">
+                            <span class="footerText lightGrey">- Help</span>
+                        </a>
+                    </span>
+
+                </div>
+              </div>
+
+              <div class="col-sm-2 iconAlignment">
+                    <a href="https://www.facebook.com/sortstringsolutions/" target="_blank"><img src="/static/img/svg/Facebook.svg" class="socialMediaIcon"></a>
+                    <a href="https://www.linkedin.com/company/sortstring-solutions/" target="_blank"><img src="/static/img/svg/Instagram.svg" class="socialMediaIcon"></a>
+                    <a href="https://twitter.com/sort_string" target="_blank"><img src="/static/img/svg/Twitter.svg" class="socialMediaIcon"></a>
+              </div>
+            </div>
+          </footer>        
+        <script>
+            $(document).ready(function(){
+                setHeightWidth();
+            });
+            function setHeightWidth() {
+                var containerHeight =
+                window.innerHeight - 80;
+                $("#containerHeight").height(containerHeight);
+            }
+            
+        </script>
+        
+        
+        
+    </body>
+    </html>

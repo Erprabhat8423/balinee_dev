@@ -1,0 +1,131 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} {% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-12 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-5 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-7 p-md-0">
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-12 p-md-0 text-right">
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <form id="rateListForm" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row">
+                    <div class="col-md-12 primaryContainerBG h-100 p-10 commonTableBg">
+                        <div class="row">
+                            <div class="col-md-6  text-left">
+                                <div class="row">
+                                    <div class="col-md-6 form-group text-left">
+                                        <label>Import file</label>
+                                        <input type="file" name="rate_list_sheet"  class="inputField" required />
+                                    </div>
+                                    <div class="col-md-6 form-group text-left" style="margin-top: 30px;">
+                                        <input type="submit" class="btn btn-primary" value="Upload"/>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                            
+                            <div class="col-md-6 text-right">
+                                <button type="button" id="" class="btn iconBox iconExportExcel"  onclick="exportExcel()"></button>
+                                {% if excel_data %}
+                                <button class="btn btn-save float-right" id="updateBtn" type="button" onclick="updateOutstandingAmount()">Save</button>
+                                <button class="btn btn-close float-right" id="cancelBtn" type="button" onclick="cancel()" >Close</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        
+                        <div class="row" style="margin-top:10px;">
+                            <div class="table-responsive">
+                                <table class="table" id="addOrgTable">
+                                    <thead>
+                                        <tr>
+                                            <th>SAP ID</th>
+                                            <th>SKU</th>
+                                            <th>Outstanding Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% if excel_data %}
+                                        {% for data in excel_data %}
+                                        <tr>
+                                            <td>{{data.sap_id}} <input type="hidden" name="sap_id[]" value="{{data.sap_id}}"></td>
+                                            <td>{{data.sku_code}} <br> ({{data.product_variant_name}}) <input type="hidden" name="variant_id[]" value="{{data.sku_code}}"> </td>
+                                            <td>{{data.rate}} <input type="hidden" name="rate[]" value="{{data.rate}}"></td>
+                                        </tr>
+                                        {% endfor %}
+                                        
+                                        {% else %}
+                                        <tr>
+                                            <td colspan="2">Please upload rate list excel to preview data.</td>
+                                        </tr>
+                                        {% endif %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+    
+</div>
+
+
+{% endblock content %}
+{% block script %}
+<script>
+    
+    function exportExcel(){
+        window.location.href = "{% url 'src:export-rate-list-template' %}";
+    }
+    
+    function updateOutstandingAmount(){
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:update-rate-list' %}",
+            method: 'POST',
+            data: $('#rateListForm').serialize(),
+            success: function (data) {
+                hideLoader();
+                if(data.flag){
+                    openToaster("success", data.message);
+                    setTimeout(function(){ window.location.reload(); }, 500);
+                }else{
+                    openToaster("danger", data.message);
+                }
+            },
+            error: function (err) {
+                hideLoader();
+                console.log(err)
+            }
+        }).always(function() {
+            hideLoader();
+        });
+        
+    }
+    function cancel(){
+        window.location.href = "{% url 'src:upload-rate-list' %}";
+    }
+    
+</script>
+{% endblock %}

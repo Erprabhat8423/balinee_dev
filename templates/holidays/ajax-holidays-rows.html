@@ -1,0 +1,30 @@
+{% load static %}
+{% for holiday in holidays %}
+<tr>
+    <td class="holiday_name" onclick="getHolidayRecord('{{ holiday.id }}')">{{ holiday.holiday | title }}</td>
+    <td class="holiday_time" onclick="getHolidayRecord('{{ holiday.id }}')">
+        {{holiday.start_date | date:"d/m/Y"}} {% if holiday.start_time is not None %}{{holiday.start_time}}{% endif %} - {{holiday.end_date | date:"d/m/Y"}} {% if holiday.end_time is not None %}{{holiday.end_time}}{% endif %}
+    </td>
+    <td class="holiday_type" onclick="getHolidayRecord('{{ holiday.id }}')">{{ holiday.holiday_type | title }}</td>
+    <td>
+        <div class="row">
+            <div class="col-md-3">
+                <a href="javascript:void(0)"
+                onclick="editHoliday('{{ holiday.id }}')" data-toggle="modal"
+                data-target="#addProductModal"><img
+                src="{% static 'img/svg/editcopy.svg' %}" /></a> 
+            </div>
+            <div class="col-md-5">
+                <label class="switch">
+                    <input type="checkbox" class="checkbox" name="is_active"
+                    id="is_active_{{ holiday.id }}"
+                    {% if holiday.status == 1 %} checked="" {% else %}
+                    {% endif %}
+                    onclick="updateHolidayStatus('{{ holiday.id }}', '{{ holiday.status }}')">
+                    <span class="slider round"></span>
+                </label>
+            </div>
+        </div>
+    </td>
+</tr>
+{% endfor %}

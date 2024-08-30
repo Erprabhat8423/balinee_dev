@@ -1,0 +1,162 @@
+{% load static %}
+
+<div class="modal-AddOrganisation centered">
+    <form name="addFileFolder" id="addFileFolder" method="POST" enctype="multipart/form-data" >
+        {% csrf_token %}
+        <input type="hidden" name="page-step" id="page-step" value="1" />
+        <input type="hidden" name="employee_id" id="employee_id" value="{% if employee_id %}{{ employee_id }}{% endif %}" >
+        <input type="hidden" name="room_id" id="room_id" value="{% if room_id %}{{ room_id }}{% endif %}" >
+        <input type="hidden" name="almira_id" id="almira_id" value="{% if almira_id %}{{ almira_id }}{% endif %}" >
+        <input type="hidden" name="rack_id" id="rack_id" value="{% if rack_id %}{{ rack_id }}{% endif %}" >
+
+        <div class="modal-header">
+            <div class="col-12 p-0">
+                <div class="row">
+                    <div class="col-6">
+                        
+                        <h5 class="mt-md-2" style="display: inline">
+                            &nbsp;&nbsp; Create New File
+                        </h5>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-save float-right btn-primary" type="button" onclick="addFileFolders()" >
+                            Create
+                        </button>
+                        <button class="btn btn-close float-right" type="button" onclick="manipulateFolder('addNewFolder','close')">
+                            Close
+                        </button>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-body" id="addUserModalBody" style="width:100% !important; height: 100%; overflow: auto">
+            <div class="row">
+				<div class="col-md-12 p-0 h-100 w-100" >
+					<div class="row">
+						<div class="col-md-12">
+							
+							<div class="row">
+								<div class="col-md-6">
+                                    <label class="mb-3" for="user_Primary_name">File name should be system genrated ?</label>
+                                   
+                                     <br>
+                                       <label>Yes &nbsp;<input type="radio" class="input_class_checkbox is_primary" value="1" checked="checked" name="is_auto" id="is_auto"></label>
+                                       
+                                       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                                       &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <label>No &nbsp;<input type="radio" class="input_class_checkbox is_primary" value="0"  name="is_auto" id="is_auto"></label>
+                                    
+                                </div>
+                                <div class="col-md-6">
+                                    <div id="systemgen">
+									<label for="" class="scheme_label"><img src="{% static 'img/svg/Scheme.svg' %}" class="profileIconSize" />&nbsp;&nbsp;File Name</label>
+									<select class="inputField selectField" name="auto_file_name" id="auto_file_name" style="width: 100%;">
+                                        <option value="1">Employee Name</option>
+                                        <option value="2">Employee ID</option>
+                                        <option value="3">Both</option>
+                                    </select>
+                                    <label class="error_msg float-right"></label>
+                                </div>
+                                <div id="manualpath">
+                                    <label for="" class="scheme_label"><img src="{% static 'img/svg/Scheme.svg' %}" class="profileIconSize" />&nbsp;&nbsp;Enter File Name</label>
+                                    <input class="inputField " type="text" placeholder="Enter Manual" name="file_name" id="file_name" maxlength="50" value="">
+								<label class="error_msg float-right" id="file_name_error"></label>
+                                </div>
+								</div>
+                            </div>  
+							
+                            
+
+							</div>
+							
+							</div>
+							
+							</div>
+	
+							
+							</div>
+
+							</div>
+							
+							</div>
+							
+							
+						</div>
+						
+						</div>
+					</div>
+				</div>
+				
+			</div>
+        </div> 
+        
+    </form>
+</div>
+<script>
+    $('#systemgen').hide();
+    $('#manualpath').hide();
+    if($('input[name="is_auto"]').prop('checked') == true){
+        $('#systemgen').show();
+        $('#manualpath').hide();
+    } 
+    else{
+        $('#systemgen').hide();
+       
+     }
+    $('input[name="is_auto"]').on( "click", function() {
+      
+     if($('input[name="is_auto"]').prop('checked') == true){
+         $('#systemgen').show();
+         $('#manualpath').hide();
+     } 
+     else{
+        $('#systemgen').hide();
+        $('#manualpath').show();
+     }
+    });
+
+    function addFileFolders(){
+        var is_auto = $("input[type='radio'][name='is_auto']:checked").val();
+        $('.error_msg').css("border", "");
+        $('.error_msg').html("");
+        error = 0;
+       
+        if(is_auto == '0'){
+            var file_name = $('#file_name').val();
+            $('#file_name').css("margin-top", "0");
+            if(file_name == ''){
+                var error = 1;
+                document.getElementById('file_name_error').innerHTML = 'Please enter file name*';
+                $('#file_name').css("border", "1px solid #db8305");
+            }
+        }
+        var auto_file_name = $('#auto_file_name').val();
+        if (error == 0) {
+              showLoader();
+            $.ajax({
+                url: "{% url 'src:add-employee-new-folder' %}",
+                method: 'POST',
+                data: {employee_id: '{{ employee_id }}', room_id:'{{ room_id }}', almira_id:'{{ almira_id }}', rack_id:'{{ rack_id }}', is_auto:is_auto, file_name:file_name, auto_file_name:auto_file_name, csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+                success: function (data) {
+                      hideLoader();
+                    if (data.error == true) {
+                        openToaster("danger", data.message);
+                    }else{
+                        openToaster("success", 'File Folder has been added successfully.');
+                        getMasterData(data.rack_id, data.rack_name, 'rack', data.college_id, data.employee_id);
+                        manipulateFolder('addNewFolder','close');
+                    }
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+    };
+    </script
+
+
+

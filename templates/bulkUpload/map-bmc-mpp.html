@@ -1,0 +1,122 @@
+{% load static %}
+<div class="modal-AddOrganisation centered">
+    <div class="modal-body p-0">
+        <div class="row">
+            {% comment %} <div class="col-md-3 p-md-0" style="background-repeat: no-repeat;text-align: center;background-color: #0073e0;background-position: bottom left;background-size: 80%;">
+                <div class="transformImage">
+                    <img src="{% static 'img/svg/master/payBands.svg' %}" style="height:60px;"/>
+                    <h4 class="modalColHead">Add MPP </h4>
+                </div>
+            </div> {% endcomment %}
+            
+            <div class="col-md-12 p-md-4">
+                <form id="addForm" method="POST" autocomplete="off" action="" aria-label="">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b> BMC & MPP MAPPING </b></h5>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <button class="btn btn-save float-right" type="button" onclick="mapBMC(emp_id)">
+                                Save
+                            </button>
+                            <button class="btn btn-close float-right" type="button"
+                            onclick="manipulateModal('addProductModal','close')">
+                            Close
+                        </button>
+                    </div>
+                    </div>
+                    <div class="row mt-md-3">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12 p-md-0">
+                                    <h6 style="display: inline-block;"><b>BMC</b></h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 p-md-0">
+                            <select class="inputField selectField" style="width: 100%;" name="bmcList[]" id='bmcList[]'  multiple onchange="getMPPList()">
+                            <option value="">Select BMC</option>
+                            {% for bmc in bmc_list %}
+                                <option value="{{bmc.id}}">{{bmc.name}} ( {{bmc.bmc_code}} )</option>
+                            {% endfor %}
+                            </select>
+                            <label class="error_msg float-right" id=""></label>
+                        </div>
+                    </div>
+                   <div class="row mt-md-3">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12 p-md-0">
+                                    <h6 style="display: inline-block;"><b>MPP</b></h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-12 p-md-0">
+                            <select class="inputField selectField" style="width: 100%;" name="mppList[]" id='mppList[]'  multiple>
+                            <option value="">Select MPP</option>
+                           
+                            </select>
+                            <label class="error_msg float-right" id=""></label>
+                        </div>
+                    </div>
+                  
+                    
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    function mapBMC(id) {
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:map-bmc' '1' %}",
+            url = url.replace('1',id)
+            method: 'POST',
+            data: $('#addForm').serialize(),
+            success: function (data) {
+                hideLoader();
+                if(data.flag){
+                    $("#addProductModal").html('');
+                    $("#addProductModal").hide();
+                    getList('users');
+                    openToaster("success", data.message);
+                }else{
+                    openToaster("danger", data.message);
+                }
+            },
+            error: function (err) {
+                hideLoader();
+                console.log(err)
+            }
+        }).always(function() {
+            // hideLoader();
+        });
+    } 
+    function getMPP(){
+        var bmc_list = $('#bmc_list[]')
+        var url = "{% url 'src:get-mpp-list' 1 %}";
+        url = url.replace(1,bmc_list)
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+                
+                $('[name="'+id+'"]').html(data.options)
+                $(".selectField").select2();
+                
+            },
+            error: function (err) {
+                hideLoader();
+                console.log(err)
+            }
+        });
+    } else {
+        $('[name="'+id+'"]').html('<option value="" selected>Select</option>')
+        $(".selectField").select2();
+    }
+
+    
+</script>

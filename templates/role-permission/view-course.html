@@ -1,0 +1,162 @@
+{% load static %}
+<style>
+	#addPermissionModule{
+		-webkit-filter: blur(5px);
+		-moz-filter: blur(5px);
+		-ms-filter: blur(5px);
+		-o-filter: blur(5px);
+		filter: blur(5px);
+		pointer-events:none;
+	}	
+	@media screen and (max-width: 767px) {
+		.select2-container ,.inputField{
+			width:  calc(100% - 45px) !important;
+
+		}
+		
+	}
+</style>
+<div class="modal-AddOrganisation centered " style="width:80%;min-height:212px;">
+    <div class="modal-body p-0" >
+        <div class="row">
+            <div class="col-sm-3 col-12 px-0 modalOrgBG" style="min-height: 100%;">
+                <div class="transformImage" >
+                    <img src="{% static 'img/svg/addorgW.svg' %}" class="w-40" style="width: 41%!important;"/>
+                    <h4 class="modalColHead">Courses</h4>
+                </div>
+            </div>
+            <div class="col-sm-9 col-12 role-details-form py-3">
+                <form method="POST" id="addCourse" autocomplete="off"  aria-label="Add Role">
+					{% csrf_token %}
+					<input type="hidden" name="user_id" value="{{user.id}}">
+					
+                    <div class="row ">
+                        <div class="col-sm-5 col-7 px-0">
+                            <h5 class="d-inline-block font-wt-b">Courses</h5>
+                        </div>
+						<div class="col-sm-7 col-5 px-0"> 
+							<button class="btn btn-close float-right ml-0 mr-0" type="button" onclick="manipulateModal('addOrganisationModal','close')">
+								<span class="mob-d-none">Close</span>
+								<i class="far fa-times-circle mob-d-block desk-d-none"></i>
+							</button>
+							<button class="btn btn-save mob-ml-16 float-right mr-2" type="button" onclick="addCourse({{org_id}})">Add New Course</button>
+						</div>
+                    </div>
+
+
+
+						
+
+				
+						<div class="row border-redius-17 h-100" id="tableBox">
+    <div class="col-md-12 col-12 primaryContainerBG h-100 px-0" id="masterListTable">
+            <table id="addOrgTable" class="detail-table table table-borderless table-striped table-hover mt-0" >
+            <thead>
+                <tr>
+                    <th class="course_name">
+                        Course Name
+                    </th>
+					<th class="course_alias">
+                        Alias Name
+                    </th>
+					<th class="student_capacity">
+                        Student Capacity
+                    </th>
+                    <th class="duration">
+                        Duration
+                    </th>
+                    
+                    
+                    <th data-sorter="false">Action</th>
+                </tr>
+            </thead>
+            <tbody id="tablebody">
+                
+                {% if branches %}
+                {% for branch in branches %}
+                <tr>
+                    <td class="course_name" name="course_name" id="course_name">{% if branch.branch %}{{ branch.branch }}{% else %}-{% endif %}</td>
+					<td class="course_alias" name="course_alias" id="course_alias">{% if branch.alias %}{{ branch.alias }}{% else %}-{% endif %} </td>
+					<td class="student_capacity" name="student_capacity" id="student_capacity">{% if branch.max_student %}{{ branch.max_student }}{% else %}-{% endif %}</td>
+					{% if branch.total_sem %}
+                    <td class="duration" name="duration" id="duration">{% if branch.total_sem %}{{ branch.total_sem }}{% else %}-{% endif %} Semesters</td>
+					{% elif branch.total_year %}
+					<td class="duration" name="duration" id="duration">{% if branch.total_year %}{{ branch.total_year }} {% else %}-{% endif %} years</td>
+					{% else %}
+                    <td class="duration" name="duration" id="duration">-</td>
+                    {% endif %}
+                    <td>
+                        <div class="row">
+                            <div class="col-md-3">
+                                <a href="javascript:void(0)"  onclick="editCourse('{{branch.id}}')"  >
+                                    <img src="{% static 'img/svg/editcopy.svg' %}" title="Edit" />
+                                </a> 
+                            </div>
+                            
+                            <div class="col-md-5">
+                                <label class="switch">
+                                    <input type="checkbox" class="checkbox" name="is_active" id="is_active_{{ branch.id }}"
+                                    {% if branch.status == 1 %} checked="" {% else %}
+                                    {% endif %}
+                                    onclick="updateCourseStatus('{{ branch.id }}','{{branch.status}}')">
+                                    <span class="slider round" title="Enable/Disable"></span>
+                                </label>
+                                
+                            </div>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+                <tr id="loading" style="display: none;">
+                    <td class="text-center" colspan="4">
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" style="text-align: center;">No Record Found...</td>
+                </tr>
+                {% endif %}
+            </tbody>
+        </table>
+</div>
+</div>
+						
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function addCourse(id){
+        $('#addOrganisationModal').html('');
+        $('#addDeptModal').html('');
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:add-course' %}",
+            method: 'GET',
+            data: {
+                id: id
+            },
+            success: function (data) {
+                hideLoader();
+                $("#addOrganisationModal").show();
+                $('#addOrganisationModal').html(data);
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+
+	  
+
+	function getDateFormat(date){
+        var dateTemp = date.split('/');
+        date = dateTemp[2]+'-'+dateTemp[1]+'-'+dateTemp[0]
+        return date
+    }
+
+
+</script>
+						

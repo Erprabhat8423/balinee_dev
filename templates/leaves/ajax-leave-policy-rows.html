@@ -1,0 +1,45 @@
+{% load static %}
+
+    {% for leave_policy in leave_policies %}
+                <tr  {% if forloop.first %} class="odd selected" {% endif %}>                    
+                    <td class="sorter-false checkbox" >
+                        {% if leave_policy.leave_status != 3 %}
+                        <input type="checkbox" class="checkbox" id="new_module_1" name="policy_id[]" value="{{ leave_policy.id }}">
+                        {% else %} 
+                        {% if leave_policy.leave_status == 1 %}
+                        <input type="checkbox" class="checkbox" id="new_module_1" name="policy_id[]" value="{{ leave_policy.id }}">
+                        {% elif leave_policy.leave_status == 2 %}
+                        <input type="checkbox" class="checkbox" id="new_module_1" name="policy_id[]" value="{{ leave_policy.id }}">
+                        {% elif leave_policy.leave_status == 3 %}
+                        <input type="checkbox" class="checkbox" id="new_module_1" name="policy_id[]" value="{{ leave_policy.id }}">
+                        {% else %}
+                        <input type="checkbox" disabled checked>
+                        {% endif %}
+
+                        {% endif %}
+                    </td>
+
+                    <td class="leave_policy_name" onclick="getLeavePolicyRecord('{{ leave_policy.id }}')">{{ leave_policy.leave_policy | title }}</td>
+                    <td class="total_leave_types" onclick="getLeavePolicyRecord('{{ leave_policy.id }}')">{{ leave_policy.total_leave_count }}</td>
+                    {% if leave_policy.policy_status == 0 %}
+                    <td>Discarded</td>
+                    {% elif leave_policy.policy_status == 1 %}
+                    <td>Initiated</td>
+                    {% elif leave_policy.policy_status == 2 %}
+                    <td>Forwarded</td>
+                    {% elif leave_policy.policy_status == 3 %}
+                    <td>Approved</td>
+                    {% endif %}
+                    <td>
+                        <a href="javascript:void(0)" onclick="editLeavePolicy('{{ leave_policy.id }}')" data-toggle="modal" data-target="#addUserModal" class="action_editor">
+                            <img src="{% static 'img/svg/editcopy.svg' %}" title="Edit" />
+                        </a> 
+                        <div class="d-inline-block">
+                            <label class="switch vrt-mdl ml-2">
+                                <input type="checkbox" class="checkbox" name="is_active" id="is_active_4" checked="" onclick="updateLeavePolicyStatus('{{ leave_policy.id }}', '{{ leave_policy.status }}')">
+                                <span class="slider round" title="Enable/Disable"></span>
+                            </label>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}

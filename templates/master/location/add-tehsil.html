@@ -1,0 +1,161 @@
+{% load static %}
+<div class="modal-AddOrganisation centered">
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-md-3 p-md-0" style="background-repeat: no-repeat;text-align: center;background-color: #0073e0;background-position: bottom left;background-size: 80%;">
+                <div class="transformImage">
+                    <img src="{% static 'img/png/townw.png' %}" class="w-50" />
+                    <h4 class="modalColHead">Add tehsil</h4>
+                </div>
+            </div>
+            
+            <div class="col-md-9 p-md-4">
+                <form id="addtehsilForm" method="POST" autocomplete="off" action="" aria-label="tehsil">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b>Tehsil details </b></h5>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <button class="btn btn-save float-right" type="button" onclick="saveTehsil()">
+                                Save
+                            </button>
+                            <button class="btn btn-close float-right" type="button"
+                            onclick="manipulateModal('addProductModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>State</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>District</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <select class="inputField selectField" style="width: 100%;" name="district_id"  >
+                         <option value="">Select</option>
+                         {% for distric in districs %}
+                            <option value="{{distric.id}}">{{distric.district_name}}</option>
+                        {% endfor %}
+                        </select>
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Tehsil Name</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder="Tehsil Name*" name="tehsil_name" maxlength="50" />
+                        <label class="error_msg float-right" id="tehsil_error"></label>
+                    </div>
+                </div> 
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    function getDistrict(state_id, id){
+        if(state_id != ""){
+            //showLoader();
+            var url = "{% url 'src:get-district-options' 1 %}";
+            url = url.replace(1,state_id)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    // hideLoader();
+                    $('[name="'+id+'"]').html(data.options)
+                    $(".selectField").select2();
+                    
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            });
+        } else {
+            $('[name="'+id+'"]').html('<option value="" selected>Select</option>')
+            $(".selectField").select2();
+        }
+        
+    }
+    function saveTehsil() {
+        showLoader();
+        if(validatetehsilForm()){
+              hideLoader();
+            return false;
+        }else{
+            $.ajax({
+                url: "{% url 'src:add-tehsil' %}",
+                method: 'POST',
+                data: $('#addtehsilForm').serialize(),
+                success: function (data) {
+                    hideLoader();
+                    if(data.flag){
+                        $("#addProductModal").html('');
+                        $("#addProductModal").hide();
+                        getList('tehsil')
+                        openToaster("success", data.message);
+                    }else{
+                        openToaster("danger", data.message);
+                    }
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            }).always(function() {
+                // hideLoader();
+            });
+        } 
+    }
+    
+    
+    function validatetehsilForm(){
+        error = 0;
+        $('.error_msg ').text('');
+        $('.inputField').css("border", "");
+
+        if($('[name="district_id"]').val() == ""){
+            $('[name="district_id"]').parent().find('.error_msg').text('Please select district');
+            $('[name="district_id"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+            error = error + 1;
+        }
+        
+        if($.trim($('[name="tehsil_name"]').val()) == ""){
+            $('[name="tehsil_name"]').parent().find('.error_msg').text('Please enter tehsil name');
+            $('[name="tehsil_name"]').css("border", "1px solid #db8305");
+            error = error + 1;
+        }
+ 
+        if(error > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+
+</script>

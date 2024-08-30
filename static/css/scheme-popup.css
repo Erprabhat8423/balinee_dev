@@ -1,0 +1,99 @@
+.inputField{
+    font-size: 10px !important;    
+    overflow: scroll !important;
+    white-space: normal !important;
+    cursor: pointer;
+}
+.order-cretw-popup{
+    border: 1px solid lightgrey;
+    padding: 4.2px;
+    border-radius: 0.6rem;
+    background-color: lightgray;
+    text-align: center;
+
+}
+table th{width: 16%;}
+
+.route-free-scheme .select2-container, .town-free-scheme .select2-container{
+    width: 100% !important;
+    max-height: 55px;
+    border: 1px solid #dee2e6!important ;
+    overflow: auto;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.modal-body {
+    overflow: scroll;height: calc(100% - 70px) !important;overflow-x: hidden;
+}
+.modal-header{
+    padding: 6px;
+}
+.modal-AddUser{ height: 93%;}
+
+#ajaxDistributors {
+    overflow: scroll;
+    height: 100%;
+}
+
+
+.remove-user-closebtn{
+    display: block;
+    height: 33px;
+    text-align: center;
+    padding: 6px 0;
+    background-color: #fff;
+    border: 1px solid lightgrey;
+    border-radius: 8px;
+    width: 50px;
+}
+
+.incetive-amount{
+    background-color: #fff;
+    border: 1px solid lightgrey;
+    font-size: 13px;
+    padding: 5px;
+    border-radius: 0.6rem;width: 100px;
+}
+.form-fill-create-scheme{
+    overflow: auto;
+    overflow-x: hidden;
+}
+.table thead th ,h5 { cursor: default;}
+.desk-quant-scheme{
+    overflow-x: hidden;
+}
+@media screen and (max-width: 767px) {
+    .modal-header{
+        padding: 10px;
+    }
+    .mob-border-right-0{ border-right: 0 !important ;}
+    .route-free-scheme .select2-container, .town-free-scheme .select2-container{
+        max-height: 100%;
+        }
+        
+    .form-fill-create-scheme{
+        padding: 8px 8px 0 !important;
+    }
+    .userTable{
+        /* box-shadow: 0px 0px 2px 1px rgb(0 0 0 / 15%); */
+        padding: 8px 8px 10px 8px !important;
+    }
+  
+    .table td, .table th {
+        padding: 0px;
+    }
+    .select2-container .select2-selection--single .select2-selection__rendered{ font-size: 11px;}
+    .select2-container .select2-search--inline .select2-search__field {
+        font-size: 11px;
+    }
+    .modal-body{
+        padding: 8px;
+    }
+    #ajaxDistributors {
+        height: auto;
+    }
+    .mob-overflow-y-hidden{
+        overflow-y: hidden !important;
+    }
+}

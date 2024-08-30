@@ -1,0 +1,168 @@
+{% load static %}
+
+<div class="md-modal centered" style="height:400px;">
+    <div class="modal-header" id="headerStep1">
+        <div class="col-12 p-0">
+            <div class="row">
+                <div class="col-6">
+                    <h5 class="mt-md-2">Salary Deduction Type Mapping ({{role.role_name}}) &nbsp;&nbsp;</h5>
+                </div>
+                <div class="col-6">
+                    <button class="btn btn-save float-right" type="button" onclick="saveRoleMapping()" >
+                        Save & Proceed
+                    </button>
+                    <button class="btn btn-close float-right" type="button" onclick="manipulateModal('addUserModal','close')">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+        <div class="row" style="overflow:scroll; height:400px;">
+            <div class="col-md-12 p-0 h-100 w-100" id="step1">
+                <div class="row">
+                    <div class="col-md-6" style="border-right: 1px solid rgb(95, 93, 93);">
+                        <ul class="list-group" id="entity_list">
+                            {% for salary_deduction in salary_deductions %}
+                            <li id="salary_deduction_{{salary_deduction.id}}" class="list-group-item" onclick="movePolicy('{{salary_deduction.id}}','{{salary_deduction.deduction}}')"><a href="javascript:;" >{{salary_deduction.deduction}}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <form id="mappingForm">
+                            {% csrf_token %}
+                            
+                            
+                            <div id="input_section">
+                                {% if mapping %}
+                                {% for mapping_salary_deduction in mapping %}
+                                <input type="hidden" name="salary_deduction_id[]" value="{{mapping.entity_id}}" >
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                            <input type="hidden" name="role_id" value="{{role.id}}">
+                            <input type="hidden" name="entity_type" value="salary_deduction">
+                            <ul class="list-group" id="mapped_section">
+                                {% if mapping %}
+                                {% for mapping_salary_deduction in mapping %}
+                                <li id="salary_deduction_{{mapping_salary_deduction.entity_id}}" class="list-group-item"><a href="javascript:;" onclick="movePolicy('{{mapping_salary_deduction.entity_id}}','{{mapping_salary_deduction.deduction}}')">{{mapping_salary_deduction.deduction}}</a></li>
+                                {% endfor %}
+                                {% endif %}
+                            </ul>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<script>
+    var temp = [];
+    function movePolicy(salary_deduction_id,salary_deduction){
+        
+        var list = `
+        <li id="salary_deduction_`+salary_deduction_id+`" class="list-group-item" onclick="moveBackPolicy('`+salary_deduction_id+`','`+salary_deduction+`')">
+            <a href="javascript:;" >
+                `+salary_deduction+`
+            </a>
+        </li>`;
+        $('#mapped_section').append(list);
+        temp.push(salary_deduction_id);
+        
+        var refreshed_list = ``;
+        {% for salary_deduction in salary_deductions %}
+        var current_id = '{{salary_deduction.id}}';
+        if($.inArray(current_id, temp) === -1){
+            refreshed_list += `
+            <li id="salary_deduction_{{salary_deduction.id}}" class="list-group-item">
+                <a href="javascript:;" onclick="movePolicy('{{salary_deduction.id}}','{{salary_deduction.deduction}}')">
+                    {{salary_deduction.deduction}}
+                </a>
+            </li>
+            `;
+        }
+        {% endfor %}
+        $('#entity_list').html(refreshed_list);
+        
+        var inputs = ``;
+        $.each(temp,function(index,val){
+            inputs += `<input type="hidden" name="salary_deduction_id[]" value="`+val+`" >`;
+        });
+        $('#input_section').html(inputs);
+        console.log(temp);
+    }
+    
+    function moveBackPolicy(salary_deduction_id,salary_deduction){
+        temp.splice($.inArray(salary_deduction_id, temp), 1);
+        
+        var inputs = ``;
+        $.each(temp,function(index,val){
+            inputs += `<input type="hidden" name="salary_deduction_id[]" value="`+val+`" >`;
+        });
+        
+        $('#input_section').html(inputs);
+        $('#salary_deduction_'+salary_deduction_id).remove();
+
+        var refreshed_list = ``;
+        {% for salary_deduction in salary_deductions %}
+        var current_id = '{{salary_deduction.id}}';
+        if($.inArray(current_id, temp) === -1){
+            refreshed_list += `
+            <li id="salary_deduction_{{salary_deduction.id}}" class="list-group-item">
+                <a href="javascript:;" onclick="movePolicy('{{salary_deduction.id}}','{{salary_deduction.deduction}}')">
+                    {{salary_deduction.deduction}}
+                </a>
+            </li>
+            `;
+        }
+        {% endfor %}
+        $('#entity_list').html(refreshed_list);
+    }
+    
+    function saveRoleMapping(){
+        showLoader();
+        if(validateForm()){
+            hideLoader();
+            return false;
+        }else{
+            $.ajax({
+                url: "{% url 'src:save-role-salary-deduction-mapping' %}",
+                method: 'POST',
+                data: $('#mappingForm').serialize(),
+                success: function (data) {
+                    hideLoader();
+                    if(data.flag){
+                        $('#addUserModal').html('');
+                        $('#addUserModal').hide();
+                        openToaster("success", data.message);
+                    }else{
+                        openToaster("danger", data.message);
+                    }
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            }).always(function() {
+                hideLoader();
+            });
+        }
+    }
+    
+    function validateForm(){
+        error = false;
+        $('[name="salary_deduction_id[]"]').each(function(){
+            if($(this).val() == ""){
+                error = true;
+            }
+        });
+        if(error){
+            openToaster("warning", "Please choose leave policy");
+        }
+        return error;
+    }
+</script>

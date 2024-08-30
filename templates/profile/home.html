@@ -1,0 +1,277 @@
+{% extends 'layout/layout.html' %}
+
+{% block title %}
+{{page_title}} 
+{% endblock %}
+
+
+
+{% load helper_tags %}
+{% load humanize %}
+
+{% block content %}
+
+
+{% load static %}
+
+
+
+{% block style %}
+
+
+<link rel="stylesheet" href="{% static 'css/paper-dashboard.css' %}" />
+
+<style type="text/css">
+   #toal_vs_due {
+    width: 100%;
+    height: 500px;
+}
+
+</style> 
+
+{% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-8 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-5 p-md-0">
+                    <h6><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-12 p-md-0">
+                    <div class="row">
+                        <div class="col-sm-2 col-5">
+                            <input id="filter_date" class="inputField" placeholder="Date" value="{% now 'd/m/Y' %}" type="text" readonly onchange="filterStudentAttendance()" >
+                        </div>
+                        <div class="col-sm-5 col-5" >
+                            <select class="inputField selectField" name="filter_org" id="filter_org" onchange="filterStudentAttendance()">
+                                {% for org in college_names %}
+                                <option value="{{org.id}}" {% if first_college.id == org.id|add:"0" %}selected{% endif %}>{{org.organization_name}}</option>   
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="row" id ="graph" name="graph">
+                        <div class="col-md-12">
+                            <div id="toal_vs_due"></div>
+                        </div>
+                    </div>
+                </div>   
+
+
+            </div>
+        </div>
+        <hr/>
+
+        
+    </div>
+    <div class="col-md-4 col-12 px-3 mob-h-100 h-100 mob-mt-8">
+        <div class="primaryContainerBG h-100" id="detailsBox" style="overflow: hidden;">
+            <div class="row">
+                <div class="col-sm-12 col-12 px-0 ">
+                    <div class="panel" id="daily-feed">
+                        <div class="panel-heading">
+                            <h3 class="panel-title"><img src="{% static 'img/png/activity.png' %}" class="tableRowIcon">Activity Feeds</h3>
+                            <div class="panel-body infinite-scroll" style="max-height: 750px; overflow:auto">
+                                <ul class="list-group list-group-dividered list-group-full infinite-scroll">
+                                    {% if activity_list %}
+                                    {% for activity in activity_list %}
+                                    <li class="list-group-item">
+                                        <div class="media">
+                                            <div class="media-left">
+                                                <a class="avatar" href="javascript:void(0)">
+                                                    <img src="{% static 'img/png/activity/' %}{{activity.icon}}"
+                                                    alt="">
+                                                    <i></i>
+                                                </a>
+                                            </div>
+                                            <div class="media-body">
+                                                <h4 class="media-heading">
+                                                    <small class="pull-right">
+                                                        <img src="{% static 'img/png/activity/' %}{{activity.platform_icon}}" class="activity-img" />
+                                                    </small>
+                                                    <a class="name">{{ activity.heading }}</a>.
+                                                </h4>
+                                                <!-- <small>Today 12:00 am - 12.04.2015</small> -->
+                                                <div class="content well">
+                                                    {{ activity.activity }}
+                                                    <br clear="all">
+                                                    <small class="pull-right">{{ activity.created_at|natural_timesince }}</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    {% endfor %}
+                                    {% include 'layout/paginator.html' with page=activity_list %}
+                                    {% else %}
+                                    <p>No Activity Found...</p>
+                                    {% endif %}
+                                </ul>
+                            </div> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% endblock content %}
+    {% block script %}
+    <script src="{% static 'js/jquery.jscroll.min.js' %}"></script>
+    <script>
+        $('div.pagination').hide();
+        $(function() {
+            $('div.pagination').hide();
+            $('.infinite-scroll').jscroll({
+                autoTrigger: true,
+                loadingHtml: '<div style="margin-top:10px; text-align:center"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>', 
+                padding: 0,
+                nextSelector: '.pagination span.active + span a',
+                contentSelector: 'ul.infinite-scroll',
+                data:{
+                    id:1
+                },
+                callback: function() {
+                    $('div.pagination').remove();
+                }
+            });
+        })
+
+        function filterStudentAttendance(){
+
+            var date = $('#filter_date').val();
+            var filter_org = $('#filter_org').val();
+            url = "{% url 'src:graph-ajaxFilter' %}"
+
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: {
+                    date:date,
+                    filter_org:filter_org,                
+                    csrfmiddlewaretoken: '{{ csrf_token }}'
+                },
+                success: function (data) {
+
+                    hideLoader();
+                    $('#graph').html(data);
+                },
+                error: function (err) {
+                    alert(err.message);
+                }
+            });
+        }
+    </script>
+    <script src="https://www.amcharts.com/lib/4/core.js"></script>
+    <script src="https://www.amcharts.com/lib/4/charts.js"></script>
+    <script src="https://www.amcharts.com/lib/4/themes/animated.js"></script>
+
+
+    <script>
+        am4core.ready(function() {
+            $("#filter_date").datepicker({  
+                changeMonth: true,
+                changeYear: true,  
+                yearRange: "-100:+0",
+                maxDate: 0,
+                dateFormat: 'dd/mm/yy' 
+            });
+            am4core.useTheme(am4themes_animated);
+            /*-------------toal_vs_due----------*/
+            var chart = am4core.create('toal_vs_due', am4charts.XYChart3D)
+            chart.colors.step = 2;
+            chart.responsive.enabled = true;
+
+
+            chart.legend = new am4charts.Legend()
+            chart.legend.position = 'bottom'
+            chart.legend.paddingBottom = 20
+            chart.legend.labels.template.maxWidth = 95
+
+            var xAxis = chart.xAxes.push(new am4charts.CategoryAxis())
+            xAxis.dataFields.category = 'category'
+            xAxis.renderer.cellStartLocation = 0.1
+            xAxis.renderer.cellEndLocation = 0.9
+            xAxis.renderer.grid.template.location = 0;
+            xAxis.renderer.minGridDistance = 30;
+            xAxis.renderer.labels.template.rotation = 320;
+
+            var yAxis = chart.yAxes.push(new am4charts.ValueAxis());
+            yAxis.min = 0;
+
+            function createSeries(value, name) {
+                var series = chart.series.push(new am4charts.ColumnSeries3D())
+                series.dataFields.valueY = value
+                series.dataFields.categoryX = 'category'
+                series.columns.template.tooltipText = "{name}: [bold]{valueY}[/]";
+                series.name = name
+
+                series.events.on("hidden", arrangeColumns);
+                series.events.on("shown", arrangeColumns);
+
+                var bullet = series.bullets.push(new am4charts.LabelBullet())
+                bullet.interactionsEnabled = false
+                bullet.dy = 30;
+                bullet.label.text = '{valueY}'
+                bullet.label.fill = am4core.color('#ffffff')
+
+                return series;
+            }
+
+            chart.data = [            
+            {% for branch in branches %}
+            {
+                category: "{{branch.abbr}}",
+                total_students: {{branch.total_students}},
+                total_attendance: {{branch.total_attendance}},
+            },
+            {% endfor %}
+
+            ]
+
+
+            createSeries('total_students', 'Total Registered Students');
+            createSeries('total_attendance', 'Present Students');
+
+            function arrangeColumns() {
+
+                var series = chart.series.getIndex(0);
+
+                var w = 1 - xAxis.renderer.cellStartLocation - (1 - xAxis.renderer.cellEndLocation);
+                if (series.dataItems.length > 1) {
+                    var x0 = xAxis.getX(series.dataItems.getIndex(0), "categoryX");
+                    var x1 = xAxis.getX(series.dataItems.getIndex(1), "categoryX");
+                    var delta = ((x1 - x0) / chart.series.length) * w;
+                    if (am4core.isNumber(delta)) {
+                        var middle = chart.series.length / 2;
+
+                        var newIndex = 0;
+                        chart.series.each(function(series) {
+                            if (!series.isHidden && !series.isHiding) {
+                                series.dummyData = newIndex;
+                                newIndex++;
+                            }
+                            else {
+                                series.dummyData = chart.series.indexOf(series);
+                            }
+                        })
+                        var visibleCount = newIndex;
+                        var newMiddle = visibleCount / 2;
+
+                        chart.series.each(function(series) {
+                            var trueIndex = chart.series.indexOf(series);
+                            var newIndex = series.dummyData;
+
+                            var dx = (newIndex - trueIndex + middle - newMiddle) * delta
+
+                            series.animate({ property: "dx", to: dx }, series.interpolationDuration, series.interpolationEasing);
+                            series.bulletsContainer.animate({ property: "dx", to: dx }, series.interpolationDuration, series.interpolationEasing);
+                        })
+                    }
+                }
+            }
+            /*-------------toal_vs_due----------*/
+
+        });
+    </script>  
+    {% endblock %}

@@ -1,0 +1,847 @@
+{% load static %}
+
+<div class="modal-AddUser centered">
+    <form name="addBiometricDetailsForms" id="addBiometricDetailsForms" method="POST" enctype="multipart/form-data" >
+        {% csrf_token %}
+        <input type="hidden" name="page-step" id="page-step" value="2" />
+        <input type="hidden" name="last_user_id" id="last_user_id" value="{% if last_user_id %}{{ last_user_id }}{% endif %}" >
+       <div class="modal-header" id="headerStep2" style="display: block!important;">
+            <div class="col-12 p-0">
+                <div class="row">
+                    <div class="col-6">
+                        <button class="iconCover" type="button" onclick="perviousPage('{{ last_user_id }}', '1')">
+                            <img src="{% static 'img/svg/backarrow.svg' %}" style="width: 1rem" />
+                        </button>
+                        <h5 class="mt-md-2" style="display: inline">
+                            &nbsp;&nbsp; Academic Details
+                        </h5>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-save float-right" type="submit" >
+                            Save & Proceed
+                        </button>
+                        <button class="btn btn-close float-right" type="button" onclick="manipulateModal('addUserModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal-body" id="addUserModalBody" style="width:100% !important; height: 100%; overflow: auto">
+            <div class="row">
+                <div class="col-md-12 p-0 h-100 w-100" id="step1">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-12 p-0">
+                                    <div class="row">
+                                        <div class="col-md-12 p-0">
+                                            <div class="row">
+                                                <div class="col-md-3 p-0 mt-2">
+                                                    <div class="row mt-3">
+                                                        <div class="col-md-12 p-0">
+                                                         <ul class="thumboption">
+                                                            <li class="thumbcontent">
+                                                                <a href="#">
+                                                                    {% if user.finger_iso_1 %}
+                                                                    <img src="/static/img/png/fingerprint_b.png" id="data_finger_1" class="thumbicon" >
+                                                                    {% else %} 
+                                                                    <img src="/static/img/svg/fingerprint.svg" id="data_finger_1" class="thumbicon" >
+                                                                    {% endif %}
+                                                                   &nbsp;&nbsp;<br>
+                                                                   <h6 class="mt-2 mb-0 btn text-white btn-primary" style="display: inline-block;" onClick="return Capture('1');">
+                                                                       <!--<img src="/static/img/svg/user_NEW.svg" class="usericon" >--> Scan Right Thumb
+                                                                   </h6></a><br>
+                                                                   <!-- <img id="data_finger_1" width="50px" height="50px" alt=""  /> -->
+                                                                   <input type="hidden" id="img_finger_1" name="img_finger_1" value="img_finger_1">  
+                                                                    {% if user.finger_iso_1 %}
+                                                                    <input type="hidden" id="finger_iso_1" name="finger_iso_1" value="{{user.finger_iso_1}}">
+                                                                    {% else %} 
+                                                                    <input type="hidden" id="finger_iso_1" name="finger_iso_1" value="">  
+                                                                    {% endif %} 
+                                                                   
+                                                                   <label class="error_msg float-center" id="finger_iso_1_error"></label>
+                                                                </li>
+                                                                <li class="thumbcontent">
+                                                                   <a href="#">
+                                                                        {% if user.finger_iso_2 %}
+                                                                        <img src="/static/img/png/fingerprint_b.png" id="data_finger_2" class="thumbicon" >
+                                                                        {% else %} 
+                                                                        <img src="/static/img/svg/fingerprint.svg" id="data_finger_2" class="thumbicon" >
+                                                                        {% endif %}
+                                                                       &nbsp;&nbsp;<br>
+                                                                       <h6 class="mt-2 mb-0 btn text-white btn-primary" style="display: inline-block;" onClick="return Capture('2');">
+                                                                          <!-- <img src="/static/img/svg/user_NEW.svg" class="usericon" >--> Scan Left Thumb
+                                                                       </h6>
+                                                                   </a><br>
+                                                                   <!-- <img id="data_finger_2" width="50px" height="50px" alt=""  /> -->
+                                                                   <input type="hidden" id="img_finger_2" name="img_finger_2" value="img_finger_2">  
+                                                                    {% if user.finger_iso_2 %}
+                                                                    <input type="hidden" id="finger_iso_2" name="finger_iso_2" value="{{user.finger_iso_2}}">
+                                                                    {% else %} 
+                                                                    <input type="hidden" id="finger_iso_2" name="finger_iso_2" value="">  
+                                                                    {% endif %}
+                                                                   
+                                                                   <label class="error_msg float-center" id="finger_iso_2_error"></label> 
+                                                                </li>
+                                                            </ul>     
+                                                     </div>
+                                                    </div> 
+                                                </div>
+                                                <div class="col-md-9 p-0 mt-2">
+                                                <div class="row mt-3">
+                                                    <div class="col-md-3 pr-2 mt-2">
+                                                        
+                                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                                            Course Type
+                                                        </h6>
+                                                    </div>
+                                                    <div class="col-md-3 pl-2 mt-2">
+                                                        
+                                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                                            Branch
+                                                        </h6>
+                                                    </div>
+                                                    <div class="col-md-3 p-0 mt-2">
+                                                        
+                                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                                            Year/Sem
+                                                        </h6>
+                                                    </div>
+                                                    
+                                                    <div class="col-md-3 pr-2 mt-2">
+                                                        
+                                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                                            Section
+                                                        </h6>
+                                                    </div>
+                                                   
+                                                    <div class="col-md-3 p-0 mt-2">
+                                                        <select class="inputField selectField" style="width: 100% !important;" name="course_id" id="course_id" onchange="getBranch(this.value)">
+                                                            <option value="">Course Type</option>
+                                                            {% for course in courses %}
+                                                            <option value="{{course.id}}" {% if user.course_type_id ==  course.id %}selected{% endif %}>{{course.course_type}}</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                        <label class="error_msg float-right" id="course_id_error"></label>
+                                                    </div>
+                                                    <div class="col-md-3 pl-2 mt-2">
+                                                        <select class="inputField selectField" style="width: 100% !important;" name="branch_id" id="branch_id" onchange="getBranchSemYear(this.value)">
+                                                            <option value="">Branch </option>
+                                                            {% if branches %}
+                                                            {% for branch in branches %}
+                                                            <option value="{{branch.id}}" {% if branch.id == user.branch_id|add:"0" %}selected{% endif %}>{{branch.branch}}</option>
+                                                            {% endfor %}
+                                                            {% endif %}
+                                                        </select>   
+                                                        <label class="error_msg float-right" id="branch_id_error"></label>
+                                                   </div>
+                                                   <div class="col-md-3 p-0 mt-2">
+                                                    <!--<select class="inputField selectField" style="width: 100% !important;" name="year_sem_id" id="year_sem_id" >-->
+                                                    <!--    <option value="">Semester</option>-->
+                                                    <!--    {% if year_sem_list %}-->
+                                                    <!--        {% for year_sem in year_sem_list %}-->
+                                                    <!--            <option value="{{year_sem}}" {% if year_sem == semester %}selected{% endif %}>{{year_sem}}</option>-->
+                                                    <!--        {% endfor %}-->
+                                                    <!--    {% endif %}-->
+                                                    <!--</select>   -->
+                                                    <select class="inputField selectField" style="width: 100% !important;" name="year_sem_id" id="year_sem_id" >
+                                                        <option value="">{% if user.semester_id %}Semester{% else %}Year{% endif %}</option>
+                                                        {% if year_sem_list %}
+                                                        {% for year_sem in year_sem_list %}
+                                                        <option value="{{year_sem}}" {% if year_sem == user.year_id|add:"0" %}selected{% endif %} {% if year_sem == user.semester_id|add:"0" %}selected{% endif %}>{{year_sem}}</option>
+                                                        {% endfor %}
+                                                        {% endif %}
+                                                    </select>
+                                                    <label class="error_msg float-right" id="year_sem_id_error"></label>
+                                                    </div>
+                                                    
+                                                   <div class="col-md-3 pr-2 mt-2">
+                                                   <select class="inputField selectField" style="width: 100% !important;" name="section_id" id="section_id" onchange="getStudentRegistrationId()">
+                                                    <option value="" data-select2-id="select2-data-250-8mry">Section</option>
+                                                        {% for section in sections %}
+                                                        <option value="{{section.id}}" {% if section.id == user.section_id|add:"0" %}selected{% endif %}>{{section.section_name}}</option>
+                                                        {% endfor %}
+                                                   </select>   
+                                                   <label class="error_msg float-right" id="section_id_error"></label>
+                                                </div>
+                                                <div class="col-md-12 pr-2 mt-2">
+                                                        
+                                                    <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                                        Roll No
+                                                    </h6>
+                                                </div>
+                                                <div class="col-md-12 pr-0 mt-2">
+                                                   
+                                                        <input class="inputField" type="text" placeholder="Enter Roll No" name="roll_no" id="roll_no" maxlength="50" value="{% if user.reg_no %}{{user.reg_no}}{% endif %}" readonly>
+                                                        <label class="error_msg float-right" id="roll_no_error"></label>
+
+                                                </div>
+                                                <div class="col-md-12 pr-0">
+                                                    <div class="col-md-12 p-0">
+                                                        
+                                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                                            Is he/she appeared in SBAT Exam.
+                                                        </h6>
+                                                    </div>
+                                                    <div class="col-md-12 p-0 mt-2 custom_radio">
+                                                       
+                                                      <input class="rdio_sec" type="radio" name="appeared_option" id="appeared_option1" value="1" onclick="getSBAT('1')" {% if user.sbat_id %}checked{% endif %}>
+                                                        <label  for="appeared_option1">Yes</label>
+                                                    
+                                                        <input class="rdio_sec" type="radio" name="appeared_option" id="appeared_option2" value="0" onclick="getSBAT('0')" {% if user.sbat_id is None %}checked{% endif %}>
+                                                        <label  for="appeared_option2">No</label>
+                                                    </div>
+                                                </div>  
+                                                <div class="col-md-6 pr-0 sbt_div">
+                                                    <div class="col-md-12 p-0">
+                                                        
+                                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                                            SBAT ID
+                                                        </h6>
+                                                    </div>
+                                                    <div class="col-md-12 p-0 mt-2">
+                                                        <input class="inputField " type="text" placeholder="SBAT ID" name="sbat_id" id="sbat_id" maxlength="25" value="{% if user.sbat_id %}{{user.sbat_id}}{% endif %}">
+                                                        <label class="error_msg float-right" id="roll_no_error"></label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-6 pr-0 sbt_div">
+                                                    <div class="col-md-12 p-0">
+                                                        
+                                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                                            Percentage
+                                                        </h6>
+                                                    </div>
+                                                    <div class="col-md-12 p-0 mt-2">
+                                                        <input class="inputField" type="text" placeholder="Percentage" name="percent" id="percent" maxlength="5" value="{% if user.sbat_percentage %}{{user.sbat_percentage}}{% endif %}">
+                                                        <label class="error_msg float-right" id="roll_no_error"></label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                                </div>
+                                            </div>
+                                        
+                                       
+                                    </div>
+                                </div>
+                            </div>
+                            <input type="hidden" id="contact_number_error" val="0">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      
+        
+        
+        <nav class="navbar fixed-bottom" id="modalFooter">
+            <div class="dropdown-divider w-100"></div>
+            <div class="col-1 offset-11 p-0">
+                <ul id="stepFooter">
+                    <li id="li1" class="selectedstep">
+                        <button class="btn btn-step activeStep" id="stepBtn1">
+                            ✔
+                        </button>
+                    </li>
+                    <li id="li2">
+                        <button class="btn btn-step activeStep" id="stepBtn2">
+                            ✔
+                        </button>
+                    </li>
+                    <li id="li3">
+                        <button class="btn btn-step" id="stepBtn3">
+                            ✔
+                        </button>
+                    </li>
+                    
+                </ul>
+            </div>
+        </nav>
+    </form>
+</div>
+
+<script src="{% static 'js/Nitgen.js' %}"></script>
+
+<script type="text/javascript">
+    $(".selectField").select2();
+	function Capture(id) {
+		try {
+			var res = CaptureFinger();
+			if (res.httpStaus) {
+
+				if (res.data.ErrorCode == "0") {
+					document.getElementById('data_finger_'+id).src = "/static/img/png/fingerprint_b.png";
+					document.getElementById('finger_iso_'+id).value = res.data.IsoTemplate;
+					document.getElementById('img_finger_'+id).value = res.data.BitmapData;
+				}
+			}
+			else {
+				alert(res.err);
+			}
+		}
+		catch (e) {
+			alert(e);
+		}
+		return false;
+	};
+    
+    function getBranch(val){
+        
+        if(val != ""){
+            college_id = '{{college_id}}';
+            $.ajax({
+                url: "{% url 'src:get-branch-list' %}",
+                method: 'POST',
+                data:{val:val, college_id:college_id, csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+                success: function (data) {
+                    $('[name="branch_id"]').html(data.options)
+                    $(".selectField").select2();
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        } else {
+            $('[name="branch_id"]').html('<select>Select Branch</select>');
+            $('[name="year_sem_id"]').html('<select>Select Year/Sem</select>');
+        }
+    };
+
+    function getBranchSemYear(val){
+        
+        if(val != ""){
+            $.ajax({
+                url: "{% url 'src:get-branch-sem-year-list' %}",
+                method: 'POST',
+                data:{val:val, csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+                success: function (data) {
+                    $('[name="year_sem_id"]').html(data.options)
+                    $(".selectField").select2();
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        } else {
+            $('[name="year_sem_id"]').html('<select>Select Year/Sem</select>');
+        }
+    };
+
+    function getStudentRegistrationId(){
+        var last_user_id        = '{{last_user_id}}'
+        var course_id           = $('[name="course_id"]').val();
+        var branch_id           = $('[name="branch_id"]').val();
+        var year_sem_id         = $('[name="year_sem_id"]').val();
+        var section_id          = $('[name="section_id"]').val();
+        
+        $.ajax({
+            url: "{% url 'src:get-student-registration-no' %}",
+            method: 'GET',
+            data:{last_user_id:last_user_id, course_id:course_id, branch_id:branch_id, year_sem_id:year_sem_id, section_id:section_id},
+            success: function (data) {
+                $('#roll_no').val(data.reg_no);
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+        
+    };
+
+    function getSBAT(id){
+        if(id == '1'){
+            $('.sbt_div').show();
+        }else{
+            $('.sbt_div').hide();
+        }
+    }
+    {% if user.sbat_id %}
+        $('.sbt_div').show();
+    {% else %}
+        $('.sbt_div').hide();
+    {% endif %}
+</script>
+<script>
+    
+    $('#addBiometricDetailsForms').submit(function(e){
+        debugger;
+        var error = 0;
+        var p1 = document.forms["addBiometricDetailsForms"]["finger_iso_1"].value;
+        document.getElementById('finger_iso_1_error').innerHTML = '';
+        $('#finger_iso_1').css("border", "");
+        if (p1 == null || p1 == "") {
+            var error = 1;
+            document.getElementById('finger_iso_1_error').innerHTML = 'Please select right thumb*';
+            $('#finger_iso_1').css("border", "1px solid #db8305");
+        }
+        var p1 = document.forms["addBiometricDetailsForms"]["finger_iso_2"].value;
+        document.getElementById('finger_iso_2_error').innerHTML = '';
+        $('#finger_iso_2').css("border", "");
+        if (p1 == null || p1 == "") {
+            var error = 1;
+            document.getElementById('finger_iso_2_error').innerHTML = 'Please select left thumb*';
+            $('#finger_iso_2').css("border", "1px solid #db8305");
+        }
+        var p1 = document.forms["addBiometricDetailsForms"]["course_id"].value;
+        document.getElementById('course_id_error').innerHTML = '';
+        $('#course_id').css("border", "");
+        if (p1 == null || p1 == "") {
+            var error = 1;
+            document.getElementById('course_id_error').innerHTML = 'Select Course*';
+            $('#course_id').css("border", "1px solid #db8305");
+        }
+
+        var p1 = document.forms["addBiometricDetailsForms"]["branch_id"].value;
+        document.getElementById('branch_id_error').innerHTML = '';
+        $('#branch_id').css("border", "");
+        if (p1 == null || p1 == "") {
+            var error = 1;
+            document.getElementById('branch_id_error').innerHTML = 'Select Branch*';
+            $('#branch_id').css("border", "1px solid #db8305");
+        }
+
+        var p1 = document.forms["addBiometricDetailsForms"]["section_id"].value;
+        document.getElementById('section_id_error').innerHTML = '';
+        $('#section_id').css("border", "");
+        if (p1 == null || p1 == "") {
+            var error = 1;
+            document.getElementById('section_id_error').innerHTML = 'Select Section*';
+            $('#section_id').css("border", "1px solid #db8305");
+        }
+
+       
+        if (error == 0) {
+            showLoader();
+            e.preventDefault();
+            $form = $(this)
+            var formData = new FormData(this);
+            $.ajax({
+                url: "{% url 'src:add-student-biometric-details' %}",
+                type: 'POST',
+                data: formData,
+                cache: false,
+                contentType: false,
+                processData: false,
+                success: function (response) {
+                    if (response.error == true) {
+                        location.reload();
+                        $(".error_msg").html('');
+                        var data = response.message;
+                        $.each(data, function (index, value) {
+                            console.log(index);
+                            console.log(value);
+                            $('#' + index).html(value);
+                        });
+                    } else {
+                        $('#addUserModal').html(response);
+                        hideLoader();
+                        $('#headerStep3').show();
+                       // location.reload();
+                    }
+                },
+                error: function (response) {
+                    hideLoader();
+                    var data = response.responseText;
+                    openToaster("danger", data);
+                    // $.each(data, function (index, value) {
+                    //     console.log(index);
+                    //     console.log(value);
+                    //     $('#' + index).html(value);
+                    // });
+                }
+            });
+        } else {
+            var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+            $("#addUserModalBody").height(mch);
+            $(".selectField").select2();
+            return false;
+            
+        }
+    });
+    
+    
+    
+    function getState(country_id, id, store_state_id, store_city_id, permanent_city_id){
+        if(country_id != ""){
+            //showLoader();
+            var url = "{% url 'src:get-state-options' 1 %}";
+            url = url.replace(1,country_id)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    // hideLoader();
+                    $('[name="'+id+'"]').html(data.options)
+                    $(".selectField").select2();
+                    if(store_state_id!=''){
+                        $('#permanent_state_id').val(store_state_id).trigger('change');
+                        getCity(store_state_id, 'permanent_city_id', store_city_id); 
+                    }
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            });
+        } else {
+            $('[name="'+id+'"]').html('<option value="" selected>Select State</option>')
+            $('[name="'+permanent_city_id+'"]').html('<option value="" selected>Select City</option>')
+            $(".selectField").select2();
+        }
+        
+    }
+    
+    function getCity(state_id, id, store_city_id){
+        if(state_id != ""){
+            //showLoader();
+            var url = "{% url 'src:get-city-options' 1 %}";
+            url = url.replace(1,state_id)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    // hideLoader();
+                    $('[name="'+id+'"]').html(data.options)
+                    $(".selectField").select2();
+                    if(store_city_id!=''){
+                        $('#permanent_city_id').val(store_city_id).trigger('change');
+                    }
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            });
+        } else {
+            $('[name="'+id+'"]').html('<option value="" selected>Select City</option>')
+            $(".selectField").select2();
+        }
+        
+    }
+    function openImageSelector(fileUploadID) {
+        $("#" + fileUploadID).click();
+    }
+    
+    function fileUploader(id, previewId, fileType) {
+        for (var i = 0; i < $("#"+id).get(0).files.length; ++i) {
+            var file1=$("#"+id).get(0).files[i].name;
+            var error = 0;
+            if(fileType == 'Store Image'){
+                document.getElementById('store_image_error').innerHTML = '';
+            }else{
+                document.getElementById('profile_image_error').innerHTML = '';
+            }
+            
+            if(file1){                     
+                var ext = file1.split('.').pop().toLowerCase(); 
+                if($.inArray(ext,['jpg', 'JPG', 'jpeg', 'JPEG', 'png', 'PNG'])===-1){
+                    error = 1;   
+                    if(fileType == 'Store Image'){
+                        document.getElementById('store_image_error').innerHTML = ''+fileType+' should be jpg or png*';
+                    }else{
+                        document.getElementById('profile_image_error').innerHTML = ''+fileType+' should be jpg or png*';
+                    }
+                    if(fileType == 'Store Image'){
+                        $("#"+previewId).attr("src", "static/img/png/storePic.png");
+                    }else{
+                        $("#"+previewId).attr("src", "static/img/svg/uploadProfile.svg");
+                    }
+                    
+                    $("#"+id).val('');
+                }else{
+                    error = 0;
+                    if(file1){                        
+                        var file_size=$("#"+id).get(0).files[i].size;
+                        file_size = Math.round((file_size / 1024));
+                        if(file_size>2048){
+                            error = 1;
+                            if(fileType == 'Store Image'){
+                                document.getElementById('store_image_error').innerHTML = ''+fileType+' should be upto 2MB*';
+                            }else{
+                                document.getElementById('profile_image_error').innerHTML = ''+fileType+' should be upto 2MB*';
+                            }
+                            
+                            if(fileType == 'Store Image'){
+                                $("#"+previewId).attr("src", "static/img/png/storePic.png");
+                            }else{
+                                $("#"+previewId).attr("src", "static/img/svg/uploadProfile.svg");
+                            }
+                            $("#"+id).val('');
+                        }else{
+                            error = 0;
+                        }                        
+                    } else {
+                        error = 0; 
+                    }
+                }                        
+            } else {
+                error = 0;
+            }
+        }
+        if(error == 0){
+            var i = $('#' + id).prev("label").clone();
+            var temp = $('#' + id)[0].files;
+            var file = temp[0].name;
+            $('#' + id).prev("label").text(file);
+            readURL(temp, previewId);
+        }
+    }
+    
+    function readURL(input, previewId) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+            $('#' + previewId).attr('src', e.target.result);
+            $('#' + previewId).css({ "width": "100%!important;", "transform": "translate(0,0)" });
+            $('#' + previewId).addClass('w-100 imgStyle');
+        }
+        reader.readAsDataURL(input[0]);
+    }
+    
+    function sameAbove(formtype) {
+        var store_address_line_1 = document.getElementById('store_address_line_1')
+        var store_address_line_2 = document.getElementById('store_address_line_2')
+        var store_country_id = document.getElementById('store_country_id').value
+        var store_state_id = document.getElementById('store_state_id').value
+        var store_city_id = document.getElementById('store_city_id').value
+        var store_pincode = document.getElementById('store_pincode')
+        var permanent_address_line_1 = document.getElementById('permanent_address_line_1');
+        var permanent_address_line_2 = document.getElementById('permanent_address_line_2');
+        var permanent_country_id = document.getElementById('permanent_country_id');
+        var permanent_state_id = document.getElementById('permanent_state_id');
+        var permanent_city_id = document.getElementById('permanent_city_id');
+        var permanent_pincode = document.getElementById('permanent_pincode');
+        
+        permanent_address_line_1.value = store_address_line_1.value
+        permanent_address_line_2.value = store_address_line_2.value
+        permanent_pincode.value = store_pincode.value
+        
+        $('#permanent_country_id').val(store_country_id).trigger('change');
+        
+        if(store_country_id != ''){
+            getState(store_country_id, 'permanent_state_id', store_state_id, store_city_id, 'permanent_city_id');
+        }    
+    }
+    
+    $(".add_user_contact_person").click(function(){
+        var contactNumber = `<div class="row wrappers"><div class="col-md-4 mt-3">
+            <input class="inputField alpha" type="text" placeholder="Name" name="contact_person_name[]"
+            id="contact_person_name" maxlength="50" />
+            <label class="error_msg float-right" id="otherName_error"></label>
+        </div>
+        <div class="col-md-3 mt-3 pl-0">
+            <input class="inputField alpha" type="text" placeholder="Desgination" name="designation[]"
+            id="designation" maxlength="50" />
+            <label class="error_msg float-right" id="otherDesignation_error"></label>
+        </div>
+        <div class="col-md-4 mt-3 pl-0">
+            <input class="inputField numeric" type="text" placeholder="Contact no.*" name="contact_number[]"
+            id="contact_number" maxlength="10" />
+            <label class="error_msg float-right" id="otherContact_error"></label>
+        </div>
+        <div class="col-md-1 mt-3 pl-0">
+            <button class="iconCover float-right fa fa-trash removeContactPerson" style="padding: 0.75rem;" type="button" 
+            onclick="removeTableRow("otherContactCont")">
+        </button>
+    </div></div>`;
+    
+    $("#otherContactCont").append(contactNumber);
+    $('.removeContactPerson').click(function() {
+        $(this).closest('.wrappers').remove();
+    });
+    
+});
+
+$(".add_user_contact").click(function(){
+    var length = $('.contact_no_class').length;
+    console.log(length);
+    var contactPerson = `<div class="row wrapper">
+        <div class="col-md-2 mt-3 p-0">
+            <select class="inputField selectField" style="width: 100% !important;" name="country_code[]">
+                {% for country_code in country_codes %}
+                <option value="{{country_code.country_code}}">{{country_code.country_code}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <div class="col-md-3 mt-3">
+            <input class="inputField contact_no_class numeric" type="text" placeholder="Contact Number" name="contact_no[]"
+            id="contact_no_` + length + `" maxlength="10" />
+            <label class="error_msg float-right contact_no_err_class" id="contact_no_` + length + `_error"></label>
+        </div>
+        <div class="col-md-3 mt-3 pl-0">
+            <select class="inputField contact_type" style="width: 100% !important;" name="contact_type[]" id="contact_type_` + length + `">
+                {% for contact_type in contact_types %}
+                <option value="{{contact_type.id}}">{{contact_type.contact_type}}</option>
+                {% endfor %}
+            </select>
+            <label class="error_msg float-right contact_type_err_class" id="contact_type_` + length + `_error"></label>
+        </div>
+        <div class="col-md-3 mt-3 p-0">
+            <div class="inputfield">
+                <input type="radio" class="input_class_checkbox is_primary" name="is_primary[]" id="set_as_primary_1" >
+                <input type="hidden" name="primary_contact[]" value="0">
+                <label class="mb-0" for="user_Primary_name">Set as Primary</label>
+            </div>
+        </div>
+        <div class="col-md-1 mt-3 p-0">
+            <button class="iconCover float-right fa fa-trash removeContactNumber" style="padding: 0.75rem;" type="button" >
+            </button>
+        </div></div>`;
+        
+        $("#contactNumberCont").append(contactPerson);
+        $(".selectField").select2();
+        $('.removeContactNumber').click(function() {
+            $(this).closest('.wrapper').remove();
+            resetRowIndex();
+        });
+    });
+    
+    $('.removeContactNumber').click(function() {
+        $(this).closest('.wrapper').remove();
+        resetRowIndex();
+    });
+    
+    $('.removeContactPerson').click(function() {
+        $(this).closest('.wrappers').remove();
+    });
+    
+    $(document).on('click','.is_primary',function(){
+        
+        if($(this).prop('checked')){
+            $('.is_primary').prop('checked',false);
+            $('input[name="primary_contact[]"]').val(0);
+            $(this).prop('checked',true);
+            $(this).next().val(1);
+        }
+    });
+    
+    $(document).on('click','.self_owned_val',function(){
+        if ($(this).is(':checked')) {
+            $('#self_owned').val('1');
+        } else {
+            $('#self_owned').val('0');
+        }
+    });
+    
+    $(document).ready(function () {    
+        $("input[type='radio']").click(function () {
+            if ($("input[name='user_gender']:checked")) {
+                var radioValue = $("input[name='user_gender']:checked").val();
+                $("#user_gender_" + radioValue).attr("src", "static/img/svg/" + radioValue + ".svg");
+                if (radioValue == 'male') {
+                    $("#user_gender_female").attr("src", "static/img/svg/femalegrey.svg");
+                    $("#user_gender_other").attr("src", "static/img/svg/othergrey.svg");
+                } else if (radioValue == 'female') {
+                    $("#user_gender_male").attr("src", "static/img/svg/malegrey.svg");
+                    $("#user_gender_other").attr("src", "static/img/svg/othergrey.svg");
+                } else {
+                    $("#user_gender_male").attr("src", "static/img/svg/malegrey.svg");
+                    $("#user_gender_female").attr("src", "static/img/svg/femalegrey.svg");
+                }
+            }
+        });
+    });
+    
+    function resetRowIndex(){
+        obj = $('#addUserModalBody').find('.contact_no_class');
+        $.each( obj, function( key, value ) {
+            id=value.id;
+            var sum = key;
+            $('#'+id).attr('id', 'contact_no_'+sum);
+        });
+        
+        obj = $('#addUserModalBody').find('.contact_no_err_class');
+        $.each( obj, function( key, value ) {
+            id=value.id;
+            var sum = key;
+            $('#'+id).attr('id', 'contact_no_'+sum+'_error');
+        });
+
+        obj = $('#addUserModalBody').find('.contact_type_err_class');
+        $.each( obj, function( key, value ) {
+            id=value.id;
+            var sum = key;
+            $('#'+id).attr('id', 'contact_type_'+sum+'_error');
+        });
+
+        $(document).ready(function () { 
+            
+            // function role_filter_by_org(){
+            //     var filter_org_id = $('#college_name').val();
+            //     console.log("College Name: ", filter_org_id)
+            //     if(filter_org_id){
+            //         $.ajax({
+            //             url: "{% url 'src:filter-by-organization' %}",
+            //             type: 'POST',
+            //             data: {filter_org_id:filter_org_id,csrfmiddlewaretoken: '{{ csrf_token }}'},
+            //             success: function (response) {                        
+            //                 hideLoader();
+            //                 if (response.filter_role_option !='') {
+            //                     $('#branch').html(response.branch_option);
+            //                 } else {
+            //                     openToaster("danger", response.filter_role_option);
+            //                     openToaster("danger", response.filter_role_option);
+            //                 }
+            //             }
+            //         });
+            //     }else{
+            //         $('#filter_role_id').html('');
+            //     }
+                
+            // }
+
+            $("#date_of_birth").datepicker({  
+				changeMonth: true,
+				changeYear: true,  
+				yearRange: "-100:+0"
+				,maxDate: 0,
+				dateFormat: 'dd/mm/yy' 
+				});
+                
+                   
+            $("input[type='radio']").click(function () {
+                if ($("input[name='user_gender']:checked")) {
+                    var radioValue = $("input[name='user_gender']:checked").val();
+                    $("#user_gender_" + radioValue).attr("src", "static/img/svg/" + radioValue + ".svg");
+                    if (radioValue == 'male') {
+                        $("#user_gender_female").attr("src", "static/img/svg/femalegrey.svg");
+                        $("#user_gender_other").attr("src", "static/img/svg/othergrey.svg");
+                    } else if (radioValue == 'female') {
+                        $("#user_gender_male").attr("src", "static/img/svg/malegrey.svg");
+                        $("#user_gender_other").attr("src", "static/img/svg/othergrey.svg");
+                    } else {
+                        $("#user_gender_male").attr("src", "static/img/svg/malegrey.svg");
+                        $("#user_gender_female").attr("src", "static/img/svg/femalegrey.svg");
+                    }
+                }
+            });
+        });
+        
+        
+    }
+</script>
+
+<script>
+    function role_filter_by_org(){
+        var filter_org_id = $('#college_name').val();
+        console.log("College Name: ", filter_org_id)
+        if(filter_org_id){
+            $.ajax({
+                url: "{% url 'src:filter-by-organization' %}",
+                type: 'POST',
+                data: {filter_org_id:filter_org_id,csrfmiddlewaretoken: '{{ csrf_token }}'},
+                success: function (response) {                        
+                    hideLoader();
+                    if (response.filter_role_option !='') {
+                        $('#branch').html(response.branch_option);
+                    } else {
+                        openToaster("danger", response.filter_role_option);
+                        openToaster("danger", response.filter_role_option);
+                    }
+                }
+            });
+        }else{
+            $('#filter_role_id').html('');
+        }
+        
+    }
+</script>

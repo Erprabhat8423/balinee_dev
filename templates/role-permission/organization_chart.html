@@ -1,0 +1,81 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %}
+
+{% endblock %}
+
+
+<div class="row" id="containerHeight">
+	<div class="col-md-8 pr-md-0 h-100">
+		<div class="primaryContainer h-100" id="mainbox">
+			<div class="row mb-2" id="topRow">
+				<div class="col-md-5 p-md-0"> 
+					<h6 class="mt-md-3 mb-md-0"><b>{{page_title}} &nbsp;&nbsp;</b><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+				</div>
+				<div class="col-md-7 p-md-0">
+					<div class="row mb-2 mt-2 manageBlock" id="topRow">
+						<div class="col-md-12 p-md-0 text-right">
+							
+						</div>
+					</div>
+				</div>
+			</div>
+			<div class="row" id="tableBox">
+				<div class="col-md-12 primaryContainerBG h-100 p-0 commonTableBg">
+					
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
+<div class="col-md-4 h-100" id="ajax-role-detail">
+	<div class="primaryContainerBG h-100 manageBlock" id="detailsBox">
+		
+	</div>
+</div>
+</div>
+
+
+</div>
+<!-- ***************************************************************************** -->
+
+
+
+<!-- *************************************Modal********************************** -->
+<div class="overlayModal" id="addPermissionModal">
+	
+</div>
+
+
+<div class="overlayModal" id="workflowModal" style="display: none;">
+	
+</div>
+
+<div class="overlayModal" id="viewWorkflowModal" style="display: none;">
+	
+</div>
+
+</div>
+
+<!-- *************************************Modal********************************** -->
+
+{% endblock content %}
+
+
+
+{% block script %}
+
+
+
+
+
+
+
+{% endblock %}

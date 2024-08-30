@@ -1,0 +1,69 @@
+{% load static %}
+<div class="row" id="tableBox">
+    <div class="col-md-12 primaryContainerBG h-100 p-0 commonTableBg" id="ajax-div" >
+        <input type="hidden" name="page" id="page" value="2" />
+        <input type="hidden" name="page_status" id="page_status" value="0" />
+        <input type="hidden" name="total_pages" id="total_pages" value="{{ total_pages }}" />
+        <table id="addOrgTable" class="detail-table table table-borderless table-striped table-hover mt-0"
+        style="width: 100%;">
+        
+        <tbody id="tablebody">
+            {% if leave_policies %}
+            {% for leave_policy in leave_policies %}
+            <tr  {% if forloop.first %} class="odd selected" {% endif %}>
+                <td class="sorter-false checkbox" >
+                        {% if leave_policy.leave_status != 3 or leave_policy.leave_status != 0 %}
+                        <input type="checkbox" class="checkboxSingle" id="new_module_1" name="policy_id[]" value="{{ leave_policy.id }}" onchange="handleCheckBox()">
+                        {% else %} 
+                            {% if leave_policy.leave_status == 1 %}
+                            <input type="checkbox" class="checkboxSingle" id="new_module_1" name="policy_id[]" value="{{ leave_policy.id }}" onchange="handleCheckBox()">
+                            {% elif leave_policy.leave_status == 2 %}
+                            <input type="checkbox" class="checkboxSingle" id="new_module_1" name="policy_id[]" value="{{ leave_policy.id }}" onchange="handleCheckBox()">
+                            {% elif leave_policy.leave_status == 3 %}
+                            <input type="checkbox" class="checkboxSingle" id="new_module_1" name="policy_id[]" value="{{ leave_policy.id }}" onchange="handleCheckBox()">
+                            {% else %}
+                            <input type="checkboxSingle" disabled checked>
+                            {% endif %}
+                        
+                        {% endif %}
+                    </td>
+                <td class="leave_policy_name" onclick="getLeavePolicyRecord('{{ leave_policy.id }}')">{{ leave_policy.leave_policy | title }}</td>
+                <td class="total_leave_types" onclick="getLeavePolicyRecord('{{ leave_policy.id }}')">{{ leave_policy.total_leave_count }}</td>
+                    {% if leave_policy.policy_status == 0 %}
+                    <td>Discarded</td>
+                    {% elif leave_policy.policy_status == 1 %}
+                    <td>Initiated</td>
+                    {% elif leave_policy.policy_status == 2 %}
+                    <td>Forwarded</td>
+                    {% elif leave_policy.policy_status == 3 %}
+                    <td>Approved</td>
+                    {% endif %}
+                    <td>
+                        <a href="javascript:void(0)" onclick="editLeavePolicy('{{ leave_policy.id }}')" data-toggle="modal" data-target="#addUserModal" class="action_editor">
+                            <img src="{% static 'img/svg/editcopy.svg' %}" title="Edit" />
+                        </a> 
+                        <div class="d-inline-block">
+                            <label class="switch vrt-mdl ml-2">
+                                <input type="checkbox" class="checkbox" name="is_active" id="is_active_4" checked="" onclick="updateLeavePolicyStatus('{{ leave_policy.id }}', '{{ leave_policy.status }}')">
+                                <span class="slider round" title="Enable/Disable"></span>
+                            </label>
+                        </div>
+                    </td>
+            </tr>
+            {% endfor %}
+            <tr id="loading" style="display: none;">
+                <td class="text-center" colspan="3"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                </td>
+            </tr>
+            
+            {% else %}
+            <tr>
+                <td colspan="5" style="text-align: center;">No Record Found...</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+</div>
+
+</div>
+</div>

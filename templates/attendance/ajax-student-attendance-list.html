@@ -1,0 +1,47 @@
+{% load static %}
+{% for student in students %}
+<tr>
+    <td class="table_student_name" onclick="getStudentAttendanceDetail('{{ student.id }}')">
+        <div class="row">
+            <span class="col-sm-10 col-10 pl-0 pr-2"> {{ student.first_name | title }} {% if student.middle_name is not None%}{{ student.middle_name | title }} {% endif %}{{ student.last_name | title }} <br>
+                {{ student.reg_no}}</span> 
+            <div class="col-sm-2 col-2 px-0">
+                {% if student.is_registered == 1 %}
+                <img src="{% static 'img/svg/Verified.svg' %}" alt="" width="15">
+                {% else %}
+                <img src="{% static 'img/svg/notVerified.svg' %}" alt="" width="15">
+                {% endif %}
+            </div>
+        </div>
+    </td>
+
+    <td class="table_phone_no" onclick="getStudentAttendanceDetail('{{ student.id }}')">
+        <div class="row">
+            <span class="col-sm-10 col-10 pl-0 pr-2">
+                {{ student.primary_contact_no }}
+            </span>
+            <div class="col-2 col-sm-2 px-0">
+                {% if student.is_mobile_verified == 1 %}
+                <img src="{% static 'img/svg/Verified.svg' %}" alt="" width="15">
+                {% else %}
+                <img src="{% static 'img/svg/notVerified.svg' %}" alt="" width="15">
+                {% endif %}
+            </div>
+        </div>
+    </td>
+
+    <td class="table_mentor_name" onclick="getStudentAttendanceDetail('{{ student.id }}')">
+        {% if student.teacher_gaurdian_name is not None %}{{ student.teacher_gaurdian_name | title }}{% else %}--{% endif %}
+    </td>
+    <td class="table_college" onclick="getStudentAttendanceDetail('{{ student.id }}')">
+        {{ student.alias|safe }}
+    </td>
+    <td class="table_course" onclick="getStudentAttendanceDetail('{{ student.id }}')">
+        <span class="mr-2">{{ student.branch }}</span>
+        <p class="mt-1">{{student.semester_year}}</p>
+    </td>
+    
+    <td class="table_punch_in">{% if student.punch_in_time %}{{student.punch_in_time |date:'H:i'}}{% else %}--:--{% endif %}</td>
+    <td class="table_punch_out"> {% if student.punch_out_time %}{{student.punch_out_time |date:'H:i'}}{% else %}--:--{% endif %}</td>
+</tr>
+{% endfor %}

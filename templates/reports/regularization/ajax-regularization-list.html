@@ -1,0 +1,146 @@
+{% load static %}
+{% if regularizationReport %}
+{% for regularizationRecord in regularizationReport %}
+<tr  {% if forloop.first %} class="odd selected" {% endif %}>
+    <td class="sorter-false checked_class {{regularizationRecord.regularization_status}}  {{regularizationRecord.level_id}}" >
+        {% if role_id == 0 and regularizationRecord.regularization_status != 3 and regularizationRecord.regularization_status != 4 %}
+        
+        <input type="checkbox" class="checkbox" id="new_module_1 1" name="order_id[]" value="{{ regularizationRecord.id }}" onclick="checkBox()"> 
+        {% else %} 
+        {% if regularizationRecord.status == 0 %}
+        {% if regularizationRecord.regularization_status == 1 and regularizationRecord.level_id == 2 %} 
+        <input type="checkbox" class="checkbox " id="new_module_1 2" name="order_id[]" value="{{regularizationRecord.id}}"> 
+        {% elif regularizationRecord.regularization_status == 2 %} 
+        <input type="checkbox" class="checkbox " id="new_module_1 3" name="order_id[]" value="{{regularizationRecord.id}}"> 
+        {% elif regularizationRecord.regularization_status == 3 %} 
+        <input type="checkbox" class="checkbox  4{{regularizationRecord.status}}" id="new_module_1" name="order_id[]" value="{{regularizationRecord.id}}"> 
+        {% else %}  
+        {% endif %} 
+        {% else %} 
+        <input type="checkbox" disabled checked> 
+        {% endif %}
+        {% endif %}
+    </td>
+    
+    <td class="user_name" >{{ regularizationRecord.user_name  }}</td>
+    <td class="regularization_type" >{{ regularizationRecord.regularization_type_name  }}</td>
+    <td class="regularization_from_date" >
+        {% if regularizationRecord.from_date %}{{ regularizationRecord.from_date | date:"d/m/Y"}}{% else %}-{% endif %}{% if regularizationRecord.from_time %} {{ regularizationRecord.from_time }}{% endif %}
+    </td>
+    <td class="regularization_to_date" >
+        {% if regularizationRecord.to_date %}{{ regularizationRecord.to_date | date:"d/m/Y"}}{% else %}-{% endif %}{% if regularizationRecord.to_time %} {{ regularizationRecord.to_time }}{% endif %}
+    </td>
+    <td class="mobile_no" >
+        {% if regularizationRecord.mobile_no %}{{ regularizationRecord.mobile_no }}{% else %}-{% endif %}
+    </td>
+    <td class="place" >
+        {% if regularizationRecord.place %}{{ regularizationRecord.place }}{% else %}-{% endif %}
+    </td>
+    <td class="reason_for_leave" >
+        {% if regularizationRecord.reason_for_leave %}{{ regularizationRecord.reason_for_leave }}{% else %}-{% endif %}
+    </td>
+    <td class="manager" >
+        {% if regularizationRecord.manager %}{{ regularizationRecord.manager }}{% else %}-{% endif %}
+    </td>
+    <td class="hod" >
+        {% if regularizationRecord.hod %}{{ regularizationRecord.hod }}{% else %}-{% endif %}
+    </td>
+    <td class="status">  
+        <a href="javascript:void(0)" onclick="getLeaveStatus('{{ regularizationRecord.id }}')">
+            {% if role_id == 0 %} {% if regularizationRecord.regularization_status	 == 1 %} Initiated {% elif regularizationRecord.regularization_status == 2 %} Forwarded {% elif regularizationRecord.regularization_status == 3 %} Approved {% elif regularizationRecord.regularization_status == 4 %} Declined {% else %} {{regularizationRecord.regularization_status}}   {% endif %} {% else %} 
+            {% if regularizationRecord.regularization_status == 4 %} Declined {% elif regularizationRecord.regularization_status == 3 %}Approved {% elif regularizationRecord.status == 0 %}{% if regularizationRecord.regularization_status == 1 and regularizationRecord.level_id == 2 %} Initiated {% elif regularizationRecord.regularization_status == 2 %} Forwarded {% else %} Pending for Forward {% endif %} {% else %} Pending for Approval {% endif %} {% endif %}
+        </a>
+    </td>
+    
+</tr>
+{% endfor %}
+<tr id="loading" style="display: none;">
+    <td class="text-center" colspan="11"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+    </td>
+</tr>                        
+{% else %}
+<tr>
+    <td colspan="11" style="text-align: center;">No Record Found...</td>
+</tr>
+{% endif %}
+
+<script>
+    
+    $('#forward').hide();
+    $('.iconApproved').hide();
+    $('.iconDeclined').hide();
+    $('.iconForward').hide();
+    $(".checked_all_checkbox").attr("checked", false);
+    
+    $('.checked_all').on('change', function() {     
+        $('.checkbox').prop('checked', $(this).prop("checked")); 
+        checked_all();           
+    });
+    
+    function checked_all(){
+        
+        $('.iconForward').hide();
+        $('.iconApproved').hide();
+        $('.iconDeclined').hide();
+        $('#forward').hide();
+        if($('.checkbox:checked').prop('checked') == true){
+            $('.checked_all').prop('checked',true);
+        }else{
+            $('.checked_all').prop('checked',false);
+        }
+        if($('.checkbox:checked').length > 0){
+            {% if role_id == 0 %}
+            {% if regularization_status == "1" %}
+            $('.iconForward').show();
+            {% else %} 
+            
+            $('.iconApproved').show();
+            $('.iconDeclined').show();
+            {% endif %}
+            {% else %}
+            $('#forward').show();
+            {% endif %}
+            
+        }else{
+            $('.iconForward').hide();
+            $('.iconApproved').hide();
+            $('.iconDeclined').hide();
+            $('#forward').hide();
+        }
+    }
+    
+    $('.checkbox').change(function(){ 
+        checked_all();
+    });
+    
+    
+    {% if role_id == 0 %}
+    {% if regularization_status and regularization_status != '' %}
+    $(".all_checkbox_class").css("display", "block");
+    $(".checked_class").css("display", "block");
+    {% else %} 
+    $(".all_checkbox_class").css("display", "none");
+    $(".checked_class").css("display", "none");
+    {% endif %}
+    {% if regularization_status == '3' %}
+    $(".all_checkbox_class").css("display", "none");
+    $(".checked_class").css("display", "none");
+    {% endif %}
+    {% else %}
+    $(".all_checkbox_class").css("display", "block");
+    $(".checked_class").css("display", "block");
+    {% endif %}
+    
+    
+    {% if regularizationReport %}
+    $(".checked_all").attr("disabled", false);
+    {% else %}    
+    $(".checked_all").attr("disabled", true);
+    {% endif %}
+    
+    
+    $("#addOrgTable tbody tr").click(function () {
+        $(this).addClass("selected").siblings().removeClass("selected");
+    });
+    $('#order_count').html('Order Count: {{foc_requests|length}}');
+</script>

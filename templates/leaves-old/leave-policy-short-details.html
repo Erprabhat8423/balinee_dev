@@ -1,0 +1,112 @@
+{% if last_leave_policy_details %}
+
+<div class="row" id="detailsBoxFirst" style="display: block;">
+    <div class="col-md-12 p-md-0">
+        <h6><b> {{leave_policy.leave_policy}}</b></h6>
+        ({{ leave_policy.organization_name }})
+    </div>
+    
+    <div class="col-md-12 p-2">
+        <div class="row mb-2">
+            
+            {% for last_leave_policy_detail in last_leave_policy_details %}
+            <div class="row deptRow">
+                <div class="col-md-12 p-2">
+                    <h6 class="deptRowHead"><b style="color: black;">{{last_leave_policy_detail.leave_type}}</b></h6>
+                </div>
+                
+                <div class="col-md-12 p-md-0">
+                    <div class="row">
+                        <div class="col-md-4">
+                            <span class="smallText">Year Leave Count</span><br>
+                            <span class="largeText">{{last_leave_policy_detail.year_leave_count}}</span>
+                        </div>
+                        {% comment %} <div class="col-md-4">
+                            <span class="smallText">Month Leave Count</span><br>
+                            <span class="largeText">{{last_leave_policy_detail.month_leave_count}}</span>
+                        </div> {% endcomment %}
+                        <div class="col-md-4">
+                            <span class="smallText">Consecutive Leaves</span><br>
+                            <span class="largeText">{{last_leave_policy_detail.consecutive_leave}}</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-4">
+                            <span class="smallText">Carry forward</span><br>
+                            <span class="largeText">{% if last_leave_policy_detail.is_carry_forward > 0 %}Yes{% else %}No{% endif %}</span>
+                        </div>
+                        <div class="col-md-4">
+                            <span class="smallText">Salary affecting</span><br>
+                            <span class="largeText">{% if last_leave_policy_detail.is_salary_affecting > 0 %}Yes{% else %}No{% endif %}</span>
+                        </div>
+                        <div class="col-md-4">
+                            <span class="smallText">Halfday Included</span><br>
+                            <span class="largeText">{% if last_leave_policy_detail.is_halfday_included > 0 %}Yes{% else %}No{% endif %}</span>
+                        </div>
+                        <div class="col-md-4">
+                            <span class="smallText">Can Swipe</span><br>
+                            <span class="largeText">{% if last_leave_policy_detail.can_swipe > 0 %}Yes{% else %}No{% endif %}</span>
+                        </div>
+                        <div class="col-md-4">
+                            <span class="smallText">Excess Leave</span><br>
+                            <span class="largeText">{% if last_leave_policy_detail.access_leave > 0 %}Yes{% else %}No{% endif %}</span>
+                        </div>
+                        {% if last_leave_policy_detail.can_swipe > 0 %}
+                        <div class="col-md-4">
+                            <span class="smallText">Swipeable Leave Types</span><br>
+                            <span class="largeText">{{last_leave_policy_detail.swipeable_leave_types}}</span>
+                        </div>
+                        {% endif %}
+                        {% if last_leave_policy_detail.access_leave > 0 %}
+                        <div class="col-md-4">
+                            <span class="smallText">Excess Leave Types</span><br>
+                            <span class="largeText">{{last_leave_policy_detail.access_leave_types}}</span>
+                        </div>
+                        {% endif %}
+                        {% if last_leave_policy_detail.access_leave > 0 %}
+                        <div class="col-md-4">
+                            <span class="smallText">Excess Leave Types</span><br>
+                            <span class="largeText">{{last_leave_policy_detail.access_leave_types}}</span>
+                        </div>
+                        {% endif %}
+                        {% if last_leave_policy_detail.apply_leave_before %}
+                        <div class="col-md-4">
+                            <span class="smallText">Apply Leave Before</span><br>
+                            <span class="largeText">{{last_leave_policy_detail.apply_leave_before}}</span>
+                        </div>
+                        {% endif %}
+                        <div class="col-md-4">
+                            <span class="smallText">Fraction of Leave</span><br>
+                            <span class="largeText">{% if last_leave_policy_detail.is_fraction_leave > 0 %}Yes{% else %}No{% endif %}</span>
+                        </div>
+                        <div class="col-md-4">
+                            <span class="smallText">Avail Advance Leave</span><br>
+                            <span class="largeText">{% if last_leave_policy_detail.is_avial_advance_leave > 0 %}Yes{% else %}No{% endif %}</span>
+                        </div>
+                        <div class="col-md-4">
+                            <span class="smallText">Is Document Required</span><br>
+                            <span class="largeText">{% if last_leave_policy_detail.is_document_required > 0 %}Yes{% else %}No{% endif %}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% if mapped_roles %}
+            <div class="col-md-12 p-2">
+                        
+                <h6><b> Mapped Roles </b></h6> 
+                <span style="color: #0052a0;">
+                    <ul class="list-group list-group-striped taglist">
+                        {% for role_name in mapped_roles %}
+                        <li>{{role_name.role_name}}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+                </span>
+            </div>
+    </div>
+    
+</div>
+{% else %}
+<p>No record found</p>
+{% endif %}

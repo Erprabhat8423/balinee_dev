@@ -1,0 +1,71 @@
+<style>
+  .header-title h2,
+  .header-title h3 {
+    display: inline-block;
+  }
+  h3 {
+    font-size: 18px;
+    text-align: center;
+    padding: 15px 0px 0px 0px;
+    margin: 0px;
+  }
+  
+  table {
+    width: 750px;
+    border-collapse: collapse;
+    margin: 0px auto;
+  }
+  
+  /* Zebra striping */
+  tr:nth-of-type(odd) {
+    background: #eee;
+  }
+  
+  th {
+    background: #3498db;
+    color: #000000;
+    font-weight: bold;
+  }
+  
+  td,
+  th {
+    padding: 5px;
+    border: 1px solid #ccc;
+    text-align: left;
+    font-size: 12px;
+  }
+</style>
+
+<div class="col-md-12">
+  <div class="col-12" style="margin-bottom: 15px;">
+    <img src="{{ url }}/static/img/png/dashboardLogo.png" style="height: 40px;" class="dashboardLogo" />
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th colspan="{{ columns_length }}">
+          <h3> Employees List </h3>
+        </th>
+      </tr>
+      <tr>
+        <th style="width: 15%;" class="employee_id">Employee ID</th>
+        <th style="width: 20%;" class="employee_name">Name</th>
+        <th style="width: 15%;" class="employee_contact">Contact</th>
+        <th style="width: 25%;" class="employee_role">Role</th>
+        <th style="width: 25%;" class="employee_dep_org">Department</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for user in users %}
+      <tr>
+        <th style="width: 15%;" class="employee_id"> {% if user.emp_sap_id %} {{ user.emp_sap_id }} {% else %} - {% endif %}</th>
+        <td style="width: 20%;" class="employee_name">{% if user.first_name %}{{ user.first_name }}{% endif %} {% if user.middle_name %}{{ user.middle_name }} {% else %} - {% endif %} {% if user.last_name %}{{ user.last_name }} {% else %} - {% endif %}</td>
+        <td style="width: 15%;" class="employee_contact">{{ user.primary_contact_number }}</td>
+        <td style="width: 25%;" class="employee_role">{{ user.role_name }}</td>
+        <td style="width: 25%;" class="employee_dep_org"> {% if user.department_name %}{{ user.department_name }} {% else %} - {% endif %}/{% if user.organization_name %}{{ user.organization_name }} {% else %} - {% endif %} </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+

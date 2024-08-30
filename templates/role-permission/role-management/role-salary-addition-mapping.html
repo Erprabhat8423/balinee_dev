@@ -1,0 +1,168 @@
+{% load static %}
+
+<div class="md-modal centered" style="height:400px;">
+    <div class="modal-header" id="headerStep1">
+        <div class="col-12 p-0">
+            <div class="row">
+                <div class="col-6">
+                    <h5 class="mt-md-2">Salary Addition Type Mapping ({{role.role_name}}) &nbsp;&nbsp;</h5>
+                </div>
+                <div class="col-6">
+                    <button class="btn btn-save float-right" type="button" onclick="saveRoleMapping()" >
+                        Save & Proceed
+                    </button>
+                    <button class="btn btn-close float-right" type="button" onclick="manipulateModal('addUserModal','close')">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+        <div class="row" style="overflow:scroll; height:400px;">
+            <div class="col-md-12 p-0 h-100 w-100" id="step1">
+                <div class="row">
+                    <div class="col-md-6" style="border-right: 1px solid rgb(95, 93, 93);">
+                        <ul class="list-group" id="entity_list">
+                            {% for salary_addition in salary_additions %}
+                            <li id="salary_addition_{{salary_addition.id}}" class="list-group-item" onclick="movePolicy('{{salary_addition.id}}','{{salary_addition.addition}}')"><a href="javascript:;" >{{salary_addition.addition}}</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <form id="mappingForm">
+                            {% csrf_token %}
+                            
+                            
+                            <div id="input_section">
+                                {% if mapping %}
+                                {% for mapping_salary_addition in mapping %}
+                                <input type="hidden" name="salary_addition_id[]" value="{{mapping.entity_id}}" >
+                                {% endfor %}
+                                {% endif %}
+                            </div>
+                            <input type="hidden" name="role_id" value="{{role.id}}">
+                            <input type="hidden" name="entity_type" value="salary_addition">
+                            <ul class="list-group" id="mapped_section">
+                                {% if mapping %}
+                                {% for mapping_salary_addition in mapping %}
+                                <li id="salary_addition_{{mapping_salary_addition.entity_id}}" class="list-group-item"><a href="javascript:;" onclick="movePolicy('{{mapping_salary_addition.entity_id}}','{{mapping_salary_addition.addition}}')">{{mapping_salary_addition.addition}}</a></li>
+                                {% endfor %}
+                                {% endif %}
+                            </ul>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+
+<script>
+    var temp = [];
+    function movePolicy(salary_addition_id,salary_addition){
+        
+        var list = `
+        <li id="salary_addition_`+salary_addition_id+`" class="list-group-item" onclick="moveBackPolicy('`+salary_addition_id+`','`+salary_addition+`')">
+            <a href="javascript:;" >
+                `+salary_addition+`
+            </a>
+        </li>`;
+        $('#mapped_section').append(list);
+        temp.push(salary_addition_id);
+        
+        var refreshed_list = ``;
+        {% for salary_addition in salary_additions %}
+        var current_id = '{{salary_addition.id}}';
+        if($.inArray(current_id, temp) === -1){
+            refreshed_list += `
+            <li id="salary_addition_{{salary_addition.id}}" class="list-group-item" onclick="movePolicy('{{salary_addition.id}}','{{salary_addition.addition}}')">
+                <a href="javascript:;">
+                    {{salary_addition.addition}}
+                </a>
+            </li>
+            `;
+        }
+        {% endfor %}
+        $('#entity_list').html(refreshed_list);
+        
+        var inputs = ``;
+        $.each(temp,function(index,val){
+            inputs += `<input type="hidden" name="salary_addition_id[]" value="`+val+`" >`;
+        });
+        $('#input_section').html(inputs);
+        console.log(temp);
+    }
+    
+    function moveBackPolicy(salary_addition_id,salary_addition){
+        temp.splice($.inArray(salary_addition_id, temp), 1);
+        
+        var inputs = ``;
+        $.each(temp,function(index,val){
+            inputs += `<input type="hidden" name="salary_addition_id[]" value="`+val+`" >`;
+        });
+        
+        $('#input_section').html(inputs);
+        $('#salary_addition_'+salary_addition_id).remove();
+
+        var refreshed_list = ``;
+        {% for salary_addition in salary_additions %}
+        var current_id = '{{salary_addition.id}}';
+        if($.inArray(current_id, temp) === -1){
+            refreshed_list += `
+            <li id="salary_addition_{{salary_addition.id}}" class="list-group-item">
+                <a href="javascript:;" onclick="movePolicy('{{salary_addition.id}}','{{salary_addition.addition}}')">
+                    {{salary_addition.addition}}
+                </a>
+            </li>
+            `;
+        }
+        {% endfor %}
+        $('#entity_list').html(refreshed_list);
+    }
+    
+    function saveRoleMapping(){
+        showLoader();
+        if(validateForm()){
+            hideLoader();
+            return false;
+        }else{
+            $.ajax({
+                url: "{% url 'src:save-role-salary-addition-mapping' %}",
+                method: 'POST',
+                data: $('#mappingForm').serialize(),
+                success: function (data) {
+                    hideLoader();
+                    if(data.flag){
+                        $('#addUserModal').html('');
+                        $('#addUserModal').hide();
+                        openToaster("success", data.message);
+                    }else{
+                        openToaster("danger", data.message);
+                    }
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            }).always(function() {
+                hideLoader();
+            });
+        }
+    }
+    
+    function validateForm(){
+        error = false;
+        $('[name="salary_addition_id[]"]').each(function(){
+            if($(this).val() == ""){
+                error = true;
+            }
+        });
+        if(error){
+            openToaster("warning", "Please choose leave policy");
+        }
+        return error;
+    }
+</script>

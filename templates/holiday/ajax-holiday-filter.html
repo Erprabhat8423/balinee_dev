@@ -1,0 +1,76 @@
+{% load static %}
+
+{% if holidays %}
+{% for holiday in holidays %}
+<tr>
+    <td>
+        <div class="accent-color font-wt-b font-12" style="margin-left: 11px;">
+            {{holiday.month_name}}
+        </div>
+        <ul>
+            {% for month_holiday in holiday.month_holidays %}
+
+            <li class="holidays_row">
+                <div class="row">
+                    <script>
+                        $('.checked_all').show();
+                    </script>
+                    <!-- <div class="col-sm-1 col-4 px-0 checkBox"> -->
+                        <div class="checkBox mr-2" style="margin-top: 3px;">
+                        {% if month_holiday.holiday_status != 3 %}
+                            <input type="checkbox" class="checkboxSingle" id="new_module_1" name="holiday_id[]" value="{{month_holiday.id}}" onchange="handleCheckBox()">
+                            {% else %} 
+                            {% if month_holiday.holiday_status == 1 %}
+                            <input type="checkbox" class="checkboxSingle" id="new_module_1" name="holiday_id[]" value="{{month_holiday.id}}" onchange="handleCheckBox()">
+                            {% elif month_holiday.holiday_status == 2 %}
+                            <input type="checkbox" class="checkboxSingle" id="new_module_1" name="holiday_id[]" value="{{month_holiday.id}}" onchange="handleCheckBox()">
+                            {% elif month_holiday.holiday_status == 3 %}
+                            <!-- <input type="checkbox" class="checkboxSingle" id="new_module_1" name="holiday_id[]" value="{{month_holiday.id}}" onchange="handleCheckBox()"> -->
+                            {% else %}
+                            <input type="checkbox" disabled checked >
+                            {% endif %}
+                            {% endif %}
+                    </div>
+                    <div class="col-sm-4 col-4 px-0 holidays_name" >{{month_holiday.holiday}}</div>
+                    <div class="col-sm-4 col-5 px-0 holidays_date" > 
+                        <span class="d-inline-block ml-1">{{ month_holiday.start_date|date:'d M' }} {{ month_holiday.start_date|date:'D' }} - {{ month_holiday.end_date|date:'d M' }} {{ month_holiday.end_date|date:'D' }} ,</span>
+                        <span class="d-inline-block ml-1">{{month_holiday.start_date|date:'Y'}}</span>
+                    </div>
+                    <div class="col-sm-3 col-3 px-0 ">
+                        <div class="row float-right">
+                            <a href="javascript:;" class="ml-2" onclick="editHoliday('{{ month_holiday.id }}')">
+                                <img class="tableRowIcon tableRowIcon-product-icon mr-0" src="/static/img/svg/editcopy.svg" style="width: 16px;" >
+                            </a> 
+                            <label class="switch">
+                                <input type="checkbox" class="checkbox" name="is_active"
+                                id="is_active_{{ month_holiday.id }}"
+                                {% if month_holiday.status == 1 %} checked="" {% else %}
+                                {% endif %}
+                                onclick="updateHolidayStatus('{{ month_holiday.id }}', '{{ month_holiday.status }}')">
+                                <span class="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12 px-0 grey-color d-block font-11">
+                    {{month_holiday.description|safe}}
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+    </td>
+</tr>
+{% endfor %}
+
+{% else %}
+<script>
+    $('.checked_all').hide();
+</script>
+
+    <b  style="text-align: center; margin-left: 35%;">No Record Found...</b>
+
+{% endif %}
+
+<script>
+    $('#total_holidays').text('('+{{total_holidays}}+')')
+</script>

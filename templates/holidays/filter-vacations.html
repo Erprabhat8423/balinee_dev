@@ -1,0 +1,59 @@
+
+
+
+{% load static %}
+<link rel="stylesheet" href="{% static 'css/jquery-confirm.min.css' %}">
+<link rel="stylesheet" href="{% static 'css/vications.css' %}">
+
+
+
+<input type="hidden" name="page" id="page" value="2" />
+<input type="hidden" name="page_status" id="page_status" value="0" />
+<input type="hidden" name="total_pages" id="total_pages" value="{{ total_pages }}" />
+<table id="addOrgTable" class="table table-borderless table-striped table-hover mt-0" style="width: 100%;">
+    <thead>
+        <tr>
+            <th>Customer</th>
+            <th>Mobile no.</th>
+            <th>Email</th>
+            <!-- <th>Action</th> -->
+        </tr>
+    </thead>
+    <tbody id="tablebody">
+        {% if customers %}
+        {% for customer in customers %}
+        <tr  {% if forloop.first %} class="odd selected" {% endif %}>
+            <td onclick="getVacationCalender('{{ customer.id }}','{{current_month}}','{{current_year}}')">{{ customer.first_name }}{% if customer.middle_name is not None %} {{ customer.middle_name }} {% endif %}{{ customer.last_name }}
+                <br>
+                <span style="color: #00417e;">{{ customer.emp_sap_id }}</span>
+            </td>
+            <td onclick="getVacationCalender('{{ customer.id }}','{{current_month}}','{{current_year}}')">{{customer.primary_contact_number}}</td>
+            <td onclick="getVacationCalender('{{ customer.id }}','{{current_month}}','{{current_year}}')">
+                {% if customer.official_email%}{{ customer.official_email}}{% else %} - {% endif %}
+            </td>
+            <!-- <td>
+                <div class="row">
+                    <div class="col-md-3">
+                        <a href="javascript:void(0)"
+                        onclick="Vacation('{{ customer.id }}')" data-toggle="modal"
+                        data-target="#addOrganisationModal"><img
+                        src="{% static 'img/svg/editcopy.svg' %}" /></a> </div>
+                    </div>
+                </td> -->
+            </tr>
+            {% endfor %}
+            <tr id="loading" style="display: none;">
+                <td class="text-center" colspan="4"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                </td>
+            </tr>
+            
+            {% else %}
+            <tr>
+                <td colspan="4" style="text-align: center;">No Record Found...</td>
+            </tr>
+            {% endif %}
+        </tbody>
+    </table>
+
+
+

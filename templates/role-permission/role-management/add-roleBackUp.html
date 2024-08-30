@@ -1,0 +1,164 @@
+{% load static %}
+<style>
+	#addPermissionModule{
+		-webkit-filter: blur(5px);
+		-moz-filter: blur(5px);
+		-ms-filter: blur(5px);
+		-o-filter: blur(5px);
+		filter: blur(5px);
+		pointer-events:none;
+	}	
+</style>
+<div class="modal-AddOrganisation centered">
+    <div class="modal-body p-0" >
+        <div class="row">
+            <div class="col-sm-3 col-12 px-0 modalOrgBG">
+                <div class="transformImage">
+                    <img src="{% static 'img/svg/addorgW.svg' %}" class="w-50" />
+                    <h4 class="modalColHead">Add Role</h4>
+                </div>
+            </div>
+            <div class="col-sm-9 col-12 role-details-form py-3">
+                <form method="POST" id="addRoleForm" autocomplete="off" action="{% url 'src:add-role' %}" aria-label="Add Role">
+					{% csrf_token %}
+					
+                    <div class="row">
+                        <div class="col-sm-8 col-8 px-0">
+                            <h5 class="d-inline-block font-wt-b">Role Details</h5>
+                        </div>
+						<button class="btn btn-save mob-ml-16" type="button" onclick="saveRole()">Save</button>
+						<button class="btn btn-close" type="button" onclick="manipulateModal('addPermissionModal','close')">
+							<span class="mob-d-none">Close</span>
+							<i class="far fa-times-circle mob-d-block desk-d-none"></i>
+						</button>
+                    </div>
+
+				
+						<div class="row add-form-row-mrng">
+							<div class="col-sm-12 col-12 px-0">
+								<img src="{% static 'img/svg/org.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+								<h6 class="font-wt-b d-inline-block">
+									Organisation Name
+								</h6>
+							</div>
+								
+							<div class="col-sm-12 col-12 pr-0 role-select-pad mt-1">
+								<select class="inputField selectField " name="organization_id" style="width: 100% !important;" onchange="getDepartments(this.value);getOrgRoles(this.value)">
+									<option value="">Select Organization Name</option>
+									{% for organization in organizations %}
+									<option value="{{organization.id}}">{{organization.organization_name}}</option>
+									{% endfor %}
+								</select>
+								<label class="error_msg float-right"></label>
+							</div>
+						</div>
+						
+						<div class="row add-form-row-mrng">
+							<div class="col-sm-12 col-12 px-0">
+								<img src="{% static 'img/svg/depart_no.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+								<h6 class="font-wt-b d-inline-block"">
+									Departments Name
+								</h6>
+							</div>
+							<div class="col-sm-12 col-12 mt-1 pr-0 role-select-pad">
+								<select class="inputField selectField" name="department_id" style="width: 100%;">
+									<option value="">Select Department Name</option>
+								</select>
+								<label class="error_msg float-right"></label>
+							</div>		
+						</div>
+						
+						<div class="row add-form-row-mrng">
+							<div class="col-sm-12 col-12 px-0">
+								<img src="{% static 'img/svg/role.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+								<h6 class="font-wt-b d-inline-block"">
+									Role Name
+								</h6>
+							</div>
+							<div class="col-sm-12 col-12 px-0 mt-1">
+								<input class="inputField widthSetter" type="text" placeholder="Enter Role Name" name="role_name" id="dept_role_name" maxlength="50" value="">
+								<label class="error_msg float-right"></label>
+							</div>		
+						</div>
+						
+						<div class="row add-form-row-mrng">
+							<div class="col-sm-12 col-12 px-0">
+								<img src="{% static 'img/svg/role.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+								<h6 class="font-wt-b d-inline-block">Responsibilities</h6>
+							</div>
+
+							<div class="col-sm-12 col-12 px-0">
+								<textarea name="responsibilities" class="inputField widthSetter" id="responsibilities" cols="10" rows="3" placeholder="Enter role responsibilities"></textarea>
+								<label class="error_msg float-right"></label>
+							</div>
+							
+						</div>
+
+						<div class="row add-form-row-mrng">
+							<div class="col-sm-12 col-12 px-0">
+								<img src="{% static 'img/svg/depart_no.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+								<h6 class="font-wt-b d-inline-block">Report</h6>
+							</div>
+
+							<div class="col-sm-12 col-12 pr-0 role-select-pad">
+								<select class="inputField selectField " name="reporting_role_id" style="width: 100%;">
+									<option value="">Select </option>
+								</select>
+								<label class="error_msg float-right"></label>
+							</div>
+						</div>
+									
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="text/javascript">
+	function getDepartments(organization_id){
+		if(organization_id != ""){
+			
+			showLoader();
+			var url = "{% url 'src:get-org-department-options' 1 %}";
+			url = url.replace(1,organization_id)
+			$.ajax({
+				url: url,
+				method: 'GET',
+				success: function (data) {
+					hideLoader();
+					$('[name="department_id"]').html(data.options)
+					$(".selectField").select2();
+					
+				},
+				error: function (err) {
+					hideLoader();
+					console.log(err)
+				}
+			});
+		}
+		
+	}
+
+	function getOrgRoles(organization_id){
+										if(organization_id != ""){
+											
+											showLoader();
+											var url = "{% url 'src:get-org-role-options' 1 %}";
+											url = url.replace(1,organization_id)
+											$.ajax({
+												url: url,
+												method: 'GET',
+												success: function (data) {
+													hideLoader();
+													$('[name="reporting_role_id"]').html(data.options)
+													
+												},
+												error: function (err) {
+													hideLoader();
+													console.log(err)
+												}
+											});
+										}
+										
+									}
+</script>						

@@ -1,0 +1,104 @@
+{% load static %}
+<h6 style="float: left;">Unallocated Documents</h6> 
+<img src="/static/img/png/icons8-refresh-30.png" style="width: 1rem; float: right;" onclick="refreshDocumentDiv()" title="refresh">
+<br clear="all">
+                                                    
+    {% if document_lists %}
+    <ul class="documentsec drsec" id="sortable1">
+        {% for document_list in document_lists %}
+        <li id="doc{{ forloop.counter }}" data-filter-item data-filter-name="{{document_list.id}}">
+            <div class="Filesec"><a href="{{document_list.document_path}}" target="_blank"><div class="Viewicon"></div></a><img src="/static/img/png/pdf.png"><div class="doctitle">{{ document_list.document_name }}</div> </div>
+        </li> 
+        {% endfor %}
+        </ul>
+    {% else %}
+    <p style="text-align: center; color: red; border: 1px solid #dee2e6;">No Document Found...</p>
+    {% endif %}
+<script>
+    $(document).ready(function () {
+        setTimeout(function () {
+            var last_user_id = '{{ last_user_id }}';
+            $.ajax({
+                    url: "{% url 'src:employee-document-list' %}",
+                    method: 'POST',
+                    data: {last_user_id, last_user_id,document_list_count:'{{document_list_count}}', type:0, csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val()},
+                    success: function (data) {
+                        if(data.error == true){
+
+                        }else{
+                            $('#document_div_ids').html(data);
+                        }
+                    },
+                    error: function (err) {
+                        console.log(err)
+                    }
+                });
+        }, 2000);
+        });
+
+        $(function () {
+        $("#rooms").draggable({ disabled: false });
+        $("ul.drsec").sortable({
+            connectWith: 'ul.drsec',
+            opacity: 0.6,
+            revert: true,
+            helper: function (e, item) {
+                console.log('parent-helper');
+                console.log(item);
+                if(!item.hasClass('selected1'))
+                   item.addClass('selected1');
+                var elements = $('.selected1').not('.ui-sortable-placeholder').clone();
+                var helper = $('<ul/>');
+                item.siblings('.selected1').addClass('hidden');
+                return helper.append(elements);
+            },
+            start: function (e, ui) {
+                
+                var elements = ui.item.siblings('.selected1.hidden').not('.ui-sortable-placeholder');
+                ui.item.data('items', elements);   
+                //var docid = $(ui.item).attr('data-filter-name'); 
+                //makeNewFile(docid);    
+            },
+            receive: function (e, ui) {
+                
+                ui.item.before(ui.item.data('items'));
+                var docid = $(ui.item).attr('data-filter-name');
+                var id = $('#id').val();
+                var type = $('#type').val();
+                var employee_id = $('#employee_id').val(); 
+                var college_id = $('#college_id').val();  
+                var master_name = $('#master_name').val(); 
+                var room_id = $('#room_id').val(); 
+                var room_name = $('#room_name').val(); 
+                var almira_id = $('#almira_id').val(); 
+                var almira_name = $('#almira_name').val(); 
+                var rack_id = $('#rack_id').val(); 
+                var rack_name = $('#rack_name').val();
+                makeNewFile(docid, id, type, employee_id, college_id, master_name, room_id, room_name, almira_id, almira_name, rack_id, rack_name, '{{last_user_id}}');
+            
+            },
+            stop: function (e, ui) {
+                ui.item.siblings('.selected1').removeClass('hidden');
+                $('.selected1').removeClass('selected1');
+            },
+            update: function(e,ui){
+                ui.item.before(ui.item.data('items'));
+                var docid = $(ui.item).attr('data-filter-name');
+                updatePostOrder(docid);
+            }
+        });
+       
+    
+        $("#sortable1, #sortable2").disableSelection();
+        $("#sortable1, #sortable2").css('minHeight', $("#sortable1, #sortable2").height() + "px");
+    });
+    
+    function updatePostOrder(e) {
+        var arr = [];
+        
+        $("#sortable2 li").each(function () {
+            arr.push($(this).attr('id'));
+        });
+        
+    }
+</script>

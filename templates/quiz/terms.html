@@ -1,0 +1,54 @@
+{% load static %}
+
+        <div id="layoutDefault">
+            <div id="layoutDefault_content" class="insbg">
+                <main>
+                 <div class="container-fluid">
+                       <div class="row">
+                           <div class="logo"><img src="{% static 'entrance-assets/img/Group-295.png' %}"/></div>
+                       	</div>
+                    </div>
+                    <!-- Page Header-->
+                    <header class="">
+                        <div class="page-header-ui-content pt-0">
+                            <div class="container px-15">
+                                <div class="row gx-5 align-items-center">
+                                    <ul class="otplist">
+                                        <li>
+                                        <div class="row udesign1">
+                                            <div class="col-md-4 flex-fill bgtb">&nbsp;</div>
+                                            <div class="col-md-8">
+                                                <ul class="inslist">
+                                                    <li>{{candidate_id}}.</li>
+                                                    <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut vestibulum pellentesque cursus.</li>
+                                                    <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut vestibulum pellentesque cursus.</li>
+                                                    <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut vestibulum pellentesque cursus.</li>
+                                                    <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut vestibulum pellentesque cursus.</li>
+                                                    <li>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut vestibulum pellentesque cursus.</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        </li>
+                                        <li class="btlist mt-2 mb-2">
+                                            <div align="right" class="panelfoot">
+                                                <div class="checksec">
+                                                    <div class="check-group">
+                                                        <input type="checkbox" id="agree_terms">
+                                                        <label for="agree_terms">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</label>
+                                                    </div>
+                                                </div>
+                                                <a onclick="declineTerms({{candidate_id}})" type="button" class="btn btn-lg btn-white col-md-2 fw-500 me-sm-3 mb-3 mb-sm-0">Decline</a>
+                                                <a onclick="accept_terms({{candidate_id}})" class="btn btn-lg btn-primary col-md-2 fw-500 me-sm-3 mb-3 mb-sm-0">Accept</a>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </header>
+                </main>
+            </div>
+      
+        </div>
+
+

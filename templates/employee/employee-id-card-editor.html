@@ -1,0 +1,497 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} 
+    <link rel="stylesheet" href="{% static 'css/cropper.css' %}">
+    <link rel="stylesheet" href="{% static 'css/cropper-main.css' %}">
+    <!-- <link rel="stylesheet" href="{% static 'plugins/dropify/css/dropify.min.css' %}"> -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.0/dist/sweetalert2.min.css">
+    <style>
+        .content{
+            bottom: 0;
+            color: #FFFFFF;
+            font-size: 26px;
+            position: relative;
+            z-index: 100;
+        }
+
+        .background{
+            color: #999999;
+            position: absolute;
+            top: 0;
+            left: 0;
+            margin: 0 3rem;
+        }
+
+        #wrapper {
+            width: 100%;
+            position: relative;
+        }
+        #frameBorder {
+            width: 200px;
+            height: 100px;
+            background-size: 100% 100%;
+            position: relative;
+        }
+        #cutout {
+            position: relative;
+        }
+        /* .ui-resizable-n, 
+        .ui-resizable-s, 
+        .ui-resizable-e, 
+        .ui-resizable-w  */
+        .ui-resizable-ne, 
+        .ui-resizable-nw, 
+        .ui-resizable-se, 
+        .ui-resizable-sw 
+        {
+          overflow: visible;
+          width: 10px;
+          height: 10px;
+          border-radius: 50%;
+          /* background-color: #000; */
+          border: 5px solid #000000;
+        }
+        .ui-wrapper {
+          overflow: visible !important;
+        }
+        .ui-datepicker {
+          z-index: 1000 !important;
+        }
+        body.swal2-shown > [aria-hidden="true"] {
+          transition: 0.1s filter;
+          filter: blur(10px);
+        }
+
+    </style>
+{% endblock %}
+
+{% block script %}
+    <script src="https://code.jquery.com/jquery-3.6.0.js" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="{% static 'js/cropper.js' %}"></script>
+    <script src="{% static 'js/cropper-main.js' %}"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.3.0/dist/sweetalert2.min.js"></script>
+    <!-- <script src="{% static 'plugins/dropify/js/dropify.min.js' %}"></script> -->
+{% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-12 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            {% csrf_token %}
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-4">
+                    <h1 class="page-main-heading">Employee ID Card Editor</b><span class="mx-3 fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h1>
+                </div>
+                <div class="col-md-8">
+                </div>
+            </div>
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-2">
+                        <label class="pt-2" style="min-width: 40%; max-width: 100%;" for="reg_no">Employee Id :</label>
+                        <input class="inputField" style="margin-left: 0px; max-width: 100%;" type="text" id="reg_no">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="pt-2" style="min-width: 50%; max-width: 100%;" for="blood_group">Select Blood Group :</label>
+                        <select class="inputField selectField" style="max-width: 100%;" data-live-search="true" name="blood_group" id="blood_group" data-placeholder="Select Blood Group">
+                            <option value="A+" >A+</option>
+                            <option value="B+" >B+</option>
+                            <option value="O+" >O+</option>
+                             <option value="AB+" >AB+</option>
+                        </select> 
+                    </div>
+                    <div class="col-md-2">
+                        <label class="pt-2" style="min-width: 25%; max-width: 200px;" for="address">Address :</label>
+                        <input class="inputField" style="margin-left: 0; max-width: 100%;" type="textbox" id="address" maxlength="60">
+                    </div>
+                    {% comment %} <div class="col-md-2">
+                      <label class="pt-2" style="min-width: 25%; max-width: 200px;" for="from_date">Issue Date :</label>
+                      <input style="max-width: 100%;" id="issue_date" name="from_date" class="inputField" placeholder="Issue Date" type="text" readonly>
+                    </div>
+                    <div class="col-md-2">
+                      <label class="pt-2" style="min-width: 25%; max-width: 200px;" for="to_date">Expiry Date :</label>
+                      <input style="max-width: 100%;" id="expiry_date" name="to_date" class="inputField" placeholder="Expiry Date" type="text" readonly>
+                    </div> {% endcomment %}
+                    <div class="col-md-2" style="justify-content: flex-end; padding-top: 2.5em;">
+                      <button class="btn btn-save" onclick="generateQR()">Go</button>
+                    </div>
+                    <!-- <button class="btn btn-save" onclick="generateQR()">Go</button> -->
+                </div>
+
+                <!-- <div class="row">
+                    <label class="error_msg float-right" id="" style="font-size: 16px;"></label>
+                </div> -->
+                <div class="row d-flex mt-3 w-100">
+                  <div class="col-md-8 mt-3 mb-1" style="text-align: left;">
+                    <h1 class="h5"><b>Image Editor</b></h1>
+                  </div>
+                  <div class="col-md-4 mt-3 mb-1 d-flex">
+                      <div class="col-md-6">
+                        <h1 class="h5"><b>Preview</b></h1>
+                      </div>
+                      <div class="col-md-3 align-middle d-flex justify-content-end">
+                        {% comment %} <i id="reset" class="px-2 fa fa-refresh fa-2x" style="color: #0073E0; cursor: pointer;" aria-hidden="true" data-toggle="tooltip" title="Refresh"></i> {% endcomment %}
+                        <i id="generate" class="px-2 fa fa-download fa-2x" style="color: #0073E0; cursor: pointer;" aria-hidden="true" data-toggle="tooltip" title="Download"></i>
+                      </div>
+                      <!-- <button class="btn" id="cmd" style="background-image: url('/static/img/svg/download.svg'); background-repeat: no-repeat; width: 4em; height: 4em;"></button> -->
+                  </div>
+              </div>
+                <div class="row mt-1 mb-4">
+                    <div class="col-md-8 shadow-lg bg-white pt-4" style="border-radius: 25px;">
+                        <div class="container">
+                            <div class="row">
+                              <!-- <div class="col-md-11 pt-5">
+                                <div class="img-container" style="height: 100vh;">
+                                  <img id="image" src="" alt="">
+                                </div>
+                              </div> -->
+                              <!-- </div>
+                              <div class="row"> -->
+                              <div class="col-md-1 docs-buttons ">
+                                <!-- <div class="btn-group"> -->
+                                  <button type="button" class="btn btn-primary shadow" data-method="setDragMode" data-option="move" title="Move">
+                                    <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="Move Image Section">
+                                      <span class="fa fa-arrows"></span>
+                                    </span>
+                                  </button>
+                                  <!-- <button type="button" class="btn btn-primary" data-method="setDragMode" data-option="crop" title="Crop">
+                                    <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="Move Cropped Section">
+                                      <span class="fa fa-crop"></span>
+                                    </span>
+                                  </button> -->
+                                <!-- </div> -->
+
+                                <!-- <div class="btn-group"> -->
+                                  <button type="button" class="btn btn-primary shadow" data-method="zoom" data-option="0.1" title="Zoom In">
+                                    <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="Zoom In">
+                                      <span class="fa fa-search-plus"></span>
+                                    </span>
+                                  </button>
+                                  <button type="button" class="btn btn-primary shadow" data-method="zoom" data-option="-0.1" title="Zoom Out">
+                                    <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="Zoom Out">
+                                      <span class="fa fa-search-minus"></span>
+                                    </span>
+                                  </button>
+                                <!-- </div> -->
+
+                                <!-- <div class="btn-group"> -->
+                                  <button type="button" class="btn btn-primary shadow" data-method="move" data-option="-10" data-second-option="0" title="Move Left">
+                                    <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="Move Left">
+                                      <span class="fa fa-arrow-left"></span>
+                                    </span>
+                                  </button>
+                                  <button type="button" class="btn btn-primary shadow" data-method="move" data-option="10" data-second-option="0" title="Move Right">
+                                    <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="Move Right">
+                                      <span class="fa fa-arrow-right"></span>
+                                    </span>
+                                  </button>
+                                  <button type="button" class="btn btn-primary shadow" data-method="move" data-option="0" data-second-option="-10" title="Move Up">
+                                    <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="Move Up">
+                                      <span class="fa fa-arrow-up"></span>
+                                    </span>
+                                  </button>
+                                  <button type="button" class="btn btn-primary shadow" data-method="move" data-option="0" data-second-option="10" title="Move Down">
+                                    <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="Move Down">
+                                      <span class="fa fa-arrow-down"></span>
+                                    </span>
+                                  </button>
+                                <!-- </div> -->
+                        
+                                <!-- <div class="btn-group"> -->
+                                  <button type="button" class="btn btn-primary shadow" data-method="rotate" data-option="-45" title="Rotate Left">
+                                    <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="Rotate Anti-Clockwise">
+                                      <span class="fa fa-rotate-left"></span>
+                                    </span>
+                                  </button>
+                                  <button type="button" class="btn btn-primary shadow" data-method="rotate" data-option="45" title="Rotate Right">
+                                    <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="Rotate Clockwise">
+                                      <span class="fa fa-rotate-right"></span>
+                                    </span>
+                                  </button>
+                                <!-- </div> -->
+
+                                <!-- <div class="btn-group">
+                                  <button type="button" class="btn btn-primary" data-method="scaleX" data-option="-1" title="Flip Horizontal">
+                                    <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="$().cropper(&quot;scaleX&quot;, -1)">
+                                      <span class="fa fa-arrows-h"></span>
+                                    </span>
+                                  </button>
+                                  <button type="button" class="btn btn-primary" data-method="scaleY" data-option="-1" title="Flip Vertical">
+                                    <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="$().cropper(&quot;scaleY&quot;, -1)">
+                                      <span class="fa fa-arrows-v"></span>
+                                    </span>
+                                  </button>
+                                </div> -->
+
+                                <!-- <div class="btn-group"> -->
+                                  <button type="button" class="btn btn-primary shadow" data-method="reset" title="Reset">
+                                    <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="Refresh">
+                                      <span class="fa fa-refresh"></span>
+                                    </span>
+                                  </button>
+                                  <label class="btn btn-primary btn-upload shadow" for="inputImage" title="Upload image file">
+                                    <input type="file" class="sr-only" id="inputImage" name="file" accept=".jpg,.jpeg,.png" > <!-- onchange="Filevalidation()" -->
+                                    <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="Upload Image">
+                                      <span class="fa fa-upload"></span>
+                                    </span>
+                                  </label>
+                                  <!-- <button type="button" class="btn btn-primary" data-method="destroy" title="Destroy">
+                                    <span class="docs-tooltip" data-toggle="tooltip" data-animation="false" title="Delete canvas">
+                                      <span class="fa fa-power-off"></span>
+                                    </span>
+                                  </button> -->
+                                <!-- </div> -->
+
+                                <!-- <div class="btn-group btn-group-crop"> -->
+                                  <!-- <button type="button" class="btn btn-success" data-method="getCroppedCanvas" data-option="{ &quot;maxWidth&quot;: 4096, &quot;maxHeight&quot;: 4096 }">
+                                    <span class="docs-tooltip" data-animation="false" title="Check cropped section">
+                                      <span class="fa fa-crop"></span>
+                                    </span>
+                                  </button> -->
+                                  <button type="button" class="btn btn-success shadow" data-method="grabCutCanvas">
+                                    <span class="docs-tooltip" data-animation="false" title="Generate the cutout">
+                                      <span class="fa fa-scissors"></span>
+                                    </span>
+                                  </button>
+                                </div>
+
+                                <!-- Show the cropped image in modal -->
+                                <div class="modal fade docs-cropped" id="getCroppedCanvasModal" aria-hidden="true" aria-labelledby="getCroppedCanvasTitle" role="dialog" tabindex="-1">
+                                  <div class="modal-dialog">
+                                    <div class="modal-content">
+                                      <div class="modal-header">
+                                        <h5 class="modal-title" id="getCroppedCanvasTitle">Cropped</h5>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                          <span aria-hidden="true">&times;</span>
+                                        </button>
+                                      </div>
+                                      <div class="modal-body"></div>
+                                      <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                                        <!-- <a class="btn btn-primary" id="download" href="javascript:void(0);" download="cropped.jpg">Download</a> -->
+                                      </div>
+                                    </div>
+                                  </div>
+                                </div>
+                                
+                            <!-- </div> -->
+
+                            <div class="col-md-11">
+                              <div class="img-container" style="height: 450px; border: 1px solid lightgrey;">
+                                <img id="image" src="" alt="">
+                              </div>
+                            </div>
+
+                          </div>                            
+                        </div>
+                </div>
+                
+                <div class="shadow-lg border-1 ml-5 mb-3"  style="border-radius: 25px; zoom: 50%;" id="preview"> </div>
+            </div>
+            
+        </div>
+    </div>
+</div>
+</div>
+<script>
+	Filevalidation = () => {
+		const fi = document.getElementById('inputImage');
+		// Check if any file is selected.
+		if (fi.files.length > 0) {
+			for (const i = 0; i <= fi.files.length - 1; i++) {
+
+				const fsize = fi.files.item(i).size;
+				const file = Math.round((fsize / 1024));
+				if (file >= 64) {
+					Swal.fire({
+            title: "File too large",
+            text: "Please select file less than 2MB",
+            icon: 'warning',
+            confirmButtonText: 'Ok',
+            allowOutsideClick: false
+          }).then((result) => {
+            if(result.isConfirmed) {
+              $("#image").prop('src', '#')
+            }
+          })
+				} else if (file < 20) {
+					Swal.fire({
+            title: "File too small",
+            text: "Please select file more than 20Kb",
+            icon: 'warning',
+            confirmButtonText: 'Ok',
+            allowOutsideClick: false
+          }).then((result) => {
+            if(result.isConfirmed) {
+              $("#image").attr('src', '#')
+            }
+          })
+				}
+			}
+		}
+	}
+</script>
+<script>
+    $(document).ready(function() {
+      $(".ui-datepicker").css('z-index', 1000)
+      $("[name='from_date']").datepicker({  
+          changeMonth: true,
+          changeYear: true,  
+          yearRange: "-3:+0",
+          dateFormat: 'dd/mm/yy' 
+      });
+      $("[name='to_date']").datepicker({  
+          changeMonth: true,
+          changeYear: true,  
+          yearRange: ":+3",
+          dateFormat: 'dd/mm/yy' 
+      });
+      grabcut_url = "{% url 'src:image-grabcut'  %}"
+      csrf = '{{ csrf_token }}'
+      $("#generate").css("display", 'none')
+      $("#reset").css("display", 'none')
+      $("#reset").on('click', function() {
+        Swal.fire(
+            {
+              title: "Are you sure you want to delete?",
+              text: "You won't be able to revert this!",
+              type: 'warning',
+              showCancelButton: true,
+              confirmButtonColor: '#F9354C',
+              cancelButtonColor: '#41B314',
+              confirmButtonText: 'Yes, delete it!'
+            })
+      });
+    });
+    function generateQR() {
+        var reg_no = $("#reg_no").val()
+        blood_group = $("#blood_group").val()
+        address = $("#address").val()
+        issue_date = $("#issue_date").val()
+        expiry_date = $("#expiry_date").val()
+        $.ajax({
+            url: "{% url 'src:employee-qr-generator'  %}",
+            method: "POST",
+            data: {
+                reg_no: reg_no,
+                blood_group: blood_group,
+                address: address,
+                expiry_date: expiry_date,
+                issue_date: issue_date,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            cache: false,
+            success: function(res) {
+                if (res.response_status == 403) {
+                  $("#preview").html('')
+                  $("#cmd").css("display", 'none')
+                  const swalWithBootstrapButtons = Swal.mixin({
+                    customClass: {
+                      confirmButton: 'btn btn-success',
+                      cancelButton: 'btn btn-danger'
+                    },
+                    buttonsStyling: true
+                  })
+                  swalWithBootstrapButtons.fire({
+                    allowOutsideClick: false,
+                    title: res.message,
+                    text: res.sub_message,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Yes, Download it!',
+                    confirmButtonColor: "#0073e0",
+                    cancelButtonText: 'No, Cancel!',
+                    cancelButtonColor: "red",
+                    reverseButtons: true
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      $.ajax({
+                        url: "{% url 'src:employee-id-card-download'  %}",
+                        method: "POST",
+                        data: {
+                          reg_no: reg_no,
+                          csrfmiddlewaretoken: '{{ csrf_token }}'
+                        },
+                        success: function(res) {
+                          if (res.response_status == 200) {
+                            console.log("Download Attempt: ",res)
+                            const link = document.createElement('a')
+                            link.href = res.id_url
+                            link.download = 'id_card.png'
+                            document.body.appendChild(link)
+                            link.click()
+                            document.body.removeChild(link)
+                            swalWithBootstrapButtons.fire(
+                              'Download Attempts Left: '+res.id_counter,
+                              'The ID Card has been downloaded!',
+                              'success'
+                            ).then((result) => {
+                              if (result.isConfirmed) {
+                                location.reload();
+                              }
+                            });
+                          }
+                          else if (res.response_status == 403){
+                            swalWithBootstrapButtons.fire(
+                              'Download Attempts Left: '+res.id_counter,
+                              res.message,
+                              'error'
+                            ).then((result) => {
+                              if (result.isConfirmed) {
+                                location.reload();
+                              }
+                            });
+                          }
+                        }
+                      })
+                    }
+                    else if (result.dismiss === Swal.DismissReason.cancel) {
+                      swalWithBootstrapButtons.fire(
+                        'Download Cancelled',
+                        '',
+                        'error'
+                      ).then((result) => {
+                        if (result.isConfirmed) {
+                          location.reload();
+                        }
+                      });
+                    }
+                  });
+                }
+                else if(res.response_status == 404) {
+                  const swalWithBootstrapButtons = Swal.mixin()
+                  swalWithBootstrapButtons.fire({
+                    title: res.message,
+                    icon: 'error',
+                    confirmButtonText: 'Ok',
+                    confirmButtonColor: "#0073e0",
+                  }).then((result) => {
+                    if (result.isConfirmed) {
+                      location.reload();
+                    }
+                  });
+                }
+                else{
+                    $('.error_msg').text("");
+                    $("#generate").css("display", 'block')
+                    $("#reset").css("display", 'block')
+                    $("#preview").html(res);
+                }
+            },
+            error: function(res) {
+                $(".error_msg").innerHTML = "Registration Number not found"
+            }
+        });
+      }
+</script>
+{% endblock %}
+
+

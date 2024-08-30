@@ -1,0 +1,71 @@
+{% if last_leave_policy_details %}
+
+<div class="row" id="detailsBoxFirst" style="display: block;">
+    <div class="col-md-12 p-md-0">
+        <h6><b> {{last_leave_policy.leave_policy}}</b></h6>
+    </div>
+    
+    <div class="col-md-12 p-md-0">
+        <div class="row mb-2">
+            
+            {% for last_leave_policy_detail in last_leave_policy_details %}
+            <div class="row deptRow">
+                <div class="col-md-6 p-md-0">
+                    <h6 class="deptRowHead"><b style="color: black;">{{last_leave_policy_detail.leave_type}}</b></h6>
+                </div>
+                
+                <table class="w-100">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <span class="smallText">Year Leave Count</span><br>
+                            </td>
+                            
+                            <td>
+                                <span class="smallText">Month Leave Count</span><br>
+                            </td>
+                            
+                            <td>
+                                <span class="smallText">Consecutive Leaves</span><br>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td style="text-align:center;">
+                                <span class="largeText">{{last_leave_policy_detail.year_leave_count}}</span>
+                            </td>
+                            
+                            <td style="text-align:center;">
+                                <span class="largeText">{{last_leave_policy_detail.month_leave_count}}</span>
+                            </td>
+                            
+                            <td style="text-align:center;">
+                                <span class="largeText">{{last_leave_policy_detail.consecutive_leave}}</span>
+                            </td>
+                        </tr>
+                        
+                        <tr>
+                            <td><span class="smallText">Carry forward</span></td><td>{% if leave_policy_detail.consecutive_leave|add:"0" > 0 %}Yes{% else %}No{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td><span class="smallText">Salary affecting</span></td><td>{% if leave_policy_detail.is_carry_forward|add:"0" > 0 %}Yes{% else %}No{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td><span class="smallText">Halfday Included</span></td><td>{% if leave_policy_detail.is_halfday_included|add:"0" > 0 %}Yes{% else %}No{% endif %}</td>
+                        </tr>
+                        <tr>
+                            <td><span class="smallText">Can Swipe</span></td><td>{% if leave_policy_detail.can_swipe|add:"0" > 0 %}Yes{% else %}No{% endif %}</td>
+                        </tr>
+                        {% if leave_policy_detail.can_swipe|add:"0" > 0 %}
+                        {% endif %}
+
+                    </tbody>
+                </table>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+</div>
+{% else %}
+<p>No record found</p>
+{% endif %}

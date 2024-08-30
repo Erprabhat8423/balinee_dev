@@ -1,0 +1,137 @@
+{% load static %}
+<div class="modal-AddOrganisation centered">
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-md-3 p-md-0" style="background-repeat: no-repeat;text-align: center;background-color: #0073e0;background-position: bottom left;background-size: 80%;">
+                <div class="transformImage">
+                    <img src="{% static 'img/svg/master/payBands.svg' %}" class="w-50" />
+                    <h4 class="modalColHead">Add Document Type</h4>
+                </div>
+            </div>
+            
+            <div class="col-md-9 p-md-4">
+                <form name ="organisation_reg" id="addForm" method="POST" autocomplete="off" action="" aria-label="Pay Band">
+                    {% csrf_token %}
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b>Add Document Type</b></h5>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <button class="btn btn-save float-right" type="button" onclick="saveDocumentType()">
+                                Save
+                            </button>
+                            <button class="btn btn-close float-right" type="button"
+                            onclick="manipulateModal('addProductModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+                
+                {% comment %} <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Document Name </b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField " type="text" placeholder="Document Name*" name="document_name" maxlength="50" />
+                        <label class="error_msg float-right"></label>
+                    </div>
+                </div> {% endcomment %}
+                  
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Document Name</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <input class="inputField" type="text" placeholder=" Document Name*" name="document_name" id="document_name" maxlength="50" />
+                        <label class="error_msg float-right" id= "document_error" ></label>
+                    </div>
+                </div>
+                <div class="row mt-md-3">
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-12 p-md-0">
+                                <h6 style="display: inline-block;"><b>Description</b></h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-12 p-md-0">
+                        <textarea class="inputField" name="description" id="description" placeholder="description" cols="5" rows="3" maxlength="200"></textarea>
+                        <label class="error_msg float-right" id="description_error"></label>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+   
+    function saveDocumentType() {
+        showLoader();
+        if(validateForm()){
+            hideLoader();
+            return false;
+        }else{
+            $.ajax({
+                url: "{% url 'src:add-document-type' %}",
+                method: 'POST',
+                data: $('#addForm').serialize(),
+                success: function (data) {
+                    hideLoader();
+                    if(data.flag){
+                        $("#addProductModal").html('');
+                        $("#addProductModal").hide();
+                        getList('document_type');
+                        openToaster("success", data.message);
+                    }else{
+                        openToaster("danger", data.message);
+                    }
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            }).always(function() {
+                // hideLoader();
+            });
+        } 
+    }
+    
+     
+    function validateForm(){
+        error = 0;
+        $('.error_msg ').text('');
+        $('.inputField').css("border", "");
+        
+        var doc = document.forms["organisation_reg"]["document_name"].value;
+        document.getElementById('document_error').innerHTML = '';
+        $('#document_name').css("border", "");
+        if (doc == null || doc == "") {
+            error = error + 1;
+            document.getElementById('document_error').innerHTML = 'Please enter Document Name*';
+            $('#document_name').css("border", "1px solid #db8305");
+        }
+        var desc = document.forms["organisation_reg"]["description"].value;
+        document.getElementById('description_error').innerHTML = '';
+        $('#description').css("border", "");
+        if (desc == null || desc == "") {
+            error = error + 1;
+            document.getElementById('description_error').innerHTML = 'Please enter description*';
+            $('#description').css("border", "1px solid #db8305");
+        }
+        if(error > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+</script>

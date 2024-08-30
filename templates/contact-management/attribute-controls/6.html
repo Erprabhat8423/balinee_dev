@@ -1,0 +1,154 @@
+{% load static %}
+<div class="row ">
+	<div class="col-md-12">
+		<div class="row mt-3 wrapper">
+			{% if 'vehicle_type' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/org.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Vehicle type : {% if 'vehicle_type' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<select class="inputField selectField vehicle_types" style="width: 100% !important;" name="vehicle_type" id="vehicle_type">
+						<option value="">Select Vehicle type</option>
+						{% if vehicle_types %}
+						{% for vehicle_type in vehicle_types %}
+						<option value="{{vehicle_type.id}}">{{vehicle_type.vehicle_type}}</option>
+						{% endfor %}
+						{% endif %}
+					</select>
+					<label class="error_msg float-right" id="vehicle_type_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'fuel_type' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/org.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Fuel type : {% if 'fuel_type' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<select class="inputField selectField fuel_types" style="width: 100% !important;" name="fuel_type" id="fuel_type">
+						<option value="">Choose Fuel type</option>
+						<option value="Diesel">Diesel</option>
+						<option value="Petrol">Petrol</option>
+						<option value="CNG">CNG</option>
+						<option value="Gasoline">Gasoline</option>
+						<option value="Ethanal">Ethanal</option>
+						<option value="Bio Diesel">Bio Diesel</option>
+					</select>
+					<label class="error_msg float-right" id="fuel_type_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			
+			{% if 'vehicle_no' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/org.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Vehicle No : {% if 'vehicle_no' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField alpha_numeric vehicle_nos" type="text" placeholder="Vehicle no" name="vehicle_no" id="vehicle_no" maxlength="50">
+					<label class="error_msg float-right" id="vehicle_no_error"></label>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+
+	<div class="col-md-12">
+		<div class="row mt-3 wrapper">
+			{% if 'chessis_no' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/org.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Chessis No : {% if 'chessis_no' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField alpha_numeric chessis_nos" type="text" placeholder="Chessis no" name="chessis_no" id="chessis_no" maxlength="50">
+					<label class="error_msg float-right" id="chessis_no_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'engine_no' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/org.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Engine No : {% if 'engine_no' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField alpha_numeric engine_nos" type="text" placeholder="Engine no" name="engine_no" id="engine_no" maxlength="50">
+					<label class="error_msg float-right" id="engine_no_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			
+			{% if 'chessis_no' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/org.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						DL No : {% if 'chessis_no' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField alpha_numeric dl_nos" type="text" placeholder="DL no" name="dl_no" id="dl_no" maxlength="50">
+					<label class="error_msg float-right" id="dl_no_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+
+
+		</div>
+	</div>
+
+	<div class="col-md-12">
+		<div class="row mt-3 wrapper">
+			{% if 'chessis_no' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/calander-blue.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Expiry date : {% if 'dl_expiry' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField  dl_expirys" type="text" placeholder="Expiry date" name="dl_expiry" id="dl_expiry" maxlength="50">
+					<label class="error_msg float-right" id="dl_expiry_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'seating_capacity_no' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/org.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Seating Capacity : {% if 'seating_capacity_no' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField alpha_numeric seating_capacity_nos" type="text" placeholder="Seating Capacity" name="seating_capacity_no" id="seating_capacity_no" maxlength="50">
+					<label class="error_msg float-right" id="seating_capacity_no_error"></label>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+</div>

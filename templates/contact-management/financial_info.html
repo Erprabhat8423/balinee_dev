@@ -1,0 +1,80 @@
+{% load static %}
+{% if financialInfo %}  
+{% for bankDetail in bankDetails %}
+
+<div class="row mt-2">
+    <div class="col-md-6 col-6 px-0">
+        <div class="row">
+            <div class="col-sm-2 col-2 px-0">
+                <img src="/static/img/svg/org.svg" class="profileIconSize">
+            </div>
+            <div class="  col-sm-10 col-10 px-0 ">
+                <h6 class="smallText">Bank Name*</h6>
+                <h6 class="largeText">
+                    {% if bankDetail.bank_name %}
+                    {{ bankDetail.bank_name }}
+                    {% else %} 
+                    N/A
+                    {% endif %}
+                </h6>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-6 px-0">
+        <div class="row">
+            <div class="col-sm-2 col-2 px-0">
+                <img src="/static/img/svg/contact.svg" class="profileIconSize">
+            </div>
+            <div class="  col-sm-10 col-10 px-0 ">
+                <h6 class="smallText">IFSC Code*</h6>
+                <h6 class="largeText">
+                    {% if bankDetail.ifsc_code %}
+                    {{ bankDetail.ifsc_code }}
+                    {% else %} 
+                    N/A
+                    {% endif %}
+                </h6>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row mt-2">
+    <div class="col-md-6 col-6 px-0">
+        <div class="row">
+            <div class="col-sm-2 col-2 px-0">
+                <img src="/static/img/svg/contact.svg" class="profileIconSize">
+            </div>
+            <div class="  col-sm-10 col-10 px-0 ">
+                <h6 class="smallText">Bank Account no*</h6>
+                <h6 class="largeText">
+                    {% if bankDetail.bank_account_no %}
+                    {{ bankDetail.bank_account_no }}
+                    {% else %} 
+                    N/A
+                    {% endif %}
+                </h6>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-6 px-0">
+        <div class="row">
+            <div class="col-sm-2 col-2 px-0">
+                <img src="/static/img/svg/contactPersonName.svg" class="profileIconSize">
+            </div>
+            <div class="  col-sm-10 col-10 px-0 ">
+                <h6 class="smallText">Holder Name*</h6>
+                <h6 class="largeText">
+                    {% if bankDetail.account_holder_name %}
+                    {{ bankDetail.account_holder_name }}
+                    {% else %} 
+                    N/A
+                    {% endif %}
+                </h6>
+            </div>
+        </div>
+    </div>
+</div>
+{% endfor %}
+{% else %} 
+<p>No Data Found</p>
+{% endif %}

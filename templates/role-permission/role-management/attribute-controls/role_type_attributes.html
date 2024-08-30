@@ -1,0 +1,484 @@
+{% load static %}
+<div class="modal-AddOrganisation centered">
+	<div class="modal-body p-0" >
+		<div class="row">
+			<div class="col-sm-12 col-12 role-details-form py-3">
+				<form method="POST" id="saveRoleAttribute" autocomplete="off" action="{% url 'src:update-role-attributes' %}" aria-label="Update Role Attribute">
+					{% csrf_token %}
+					<input type="hidden" name="role_type_id" value="{{role_id}}">
+					
+					<div class="row">
+						<div class="col-sm-8 col-10 px-0">
+							<h5 class="d-inline-block font-wt-b">Role Attribute Mapping</h5>
+						</div>
+						<div class="col-sm-4 col-2 px-0">
+						<button class="btn btn-save mob-ml-16" type="button" onclick="updateRoleAttributes()" >Save </button>
+						<button class="btn btn-close" type="button" onclick="manipulateModal('addPermissionModal','close')">
+							<span class="mob-d-none">Close</span>
+							<i class="far fa-times-circle mob-d-block desk-d-none"></i>
+						</button>
+					</div>
+					</div>
+					
+					<div class="row add-form-row-mrng">
+						<div class="col-md-12 col-sm-12  form-group">
+							<select name="attribute_id[]" data-placeholder="Select attribute" id="role_attribute_id" class="form-control select2" multiple="">
+								
+								{% for attribute in attributes %}
+								<option value="{{attribute.id}}"  {% if attribute.id in role_attribute_ids %} selected {% endif %} >{{attribute.attribute}}</option>
+								{% endfor %}
+								
+							</select>
+							<span class="label error_label" id="error_attribute_id"></span>
+							
+						</div>
+					</div>
+					
+					<div class="row" id="infoPills">
+						<div class="col-sm-12 p-0">
+							<ul class="nav nav-tabs" id="attr_tab_bar">
+								{% for role_attribute in role_attributes %}
+								<li class="infoTabs {% if forloop.counter == 1  %} activeInfoTabs {% endif %}" id="tab{{role_attribute.attribute_id}}" onclick="handleTabChange('{{role_attribute.attribute_id}}')">{{role_attribute.attribute}}  <span class="" id="badge_{{role_attribute.attribute_id}}" style="    background-color: #ffb400;color:black"></span></a>
+								</li>
+								{% endfor %}
+							</ul>
+						</div>
+					</div>
+					<div class="row h-100" id="attr_tabs">
+						<input type="text" placeholder="Search Globally" class="form-control" id="global-search" onkeyup="searchGlobally()" style="width: 25% !important; margin-left: 75%;">
+						{% for role_attribute in role_attributes %}
+						<div class="col-md-12 p-0 h-100  attr_details {% if forloop.counter == 1  %} activeTab {% endif %}" id="tab{{role_attribute.attribute_id}}Tab">
+							{% with template_name=role_attribute.attribute_id|stringformat:"s"|add:".html" %}
+							{% include "role-permission/role-management/attribute-controls/"|add:template_name with attribute=role_attribute required_documents=required_documents  %}
+							{% endwith %}
+						</div>
+						{% endfor %}
+							
+							
+					</div>
+					
+				</div>
+			</form>
+		</div>
+	</div>
+</div>
+</div>
+
+<script>
+
+	function checkIfAllChecked(){
+			total = $('table:visible').find('.optional_field').length;
+			total_checked = 0;
+			$('table:visible').find('.optional_field').each(function(){
+				console.log($(this).prop('checked'));
+				if($(this).prop('checked')){
+					total_checked = total_checked + 1;
+				}
+			})
+			
+			if(total_checked == total){
+				$('.check_optional_field:visible').prop('checked',true)
+			}
+		}
+	
+	function updateRoleAttributes(){
+		showLoader();
+		$.ajax({
+			url: "{% url 'src:update-role-attributes' %}",
+			method: 'POST',
+			data: $('#saveRoleAttribute').serialize(),
+			success: function (data) {
+				hideLoader();
+				if(data.flag){
+					$("#addPermissionModal").show();
+					$('#addPermissionModal').html(data);
+					
+					openToaster("success", data.message);
+					window.location.reload();
+				}else{
+					openToaster("danger", data.message);
+				}
+			},
+			error: function (err) {
+				hideLoader();
+				console.log(err)
+			}
+		}).always(function() {
+			hideLoader();
+		});
+	}
+	
+	
+	
+	
+	$(document).on('click','.check_optional_field:visible',function(){
+		attribute_id = $('.check_optional_field:visible').val();
+		
+		if($('.check_optional_field:visible').prop('checked')){
+			disabled = [];
+			$("input[name='"+attribute_id+"[]").each(function(){
+				if($(this).prop('disabled')){
+					if($(this).prop('checked')){
+						$(this).prop('checked',true);
+					}else{
+						$(this).prop('checked',false);
+					}
+					disabled.push($(this).val());
+				}else{
+					$(this).prop('checked',true);
+				}
+			})
+			$('#optional_'+attribute_id).val(disabled.join());
+			
+		}else{
+			checked = [];
+			$("input[name='"+attribute_id+"[]").each(function(){
+				if($(this).prop('disabled')){
+					if($(this).prop('checked')){
+						$(this).prop('checked',true);
+					}else{
+						$(this).prop('checked',false);
+					}
+					checked.push($(this).val());
+				}else{
+					checked.push($(this).val());
+					$(this).prop('checked',false);
+				}
+			})
+			$('#optional_'+attribute_id).val(checked.join());
+		}
+		
+		
+	});
+	
+	
+	$(document).ready(function() {
+		
+		$('.activeInfoTabs').trigger('click');
+
+
+		checkIfAllChecked();
+		
+		$('#role_attribute_id').on('select2:unselect', function(e) {
+			unselected_id = e.params.data.id; 
+			console.log(unselected_id);
+			
+			$('#tab'+unselected_id).remove();
+			$('#tab'+unselected_id+'Tab').remove();
+		})
+		$('#role_attribute_id').on('select2:select', function(e) {
+			
+			showLoader();
+			selected_id = e.params.data.id; 
+			selected_text = e.params.data.text; 
+			
+			url = "{% url 'src:role-type-attribute-controls' '1'  %}";
+			url = url.replace('1',selected_id)
+			
+			$.ajax({
+				url: url,
+				type: 'GET',
+				success:function(data){
+					hideLoader();
+					
+					$('.attr_details').removeClass('activeTab').hide();
+					$('.infoTabs').removeClass('activeInfoTabs');
+
+					var li = `<li class="infoTabs activeInfoTabs" id="tab`+selected_id+`" onclick="handleTabChange('`+selected_id+`')">`+selected_text+`
+						<span class="" id="badge_`+ selected_id +`"></span></a>
+								</li>`;
+					var  html =`<div class="col-md-12 p-0 h-100  attr_details activeTab" id="tab`+selected_id+`Tab">
+						`+data+`
+					</div>`;
+					$('#attr_tab_bar').append(li);
+					$('#attr_tabs').append(html);
+					
+					setTimeout(function() {
+						
+						window['table_'+selected_id] = $('#table_'+selected_id).DataTable( {
+							"paging":   false,
+							"ordering": false,
+							"info":     false,
+							mark: true,
+							scrollY:        '50vh',
+							scrollCollapse: true,
+							paging:         false,
+							fixedHeader: {
+								header: true,
+							}
+						} );
+						
+						searchGlobally();
+						
+						
+					}, 1000);
+					
+					
+					checkIfAllChecked();
+					
+				}
+			});
+			
+		})
+	});
+	
+	function handleTabChange(id){
+		$('.attr_details').removeClass('activeTab').hide();
+		$('.infoTabs').removeClass('activeInfoTabs');
+
+		$('#tab'+id).addClass('activeInfoTabs');
+		$('#tab'+id+'Tab').addClass('activeTab').show();
+	}
+
+	$(document).ready(function() {
+		$("#role_attribute_id").select2({
+			multiple: true,
+		});
+		
+		
+	})
+	
+	function searchGlobally(){
+		global_search = $("#global-search").val();
+		// console.log(window.table_3);
+		if(global_search != ""){
+			
+			if($('#table_2').length){
+				window.table_2.search(global_search).draw(); 
+				var info_2 = window.table_2.page.info();
+				$('#badge_2').text(info_2.recordsDisplay);
+			}
+			if($('#table_3').length){
+				window.table_3.search(global_search).draw();
+				var info_3 = window.table_3.page.info();
+				$('#badge_3').text(info_3.recordsDisplay);
+			}
+			if($('#table_4').length){
+				window.table_4.search(global_search).draw();
+				var info_4 = window.table_4.page.info();
+				$('#badge_4').text(info_4.recordsDisplay);
+			}
+			if($('#table_5').length){
+				window.table_5.search(global_search).draw();
+				var info_5 = window.table_5.page.info();
+				$('#badge_5').text(info_5.recordsDisplay);
+			}
+			if($('#table_6').length){
+				window.table_6.search(global_search).draw();
+				var info_6 = window.table_6.page.info();
+				$('#badge_6').text(info_6.recordsDisplay);
+			}
+			if($('#table_7').length){
+				window.table_7.search(global_search).draw();
+				var info_7 = window.table_7.page.info();
+				$('#badge_7').text(info_7.recordsDisplay);
+			}
+			if($('#table_8').length){
+				window.table_8.search(global_search).draw();  
+				var info_8 = window.table_8.page.info();
+				$('#badge_8').text(info_8.recordsDisplay);
+			}
+		}else{
+			$('input[type="search"]').val('');
+			
+			if(typeof window.table_2  !== "undefined"){
+				window.table_2.search('').draw();
+			}
+			if(typeof window.table_3  !== "undefined"){
+				window.table_3.search('').draw();
+			}
+			if(typeof window.table_4  !== "undefined"){
+				window.table_4.search('').draw();
+			}
+			if(typeof window.table_5  !== "undefined"){
+				window.table_5.search('').draw();
+			}
+			if(typeof window.table_6  !== "undefined"){
+				window.table_6.search('').draw();
+			}
+			if(typeof window.table_7  !== "undefined"){
+				window.table_7.search('').draw();
+			}
+			if(typeof window.table_8  !== "undefined"){
+				window.table_8.search('').draw();
+			}
+			
+			$('#badge_2').text('');
+			$('#badge_3').text('');
+			$('#badge_4').text('');
+			$('#badge_5').text('');
+			$('#badge_6').text('');
+			$('#badge_7').text('');
+			$('#badge_8').text('');
+		}
+		
+	}
+
+	//2nd tab
+	$(document).on('click',"input[name='2[]']",function(){
+		unchecked = [];
+		$("input[name='2[]'").each(function(){
+			if(!$(this).prop('checked')){
+				unchecked.push($(this).val());
+			}else{
+				
+			}
+		})
+		$('#optional_2').val(unchecked.join());
+	});
+	
+	$(document).on('click',"input[name='hidden_attr_2[]']",function(){
+		unchecked = [];
+		$("input[name='hidden_attr_2[]'").each(function(){
+			if(!$(this).prop('checked')){
+				unchecked.push($(this).val());
+			}
+		})
+		$('#hidden_2').val(unchecked.join());
+	});
+
+	//2nd tab
+	$(document).on('click',"input[name='3[]']",function(){
+		unchecked = [];
+		$("input[name='3[]'").each(function(){
+			if(!$(this).prop('checked')){
+				unchecked.push($(this).val());
+			}else{
+				
+			}
+		})
+		$('#optional_3').val(unchecked.join());
+	});
+	
+	$(document).on('click',"input[name='hidden_attr_3[]']",function(){
+		unchecked = [];
+		$("input[name='hidden_attr_3[]'").each(function(){
+			if(!$(this).prop('checked')){
+				unchecked.push($(this).val());
+			}
+		})
+		$('#hidden_3').val(unchecked.join());
+	});
+
+
+	//2nd tab
+	$(document).on('click',"input[name='4[]']",function(){
+		unchecked = [];
+		$("input[name='4[]'").each(function(){
+			if(!$(this).prop('checked')){
+				unchecked.push($(this).val());
+			}else{
+				
+			}
+		})
+		$('#optional_4').val(unchecked.join());
+	});
+	
+	$(document).on('click',"input[name='hidden_attr_4[]']",function(){
+		unchecked = [];
+		$("input[name='hidden_attr_4[]'").each(function(){
+			if(!$(this).prop('checked')){
+				unchecked.push($(this).val());
+			}
+		})
+		$('#hidden_4').val(unchecked.join());
+	});
+
+	//2nd tab
+	$(document).on('click',"input[name='5[]']",function(){
+		unchecked = [];
+		$("input[name='5[]'").each(function(){
+			if(!$(this).prop('checked')){
+				unchecked.push($(this).val());
+			}else{
+				
+			}
+		})
+		$('#optional_5').val(unchecked.join());
+	});
+	
+	$(document).on('click',"input[name='hidden_attr_5[]']",function(){
+		unchecked = [];
+		$("input[name='hidden_attr_5[]'").each(function(){
+			if(!$(this).prop('checked')){
+				unchecked.push($(this).val());
+			}
+		})
+		$('#hidden_5').val(unchecked.join());
+	});
+
+	//2nd tab
+	$(document).on('click',"input[name='6[]']",function(){
+		unchecked = [];
+		$("input[name='6[]'").each(function(){
+			if(!$(this).prop('checked')){
+				unchecked.push($(this).val());
+			}else{
+				
+			}
+		})
+		$('#optional_6').val(unchecked.join());
+	});
+	
+	$(document).on('click',"input[name='hidden_attr_6[]']",function(){
+		unchecked = [];
+		$("input[name='hidden_attr_6[]'").each(function(){
+			if(!$(this).prop('checked')){
+				unchecked.push($(this).val());
+			}
+		})
+		$('#hidden_6').val(unchecked.join());
+	});
+
+	//2nd tab
+	$(document).on('click',"input[name='7[]']",function(){
+		unchecked = [];
+		$("input[name='7[]'").each(function(){
+			if(!$(this).prop('checked')){
+				unchecked.push($(this).val());
+			}else{
+				
+			}
+		})
+		$('#optional_7').val(unchecked.join());
+	});
+	
+	$(document).on('click',"input[name='hidden_attr_7[]']",function(){
+		unchecked = [];
+		$("input[name='hidden_attr_7[]'").each(function(){
+			if(!$(this).prop('checked')){
+				unchecked.push($(this).val());
+			}
+		})
+		$('#hidden_7').val(unchecked.join());
+	});
+
+	//2nd tab
+	$(document).on('click',"input[name='8[]']",function(){
+		unchecked = [];
+		$("input[name='8[]'").each(function(){
+			if(!$(this).prop('checked')){
+				unchecked.push($(this).val());
+			}else{
+				
+			}
+		})
+		$('#optional_8').val(unchecked.join());
+	});
+	
+	$(document).on('click',"input[name='hidden_attr_8[]']",function(){
+		unchecked = [];
+		$("input[name='hidden_attr_8[]'").each(function(){
+			if(!$(this).prop('checked')){
+				unchecked.push($(this).val());
+			}
+		})
+		$('#hidden_8').val(unchecked.join());
+	});
+</script>
+
+
+
+
+
+

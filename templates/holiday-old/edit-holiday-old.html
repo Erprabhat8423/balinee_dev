@@ -1,0 +1,279 @@
+{% load static %}
+<div class="modal-AddOrganisation centered">
+    <div class="modal-body p-0">
+        <div class="row">
+            <div class="col-md-3 p-md-0" style="background-repeat: no-repeat;text-align: center;background-color: #0073e0;background-position: bottom left;background-size: 80%;">
+                <div class="transformImage">
+                    <img src="{% static 'img/svg/calander-vacations.svg' %}" class="w-50" />
+                    <h4 class="modalColHead">Edit Holiday</h4>
+                </div>
+                <button class="btn btn-close mr-2 mob-mr-0 ml-0" type="button" onclick="manipulateModal('AddnewHolidayModal','close')">
+                    <i class="far fa-times-circle mob-d-block desk-d-none"></i>
+                </button>
+            </div>
+            
+            <div class="col-md-9 p-md-4">
+                <form id="updateHolidayForm" method="POST" autocomplete="off" action="" aria-label="Holiday">
+                    {% csrf_token %}
+                    <input type="hidden" name="holiday_id" value="{{holiday.id}}">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5><b>Holiday details </b></h5>
+                        </div>
+                        <div class="col-md-6 p-md-0">
+                            <button class="btn btn-close float-right ml-0 mr-0" type="button" onclick="manipulateModal('AddnewHolidayModal','close')">
+                                <span class="mob-d-none">Close</span>
+                            </button>
+                            <button class="btn btn-save float-right" type="button" onclick="updateHoliday('{{holiday.id}}')">
+                                Save
+                            </button>
+                            <!-- <button class="btn btn-close float-right" type="button"
+                            onclick="manipulateModal('AddnewHolidayModal','close')">
+                            Close
+                        </button> -->
+                    </div>
+                </div>
+                
+                <div class="row add-form-row-mrng">
+                    <div class="col-sm-12 col-12  pr-0 mt-2">                                
+                        <img src="{% static 'img/svg/leavePolicy.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                        <h6 class="font-wt-b d-inline-block">
+                            Add Institution*
+                        </h6>
+                        <select class="inputField selectField" data-live-search="true" name="filter_org_name" id="filter_org_id" data-placeholder="Select Institution*" onchange="role_filter_by_org()">
+                            {% for institution_name in institutions %}
+                            <option value="{{institution_name.id}}" {% if institution_name.id == holiday.organization_id|add:"0" %}selected{% endif %}>{{institution_name.organization_name|safe}}</option>
+                            {% endfor %}
+                        </select> 
+                        
+                    </div>
+                    
+                    <div class="col-sm-12 col-12  pr-0 mt-2">                                
+                        <img src="{% static 'img/svg/leavePolicy.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                        <h6 class="font-wt-b d-inline-block">
+                            Add Roles
+                        </h6>
+                        <select class="inputField selectField" multiple data-live-search="true" name="filter_role[]" id="filter_role_id" data-placeholder="Select Role*">
+                            <option value="all" id="allSelected">All Roles</option>
+                            {% for role_name in roles %}                            
+                            {% if role_name.id in role_mappings %}
+                            <option value="{{role_name.id}}" {% if role_name.id in role_mappings %}selected{% endif %}>
+                                {{role_name.role_name|safe}}
+                            </option>
+                            {% else %}
+                            <option value="{{role_name.id}}">
+                                {{role_name.role_name|safe}}
+                            </option>
+                            {% endif %}
+                            {% endfor %}
+                        </select>  
+                        
+                    </div>
+                    <div class="col-sm-12 col-12  pr-0 mt-2">                          
+                        <img src="{% static 'img/svg/leaveType.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                        <h6 class="font-wt-b d-inline-block">
+                            Holiday Type*
+                        </h6>
+                        <select class="inputField selectField" data-live-search="true" style="width: 100%;" name="holiday_type_id" id="holiday_type_id">
+                            <option value="">Add Holiday Type</option>
+                            {% for holiday_type in holiday_types %}
+                            <option value="{{holiday_type.id}}" {% if holiday_type.id == holiday.holiday_type_id|add:"0" %}selected{% endif %}>{{holiday_type.holiday_type|safe}}</option>
+                            {% endfor %}
+                        </select> 
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                    <div class="col-sm-12 col-12  pr-0 mt-2">                          
+                        <img src="{% static 'img/svg/leavePolicy.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                        <h6 class="font-wt-b d-inline-block">
+                            Holiday Name*
+                        </h6>
+                        <input class="inputField " id="edit_holidayName" name="holidayName" value="{{holiday.holiday}}" placeholder="Holiday Name"> 
+                        <label class="error_msg float-right" id=""></label>
+                        
+                    </div>
+                </div>
+                
+                
+                <div class="row add-form-row-mrng mt-2">
+                    <div class="col-sm-12 col-12  pr-0">
+                        <img src="{% static 'img/svg/calander-blue.svg' %}"  class="profileIconSize" />&nbsp;&nbsp;
+                        <h6 class="font-wt-b d-inline-block" >Select Date Range</h6>
+                        
+                    </div>
+                    
+                    <div class="col-sm-12 col-12 px-0 mt-2">
+                        <div class="row ">
+                            <div class="col-sm-6 col-6 pl-0 pr-2">
+                                <input id="edit_from_date" name="from_date" class="searchTable w-100 " placeholder="Date From*" value="{{holiday.start_date|date:'d/m/Y'}}" type="text" readonly >
+                                <img src="{% static 'img/svg/claender-grey.svg' %}" class="calender-icon-input" style="right: 16px;" />
+                                <label class="error_msg float-right" id="address_error"></label>
+                            </div>
+                            <div class="col-sm-6 col-6  pl-1 pr-0 ">
+                                
+                                <input id="edit_to_date" name="to_date" class="searchTable w-100 " placeholder="Date To*" value="{{holiday.end_date|date:'d/m/Y'}}" type="text" readonly >
+                                <img src="{% static 'img/svg/claender-grey.svg' %}" class="calender-icon-input" />
+                                <label class="error_msg float-right" id="pincode_error"></label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row add-form-row-mrng">
+                    <div class="col-sm-12 col-12  pr-0 mt-2">
+                        <img src="{% static 'img/svg/vacation-holiday.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                        <h6 class="font-wt-b d-inline-block">
+                            Holiday Description
+                        </h6>
+                    </div>
+                    
+                    <div class="col-sm-12 col-12 px-0 mt-2">
+                        <textarea class="inputField " type="textarea" placeholder="describe holiday here*"
+                        id="edit_holiday_description" name="holiday_description">{{holiday.description}}</textarea>
+                        <label class="error_msg float-right" id=""></label>
+                        
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+</div>
+
+<script>
+    
+    $(document).ready(function(){
+        
+        $('#filter_role_id').on('select2:select', function(e) {
+            selected_id = e.params.data.id;
+            if(selected_id == 'all'){
+                $('#filter_role_id').val('all').trigger('change')
+            }else{
+                selected_values = $('#filter_role_id').val()
+                if($.inArray('all',selected_values ) === -1){
+                    return true;
+                }else{
+                    $('#filter_role_id').val('all').trigger('change')
+                    
+                }
+            }
+        })
+    })
+    $(document).ready(function(){
+        $("[name='from_date']").datepicker({  
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+0",
+            minDate: 0,
+            dateFormat: 'dd/mm/yy' 
+        });
+        $("[name='to_date']").datepicker({  
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+0",
+            minDate: 0,
+            dateFormat: 'dd/mm/yy' 
+        });
+        
+        
+    })
+    function updateHoliday(id) {
+        showLoader();
+        if(validateEditForm()){
+            hideLoader();
+            return false;
+        }else{
+            url = "{% url 'src:edit-holiday' 'holiday_id' %}";
+            url = url.replace('holiday_id',id);
+            $.ajax({
+                url: url,
+                method: 'POST',
+                data: $('#updateHolidayForm').serialize(),
+                success: function (data) {
+                    hideLoader();
+                    if(data.flag){
+                        $("#AddnewHolidayModal").html('');
+                        openToaster("success", data.message);
+                        manipulateModal('AddnewHolidayModal','close');
+                        setTimeout(function(){
+                            window.location.reload(1);
+                        }, 500);
+                    }else{
+                        openToaster("danger", data.message);
+                    }
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            }).always(function() {
+                // hideLoader();
+            });
+        } 
+    }
+    
+    function role_filter_by_org(){
+        var filter_org_id = $('#filter_org_id').val();
+        console.log(filter_org_id);
+        if(filter_org_id){
+            $.ajax({
+                url: "{% url 'src:filter-role-by-organization' %}",
+                type: 'POST',
+                data: {filter_org_id:filter_org_id,csrfmiddlewaretoken: '{{ csrf_token }}'},
+                success: function (response) {                        
+                    hideLoader();
+                    if (response.filter_role_option !='') {
+                        $('#filter_role_id').html(response.filter_role_option);
+                    } else {
+                        openToaster("danger", response.filter_role_option);
+                    }
+                }
+            });
+        }else{
+            $('#filter_role_id').html('');
+        }
+        
+    }
+    
+    function validateEditForm(){
+        error = 0;
+        $('.error_msg ').text('');
+        $('.inputField').css("border", "");
+        
+        if ($.trim($('[name="filter_org_name"]').val()) == "") {
+            error = error + 1;
+            $('[name="filter_org_name"]').parent().find('.error_msg').text('Please select Institution');
+            $('[name="filter_org_name"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+        }
+        
+        if ($.trim($('[name="filter_role[]"]').val()) == "") {
+            error = error + 1;
+            $('[name="filter_role[]"]').parent().find('.error_msg').text('Please select Role');
+            $('[name="filter_role[]"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+        }
+        
+        if ($.trim($('[name="holiday_type_id"]').val()) == "") {
+            error = error + 1;
+            $('[name="holiday_type_id"]').parent().find('.error_msg').text('Please select holiday type');
+            $('[name="holiday_type_id"]').siblings(".select2-container").css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+        }
+        
+        if ($.trim($('[name="holidayName"]').val()) == "") {
+            error = error + 1;
+            $('[name="holidayName"]').css("border", "1px solid #db8305");
+            $('[name="holidayName"]').parent().find('.error_msg').text("Please enter Holiday Name*");
+        }
+        if ($.trim($('[name="holiday_description"]').val()) == "") {
+            error = error + 1;
+            $('[name="holiday_description"]').css("border", "1px solid #db8305");
+            $('[name="holiday_description"]').parent().find('.error_msg').text("Please enter holiday description*");
+        }
+        
+        
+        
+        if(error > 0){
+            return true;
+        }else{
+            return false;
+        }
+    }
+    
+</script>

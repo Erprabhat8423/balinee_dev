@@ -1,0 +1,441 @@
+{% load static %}
+{% if userContact_details.first_name %}
+<div class="row" id="detailsBoxFirst" style="display: block;">
+    <div class="col-sm-12 col-12 px-0 mb-2">
+        <div class="row  pb-3">
+            <div class="contact-person-img-box"> 
+                {% if userContact_details.profile_image is not None %}
+                <img src="{{userContact_details.profile_image}}" >
+                {% else %}
+                <img src="/static/img/png/default.png" >
+                {% endif %}
+            </div>
+            
+            <div class=" col-sm-6 col-10 px-3 pt-2">
+                <span class="font-wt-b d-block" style="margin-bottom: -5px;">{{userContact_details.first_name}} {% if userContact_details.middle_name is not None %}{{userContact_details.middle_name}} {% endif %}{{userContact_details.last_name}}</span>
+                {% if userContact_details.emp_sap_id is not None %}<span class="accent-color font-11">{{userContact_details.emp_sap_id}}</span>{% endif %}
+            
+                <div class="row">
+                    {% for user_tag in user_tags %}
+                    {% if forloop.first %}
+                    <div class="sponsoredTag">{{user_tag.tag}}</div>
+                    {% else %}
+                    <div class="sponsoredTag" style="margin-left: 10px;">{{user_tag.tag}}</div>
+                    {% endif %}
+                    
+                    {% endfor %}
+                </div>
+            
+            </div>
+            <div class="col-sm-4 px-0  pt-2">
+                <div class="row " style="justify-content: flex-end; position: relative;">
+                    <div class="grey-color pl-2 pt-1" style="font-size: 20px;">
+                        <i class="fas fa-ellipsis-v"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row mt-2 border-bottom pb-2">
+            <div class="col-md-6 col-6 px-0">
+                <div class="row">
+                    <div class="col-sm-2 col-2 px-0">
+                        <img src="/static/img/svg/contactNo.svg" class="profileIconSize">
+                    </div>
+                    <div class="  col-sm-10 col-10 px-0 ">
+                        <h6 class="smallText">Contact No</h6>
+                        <h6 class="largeText">
+                            {% if contactInfo.contact_number  %}
+                            {{contactInfo.contact_number}}
+                            {% if contactInfo.contact_type  %}
+                            ({{contactInfo.contact_type}})
+                            {% endif %}
+                            {% else %}
+                            N/A
+                            {% endif %} 
+                        </h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-6 px-0">
+                <div class="row">
+                    <div class="col-sm-2 col-2 px-0">
+                        <img src="/static/img/svg/org.svg" class="profileIconSize">
+                    </div>
+                    <div class="  col-sm-10 col-10 px-0 ">
+                        <h6 class="smallText">Organisation</h6>
+                        <h6 class="largeText">{{userContact_details.organization_name}}</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-6 px-0">
+                <div class="row">
+                    <div class="col-sm-2 col-2 px-0">
+                        <img src="/static/img/svg/@.svg" class="profileIconSize">
+                    </div>
+                    <div class="  col-sm-10 col-10 px-0 ">
+                        <h6 class="smallText">Email ID</h6>
+                        <h6 class="largeText">{{userContact_details.official_email}}</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>  
+    <div class="col-sm-12 col-12 px-0">
+        <div class="mt-1 mb-2">
+            <a class="arrow leftArrow" style="cursor:pointer;border-radius: 8px 0 0 8px;height: 30px; font-size: 20px; padding: 3px;border: 1px solid #d3d3d3;" >
+                <i class="far fa-angle-left"></i>
+            </a>
+            
+            <a class="arrow rightArrow" style="cursor:pointer;right:0;border-radius: 0 8px 8px 0;height: 30px; font-size: 20px; padding: 3px;border: 1px solid #d3d3d3;" >
+                <i class="far fa-angle-right"></i>
+            </a>
+            
+            <div class="row tabBtn">
+                <ol class="checkOL all-cont-info around-md" >
+                    {% if role_attributes %}
+                    {% for role_attribute in role_attributes %}
+                    {% if role_attribute.id == 2 %}
+                    <li role="presentation" style="cursor:pointer" class="allInfoSection_tab activeAllcontinfo" onclick="handleTabChange({{userContact_details.id}},this,'PersonalInfo')">
+                        {{role_attribute.attribute}}
+                    </li>
+                    {% elif role_attribute.id == 3 %}
+                    <li role="presentation" style="cursor:pointer" class="allInfoSection_tab " onclick="handleTabChange({{userContact_details.id}},this,'academicInfo')">
+                        {{role_attribute.attribute}}
+                    </li>
+                    {% elif role_attribute.id == 4 %}
+                    <li role="presentation" style="cursor:pointer" class="allInfoSection_tab " onclick="handleTabChange({{userContact_details.id}},this,'OfficalInfo')">
+                        {{role_attribute.attribute}}
+                    </li>
+                    {% elif role_attribute.id == 5 %}
+                    <li role="presentation" style="cursor:pointer" class="allInfoSection_tab " onclick="handleTabChange({{userContact_details.id}},this,'FinancialInfo')">
+                        {{role_attribute.attribute}}
+                    </li>
+                    {% elif role_attribute.id == 6 %}
+                    <li role="presentation" style="cursor:pointer" class="allInfoSection_tab " onclick="handleTabChange({{userContact_details.id}},this,'vehicleInfo')">
+                        {{role_attribute.attribute}}
+                    </li>
+                    {% elif role_attribute.id == 7 %}
+                    <li role="presentation" style="cursor:pointer" class="allInfoSection_tab " onclick="handleTabChange({{userContact_details.id}},this,'biometricInfo')">
+                        {{role_attribute.attribute}}
+                    </li>
+                    {% elif role_attribute.id == 8 %}
+                    <li role="presentation" style="cursor:pointer" class="allInfoSection_tab " onclick="handleTabChange({{userContact_details.id}},this,'documentInfo')">
+                        {{role_attribute.attribute}}
+                    </li>
+                    {% else %}
+                    {% endif %}
+                    {% endfor %}
+                    {% else %}
+                    {% endif %}
+                    
+                </ol>
+                
+            </div>
+        </div>
+        
+        <div id="attributeDetail" >
+            <div class="allInfoSection px-2 my-1 "  id="PersonalInfo" style="display: block;">
+                <div class="row mt-3">
+                    <div class="col-md-6 col-6 px-0">
+                        <div class="row">
+                            <div class="col-sm-2 col-2 px-0">
+                                <img src="/static/img/svg/gender.svg" class="profileIconSize">
+                            </div>
+                            <div class="  col-sm-10 col-10 px-0 ">
+                                <h6 class="smallText">Gender*</h6>
+                                <h6 class="largeText">
+                                    {% if personalInfo.gender %}
+                                    {{ personalInfo.gender }}
+                                    {% else %} 
+                                    N/A
+                                    {% endif %}
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-6 px-0">
+                        <div class="row">
+                            <div class="col-sm-2 col-2 px-0">
+                                <img src="/static/img/svg/bloodgroup.svg" class="profileIconSize">
+                            </div>
+                            <div class="  col-sm-10 col-10 px-0 ">
+                                <h6 class="smallText">Blood Group*</h6>
+                                <h6 class="largeText">
+                                    {% if personalInfo.blood_group %}
+                                    {{ personalInfo.blood_group }}
+                                    {% else %} 
+                                    N/A
+                                    {% endif %}
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-6 col-6 px-0">
+                        <div class="row">
+                            <div class="col-sm-2 col-2 px-0">
+                                <img src="/static/img/svg/father.svg" class="profileIconSize">
+                            </div>
+                            <div class="  col-sm-10 col-10 px-0 ">
+                                <h6 class="smallText">Father Name*</h6>
+                                <h6 class="largeText">
+                                    {% if personalInfo.father_first_name %}
+                                    {{ personalInfo.father_first_name }}
+                                    {% if personalInfo.father_first_name %}
+                                    {{ personalInfo.father_last_name }}
+                                    {% endif %}
+                                    {% else %} 
+                                    N/A
+                                    {% endif %}
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-6 px-0">
+                        <div class="row">
+                            <div class="col-sm-2 col-2 px-0">
+                                <img src="/static/img/svg/spouse.svg" class="profileIconSize">
+                            </div>
+                            <div class="  col-sm-10 col-10 px-0 ">
+                                <h6 class="smallText">Mother Name*</h6>
+                                <h6 class="largeText">
+                                    {% if personalInfo.mother_first_name %}
+                                    {{ personalInfo.mother_first_name }}
+                                    {% if personalInfo.mother_last_name %}
+                                    {{ personalInfo.mother_last_name }}
+                                    {% endif %}
+                                    {% else %} 
+                                    N/A
+                                    {% endif %}
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-2">
+                    <div class="col-md-6 col-6 px-0">
+                        <div class="row">
+                            <div class="col-sm-2 col-2 px-0">
+                                <img src="/static/img/svg/spouse.svg" class="profileIconSize">
+                            </div>
+                            <div class="  col-sm-10 col-10 px-0 ">
+                                <h6 class="smallText">Spouse's Name*</h6>
+                                <h6 class="largeText">
+                                    {% if personalInfo.spouse_name %}
+                                    {{ personalInfo.spouse_name }}
+                                    {% else %} 
+                                    N/A
+                                    {% endif %}
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-6 px-0">
+                        <div class="row">
+                            <div class="col-sm-2 col-2 px-0">
+                                <img src="/static/img/svg/spouse.svg" class="profileIconSize">
+                            </div>
+                            <div class="  col-sm-10 col-10 px-0 ">
+                                <h6 class="smallText">Spouse's Employer</h6>
+                                <h6 class="largeText">
+                                    {% if personalInfo.spouse_employer %}
+                                    {{ personalInfo.spouse_employer }}
+                                    {% else %} 
+                                    N/A
+                                    {% endif %}
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                    
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-6 col-6 px-0">
+                        <div class="row">
+                            <div class="col-sm-2 col-2 px-0">
+                                <img src="/static/img/svg/contact-full-blue.svg" >
+                            </div>
+                            <div class="  col-sm-10 col-10 px-0 ">
+                                <h6 class="smallText">Spouse's Work Phone*</h6>
+                                <h6 class="largeText">
+                                    {% if personalInfo.spouse_work_phone %}
+                                    {{ personalInfo.spouse_work_phone }}
+                                    {% else %} 
+                                    N/A
+                                    {% endif %}
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-6 px-0">
+                        <div class="row">
+                            <div class="col-sm-2 col-2 px-0">
+                                <img src="/static/img/svg/no-of children.svg" class="profileIconSize">
+                            </div>
+                            <div class="  col-sm-10 col-10 px-0 ">
+                                <h6 class="smallText">No of Children*</h6>
+                                <h6 class="largeText">
+                                    {% if personalInfo.no_of_children %}
+                                    {{ personalInfo.no_of_children }}
+                                    {% else %} 
+                                    N/A
+                                    {% endif %}
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-2">
+                    <div class="col-md-6 col-6 px-0">
+                        <div class="row">
+                            <div class="col-sm-2 col-2 px-0">
+                                <img src="/static/img/svg/Disability.svg" width="17" class="">
+                            </div>
+                            <div class="  col-sm-10 col-10 px-0 ">
+                                <h6 class="smallText">Disability(if any)*</h6>
+                                <h6 class="largeText">
+                                    {% if personalInfo.disability %}
+                                    {{ personalInfo.disability }}
+                                    {% else %} 
+                                    N/A
+                                    {% endif %}
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-6 px-0">
+                        <div class="row">
+                            <div class="col-sm-2 col-2 px-0">
+                                <img src="/static/img/svg/Identification.svg" width="18" class="">
+                            </div>
+                            <div class="  col-sm-10 col-10 px-0 ">
+                                <h6 class="smallText">Identification mark(if any)*</h6>
+                                <h6 class="largeText">
+                                    {% if personalInfo.identification_mark %}
+                                    {{ personalInfo.identification_mark }}
+                                    {% else %} 
+                                    N/A
+                                    {% endif %}
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-md-6 col-6 px-0">
+                        <div class="row">
+                            <div class="col-sm-2 col-2 px-0">
+                                <img src="/static/img/svg/Caste-Catagory.svg" width="18" class="">
+                            </div>
+                            <div class="  col-sm-10 col-10 px-0 ">
+                                <h6 class="smallText">Caste Catagory</h6>
+                                <h6 class="largeText">
+                                    {% if personalInfo.caste_category %}
+                                    {{ personalInfo.caste_category }}
+                                    {% else %} 
+                                    N/A
+                                    {% endif %}
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6 col-6 px-0">
+                        <div class="row">
+                            <div class="col-sm-2 col-2 px-0">
+                                <img src="/static/img/svg/Caste-Privilage.svg" width="18" class="">
+                            </div>
+                            <div class="  col-sm-10 col-10 px-0 ">
+                                <h6 class="smallText">Caste Privilage</h6>
+                                <h6 class="largeText">
+                                    {% if personalInfo.previlege_category %}
+                                    {{ personalInfo.previlege_category }}
+                                    {% else %} 
+                                    N/A
+                                    {% endif %}
+                                </h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        
+        
+        
+        
+    </div>
+</div>
+
+{% else %} 
+<p>No Data Found</p>
+{% endif %}
+
+
+<script>
+
+var incWidth = 0, divWidth = 0, OlWidth = 0,marginWidth = 50;
+    (function($) {
+        $.fn.showScrollIcons = function(){
+            OlWidth = $('.checkOL').width();
+            divWidth = this.width();
+            if(divWidth >= OlWidth){
+                if(incWidth){
+                    $('.arrow.leftArrow').hide();
+                    $('.checkOL').animate({'marginLeft':"+=" + incWidth});
+                    
+                    $('.checkOL').animate({'marginLeft':"+=" + incWidth});
+                    incWidth = 0;
+                }
+            }
+            else{
+                $('.arrow').show();
+                if(divWidth + incWidth >= ( OlWidth - 12 )){
+                }
+            }
+        };
+    })(jQuery);
+    $(document).ready(function(){
+        $('.rightArrow').click(function(){
+            var outerWidth = 0;
+            var currentTab = $('.activeAllcontinfo');
+            if(currentTab.next().length){
+                outerWidth = currentTab.outerWidth();
+            }
+            incWidth += outerWidth;
+            $('.checkOL').animate({'marginLeft':"-=" + outerWidth});
+            checkArrowHide();
+        });
+        $('.leftArrow').click(function(){
+            var outerWidth = 0;
+            var currentTab = $('.activeAllcontinfo');
+            if(currentTab.prev().length){
+                outerWidth = $('.activeAllcontinfo').outerWidth();
+            }
+            incWidth -= outerWidth;
+            $('.checkOL').animate({'marginLeft':"+=" + outerWidth});
+            checkArrowHide();
+        });
+        $('.tabBtn').showScrollIcons();
+        $( window ).resize(function(){
+            $('.tabBtn').showScrollIcons();
+        });
+        function checkArrowHide(){
+            if(!incWidth){
+                $('.arrow.leftArrow').hide();
+            }
+            else{
+                $('.arrow.leftArrow').show();
+            }
+            if(divWidth + incWidth >= ( OlWidth - 12)){
+                $('.arrow.rightArrow').hide();
+            }
+            else{
+                $('.arrow.rightArrow').show();
+            }
+        }
+    });
+</script>

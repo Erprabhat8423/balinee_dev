@@ -1,0 +1,569 @@
+{% load static %}
+
+<div class="modal-AddUser centered">
+    <form name="addBasicDetailsForms" id="addBasicDetailsForms" method="POST" enctype="multipart/form-data" >
+        {% csrf_token %}
+        <input type="hidden" name="page-step" id="page-step" value="1" />
+        <input type="hidden" name="last_user_id" id="last_user_id" value="{% if last_user_id %} {{ last_user_id }} {% endif %}" >
+        <div class="modal-header" id="headerStep1">
+            <div class="col-12 p-0">
+                <div class="row">
+                    <div class="col-6">
+                        <h5 class="mt-md-2">Basic Information &nbsp;&nbsp;</h5>
+                    </div>
+                    <div class="col-6">
+                        <button class="btn btn-save float-right" type="submit" >
+                            Save
+                        </button>
+                        <button class="btn btn-close float-right" type="button" onclick="manipulateModal('addUserModal','close')">
+                            Close
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="modal-body" id="addUserModalBody" style="overflow: auto">
+            <div class="row">
+                <div class="col-md-12 p-0 h-100 w-100" id="step1">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="row">
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/regNo.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Registration Number
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField" type="text" placeholder="Registration Number" name="registration_number" id="registration_number" maxlength="50">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                
+                                <div class="col-md-6">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/regAddress.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Registered Address
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField" type="text" placeholder="Registered Address" name="registered_address" id="registered_address" maxlength="50">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="clearfix"></div>
+                                
+                                <div class="col-md-4">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/vehicleType.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Vehicle Type*
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <select class="inputField selectField" style="width: 100% !important;" name="vehicle_type" id="vehicle_type">
+                                            <option value="Private">Private</option>
+                                            <option value="Commercial">Commercial</option>
+                                        </select>
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/ownerType.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Ownership Type*
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <select class="inputField selectField" style="width: 100% !important;" name="ownership_type" id="ownership_type" onchange="handleOwnershipType(this.value)">
+                                            <option value="First Hand">First Hand</option>
+                                            <option value="Second Hand">Second Hand</option>
+                                            <option value="On Rent">On Rent</option>
+                                        </select>
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="col-md-4 dealer_div">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/dealerName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Dealer Name
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField alpha" type="text" placeholder="Dealer Name" name="dealer_name" id="dealer_name" maxlength="50" value="">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="clearfix"></div>
+                                
+                                <div class="col-md-4 dealer_div">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/dealersAddress.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Dealer Address
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField " type="text" placeholder="Dealer Address" name="dealer_address" id="dealer_address" maxlength="50" value="">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4 dealer_div">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/dealersContact.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Dealer Contact No
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField numeric" type="text" placeholder="Dealer Contact No" name="dealer_contact_no" id="dealer_contact_no" maxlength="10" value="">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="col-md-4 owner_div" style="display: none;">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/dealerName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Owner Name
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField alpha" type="text" placeholder="Owner Name" name="owner_name" id="owner_name" maxlength="50" value="">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="clearfix"></div>
+                                
+                                <div class="col-md-4 owner_div" style="display: none;">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/dealersAddress.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Owner Address
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField" type="text" placeholder="Owner Address" name="owner_address" id="owner_address" maxlength="100" value="">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4 owner_div" style="display: none;">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/dealersContact.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Owner Contact No
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField numeric" type="text" placeholder="Owner Contact No" name="owner_contact_no" id="owner_contact_no" maxlength="10" value="">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static '/img/svg/vehicle/vehicleClass.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Class of Vehicle
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <select class="inputField selectField" style="width: 100% !important;" name="class_of_vehicle" id="class_of_vehicle">
+                                            <option value="">Select</option>
+                                            {% for vehicle_class in vehicle_classes %}
+                                            <option value="{{vehicle_class.vehicle_class}}">{{vehicle_class.vehicle_class}}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="clearfix"></div>
+                                
+                                <div class="col-md-4">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/dealerName.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Maker's Name
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <select class="inputField selectField" style="width: 100% !important;" name="maker_name" id="maker_name">
+                                            <option value="">Select</option>
+                                            {% for vehicle_maker in vehicle_makers %}
+                                            <option value="{{vehicle_maker.maker_name}}">{{vehicle_maker.maker_name}}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/ManufactYear.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Manufacturing Year
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <select class="inputField selectField" style="width: 100% !important;" name="year_of_manufacture" id="year_of_manufacture">
+                                            <option value="">Select</option>
+                                            {% for year in year_loop %}
+                                            <option value="{{year}}">{{year}}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="col-md-4">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/chassisNo.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Chassis Number
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField" type="text" placeholder="Chassis Number" name="chassis_no" id="chassis_no" maxlength="50" value="">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="clearfix"></div>
+                                
+                                
+                                <div class="col-md-4">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/engineNo.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Engine Number
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField" type="text" placeholder="Engine Number" name="engine_no" id="engine_no" maxlength="50" value="">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/horsePower.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Horsepower 
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField numeric" type="text" placeholder="Horsepower " name="horsepower" id="horsepower" maxlength="50" value="">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/cubicCap.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Cubic Capacity
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField numeric" type="text" placeholder="Cubic Capacity" name="cubic_capacity" id="cubic_capacity" maxlength="50" value="">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="clearfix"></div>
+                                <div class="col-md-4">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/setting.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Maker's Classification
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <select class="inputField selectField" style="width: 100% !important;" name="maker_classification" id="maker_classification">
+                                            <option value="">Select</option>
+                                            {% for vehicle_maker_classification in vehicle_maker_classifications %}
+                                            <option value="{{vehicle_maker_classification.classification}}">{{vehicle_maker_classification.classification}}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/seatingCap.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Seating Capacity 
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField numeric" type="text" placeholder="Seating Capacity" name="seating_capacity_standard" id="seating_capacity_standard" maxlength="50" value="">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/color.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Colour 
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField alpha" type="text" placeholder="Colour " name="color" id="color" maxlength="50" value="">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="clearfix"></div>
+                                
+                                
+                                
+                            </div>
+                            
+                        </div>
+                        
+                        <div class="col-md-6">
+                            
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/ACFitted.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            AC fitted
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <select class="inputField selectField" style="width: 100% !important;" name="ac_fitted" id="ac_fitted">
+                                            <option value="No">No</option>
+                                            <option value="Yes">Yes</option>
+                                        </select>
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="col-md-4">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/hypo.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Hypothecation
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <select class="inputField selectField" style="width: 100% !important;" name="finance" id="finance">
+                                            <option value="No">No</option>
+                                            <option value="Yes">Yes</option>
+                                        </select>
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-4">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/hypoTo.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Hypothecation To 
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField alpha" type="text" placeholder="Hypothecation To" name="financer_name" id="financer_name" maxlength="50" value="">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="clearfix"></div>
+                                
+                                <div class="col-md-4">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/purchaseDate.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Purchase Date
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField datepicker" type="text" placeholder="Purchase Date " name="purchase_date" id="purchase_date" maxlength="50" value="">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="col-md-4">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/fuleType.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Fuel type
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <select class="inputField selectField" style="width: 100% !important;" name="fuel_type" id="fuel_type">
+                                            <option value="">Select</option>
+                                            {% for fuel_type in fuel_types %}
+                                            <option value="{{fuel_type.id}}">{{fuel_type.fuel_type}}</option>
+                                            {% endfor %}
+                                        </select>
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                
+                                <div class="col-md-4">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/milease.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Milease
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="inputField numeric" type="text" placeholder="Milease" name="mileage" id="mileage" maxlength="50" value="">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="clearfix"></div>
+                                
+                                <div class="col-md-4">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static 'img/svg/vehicle/saleLetter.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Sale Letter
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="form-control" type="file"  name="sale_letter" id="sale_letter" maxlength="50" value="">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                                
+                                <div class="clearfix"></div>
+                                
+                            </div>
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="col-md-12 p-0">
+                                        <img src="{% static '/img/svg/vehicle/vehicleClass.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+                                        <h6 class="mt-2 mb-0" style="display: inline-block;">
+                                            Vehicle Image
+                                        </h6>
+                                    </div>
+                                    <div class="col-md-12 p-0 mt-2">
+                                        <input class="form-control" type="file"  name="vehicle_pic" id="vehicle_pic" maxlength="50" value="">
+                                        <label class="error_msg float-right"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        
+        $(document).ready(function(){
+            $(".datepicker").datepicker({
+                weekStart: 1,
+                changeMonth: true,
+                changeYear: true,  
+                yearRange: "-100:+0",
+                daysOfWeekHighlighted: "6,0",
+                autoclose: true,
+                todayHighlight: true,
+                dateFormat: 'dd/mm/yy',
+            });
+        });
+        function handleOwnershipType(value){
+            if(value == "First Hand"){
+                $('.owner_div').hide();
+                $('.dealer_div').show()
+            }else if(value == "Second Hand"){
+                $('.owner_div').show();
+                $('.dealer_div').hide()
+            }
+            else if(value == "On Rent"){
+                $('.owner_div').show();
+                $('.dealer_div').hide()
+            }
+        }
+        
+        $('#addBasicDetailsForms').submit(function(e){
+            showLoader();
+            if(validateBasicForm()){
+                hideLoader();
+                return false;
+            }else{
+                e.preventDefault();
+                $form = $(this)
+                var formData = new FormData(this);
+                
+                $.ajax({
+                    url: "{% url 'src:add-vehicle-basic' %}",
+                    type: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        if (response.error == true) {
+                            hideLoader();
+                            $(".text-danger").html('');
+                            var data = response.message;
+                            $.each(data, function (index, value) {
+                                $('#' + index).html(value);
+                            });
+                        } else {
+                            hideLoader();
+                            // editVehicleRegistration(response.vehicle_id) 
+                            openToaster('success',response.message);
+                            setTimeout(function(){
+                                window.location.reload();
+                            },500)
+                        }
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                });
+                
+                
+            }
+            
+        });
+        
+        function validateBasicForm(){
+            error = 0;
+            $('.error_msg ').text('');
+            $('.inputField').css("border", "");
+            if($.trim($('#registration_number').val()) == ''){
+                $('#registration_number').parent().find('.error_msg').text('Please enter registration number');
+                $('#registration_number').css("border", "1px solid #db8305");
+                error = error + 1;
+            }
+            
+            if(error > 0){
+                return true;
+            }else{
+                return false;
+            }
+            
+        }
+    </script>
+    
+    

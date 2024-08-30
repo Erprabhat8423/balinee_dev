@@ -1,0 +1,187 @@
+{% load helper_tags %}
+{% load static %}
+
+{% if role_details %}
+<div class="row"  style="display: block !important;">
+    <div class="col-md-12 p-md-0">
+        <h6><b>{{role_details.role_name}} </b></h6>
+    </div>
+    <div class="col-md-12 p-md-0 mt-md-3">
+        <div class="row mb-md-2">
+            <div class="col-md-6 p-md-0">
+                <div class="row">
+                    <div class="col-md-2 p-md-0">
+                        <img src="{% static 'img/svg/depart_no.svg' %}" class="profileIconSize" />
+                    </div>
+                    <div class="col-md-10 p-md-0">
+                        <h6 class="smallText">Department</h6>
+                        <h6 class="largeText">{{role_details.department_name}}</h6>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 p-md-0">
+                <div class="row">
+                    <div class="col-2 p-0">
+                        <img src="{% static 'img/svg/org.svg' %}" class="profileIconSize" />
+                    </div>
+                    <div class="col-md-10 p-md-0">
+                        <h6 class="smallText">Institution</h6>
+                        <h6 class="largeText">{{role_details.organization_name}}</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-md-2">
+            <div class="col-md-6 p-md-0">
+                <div class="row">
+                    <div class="col-md-2 p-md-0">
+                        <img src="{% static 'img/svg/father.svg' %}" class="profileIconSize" />
+                    </div>
+                    <div class="col-md-10 p-md-0">
+                        <h6 class="smallText">Associated Users</h6>
+                        <h6 class="largeText">{{role_user_counts}}</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="row mb-md-2">
+            <div class="col-md-6 p-md-0">
+                <div class="row">
+                    <div class="col-md-2 p-md-0">
+                        <img src="{% static 'img/svg/shift.svg' %}" class="profileIconSize" />
+                    </div>
+                    <div class="col-md-10 p-md-0">
+                        <h6 class="smallText">Role Activities</h6>
+                        <ul id="role_activity_list">
+                            {% if role_activities is not None %}
+                            {% for role_activity in role_activities %}
+                            <li><h6 class="largeText">{{role_activity.activity}} 
+                                &nbsp;<a href="javascript:void(0)" data-activity="{{role_activity.activity}}" onclick="editRoleActivity(this, '{{role_activity.id}}')"><img height="12" src="{% static 'img/svg/editcopy.svg' %}" /></a> 
+                                &nbsp;<a href="javascript:void(0)" onclick="deleteRoleActivity(this, '{{role_activity.id}}')"><img height="12" src="{% static 'img/svg/trash.svg' %}" /></a>
+                            </h6>
+                        </li>
+                        {% endfor %}
+                        
+                        {% else %}
+                        <li><h6 class="largeText">No Activities found!</h6></li>
+                        
+                        {% endif %}
+                    </ul>
+                    </div>
+                </div>
+            </div>
+        
+        </div>
+    
+</div>
+
+<div class="dropdown-divider w-100"></div>
+
+<div class="col-md-12 p-md-0">
+    <div class="row mb-2">
+        <div class="col-md-6 p-md-0">
+            <h6 class="m-md-0 mt-md-2"><b>Add New Activity</b></h6>
+        </div>
+    </div>
+</div>
+
+<div class="col-md-12 p-md-0">
+    <div class="row mb-md-2">
+        <div class="col-md-12 p-md-0">
+            <div class="row">
+                <div class="col-md-12 p-md-0">
+                    <input type="hidden" id="role_activity_id">
+                    <textarea class="inputField" placeholder="Enter Activity" name="role_activity" id="role_activity_field" cols="30" rows="3"></textarea>
+                    <label class="error_msg float-right"></label>
+                </div>
+                <div class="col-md-12 p-md-0" style="margin-top: 10px;">
+                    <button class="btn btn-save float-right" type="button" onclick="saveRoleActivity()">
+                        Save
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+</div>
+{% endif %}
+
+<script>
+    var role_id = {{role_details.id}}
+    function editRoleActivity(element,role_activity_id){
+        $("#role_activity_id").val(role_activity_id);
+        $("#role_activity_field").val($(element).data('activity'));
+    }
+    
+    function saveRoleActivity(){
+        if($("#role_activity_field").val() == ""){
+            $("#role_activity_field").parent().find('.error_msg').text('Please enter activity');
+            $("#role_activity_field").css("border", "1px solid #db8305");
+        }else{
+            if($("#role_activity_id").val() != ""){
+                payload = {csrfmiddlewaretoken: '{{ csrf_token }}',role_id:role_id,role_activity:$("#role_activity_field").val(),role_activity_id:$("#role_activity_id").val()}
+            }else{
+                payload = {csrfmiddlewaretoken: '{{ csrf_token }}',role_id:role_id,role_activity:$("#role_activity_field").val()}
+            }
+            $.ajax({
+                url: "{% url 'src:save-role-activity' %}",
+                method: 'POST',
+                data: payload,
+                success: function (data) {
+                    if(typeof data.flag !== "undefined" && !data.flag){
+                        openToaster("danger", data.message);
+                    }else{
+                        $('#role_activity_list').html(data)
+                        $("#role_activity_field").val('')
+                    }
+                },
+                error: function (err) {
+                    hideLoader();
+                    console.log(err)
+                }
+            }).always(function() {
+                hideLoader();
+            });
+        }
+    }
+    
+    function deleteRoleActivity(element,role_activity_id){
+        var question = "Deleted record cannot be reverted. Do you want to proceed?";
+        $.confirm({
+            title: 'Confirm!',
+            content: question,
+            buttons: {
+                confirm: function () {
+                    var url  = "{% url 'src:delete-role-activity' '1' %}";
+                    url = url.replace('1',role_activity_id);
+                    
+                    $.ajax({
+                        url: url,
+                        method: 'GET',
+                        success: function (data) {
+                            if(data.flag){
+                                openToaster("success", data.message);
+                                $(element).parent().parent().remove();
+                            }else{
+                                openToaster("danger", data.message);
+                            }
+                        },
+                        error: function (err) {
+                            console.log(err)
+                        }
+                    }).always(function() {
+                    });
+                    
+                },
+                cancel: function () {
+                    
+                }
+            }
+        });
+        
+        
+    }
+</script>

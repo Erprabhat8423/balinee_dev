@@ -1,0 +1,105 @@
+.modalplanleft {
+  background-color: #0073e0;
+  width: 100%;
+  height: 100%;
+  justify-content: center;
+  align-content: center;
+}
+.modal-heading {
+color: #fff;
+font-weight: 900 !important;
+margin-top: 2px;
+font-size: 19px !important;
+}
+.add-details-popup{
+padding: 18px ;
+}
+.add-contact-detail{
+padding: 4px 0px 8px 24px;
+
+}
+.modalColHead {
+color: #fff;
+font-weight: 700;
+margin-top: 12px;
+font-size: 20px;
+}
+.add-form-row-mrng{
+  margin-top: 12px;
+}
+
+.modal-AddOrganisation h6{ font-size:12px;}
+
+.modal-AddOrganisation  .select2-container .select2-selection--single .select2-selection__rendered {
+          display: block;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          padding: 7px 4px 8px 7px;
+          font-size: 0.9rem;
+  }
+.modal-AddOrganisation .select2-container--default .select2-selection--single .select2-selection__arrow {
+  height: 2.3rem;
+  position: absolute;
+  top: 3px;
+  right: 7px;
+  width: 20px;
+}
+.modal-AddOrganisation .select2-container--default .select2-selection--single .select2-selection__arrow b {
+  border-color: #000 transparent transparent transparent;
+   left: auto; 
+   margin-left: auto; 
+   margin-top: auto; 
+  position: absolute;
+  top: 45%;
+  right: 0;
+  width: 0;}
+.modal-AddOrganisation .select2-container--default.select2-container--open .select2-selection--single .select2-selection__arrow b {
+  border-color: transparent transparent #000 transparent;
+}
+.inputField{
+  padding: 7px 4px 8px 7px;
+  font-size: 0.9rem;
+}
+@media screen and (max-width: 767px) {
+.modalplanleft{
+  padding: 20px 0;
+}
+  .add-details-popup {
+    padding: 8px;
+}
+.modalColHead {
+  font-size: 17px;
+}
+.modal-heading {
+  font-size: 16px !important;
+}
+
+.basic-inform-popup .btn-close{
+    background-color: #f4f4f4;
+    border-radius: 0.6rem;
+    color: #8c8c8c;
+    margin: 0 0px 0 0;
+    position: relative;
+    top: 0;
+    font-size: 1rem;
+    min-width: 6rem;
+    padding: .375rem .75rem;
+  }
+  .basic-inform-popup .gender-input-feild{
+    padding: 5px 0;
+  }
+  .md-modal{
+    width: 85%;
+    height: 85%;
+  }
+  .inputField{
+    font-size: 11px;
+  }
+  .modal-AddOrganisation .select2-container .select2-selection--single .select2-selection__rendered{
+    font-size: 11px;
+  }
+  .modal-AddOrganisation .select2-container--default .select2-selection--single .select2-selection__arrow{
+    top: 6px;
+  }
+}

@@ -1,0 +1,656 @@
+{% extends 'layout/layout.html' %}
+
+{% block title %}
+{{page_title}} 
+{% endblock %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} 
+<link rel="stylesheet" href="{% static 'css/jquery-confirm.min.css' %}">
+<style>
+    .header{
+        background-color: #0073e0;
+        color: #ffffff;
+    }
+</style>
+{% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-8 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-5 p-md-0">
+                    <h6><b>{{page_title}}</b><span id="total_candidates">({{total_candidates}})</span><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-7 p-md-0">
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-12 p-md-0 text-right" id="listToolbar" style="display: block;">
+                            <input class="searchTable" placeholder="Search" type="search" id="filter_search" data-column="all" onkeyup="filterCandidates()">
+                            <button type="button" class="btn border border-primary py-0 pt-1" style="max-height: 50px; color: #007bff;" onclick="newEntrance()">Add Students <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize mb-1" /></button>
+                            <button class="btn iconBox iconExport" type="button" aria-haspopup="true" aria-expanded="false" onclick="exportEnrolled()"></button>
+                            <!--<div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">-->
+                            <!--    <button class="btn iconBox iconUnFreeze" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button> -->
+                            <!--</div>-->
+                        </div>
+                        <div class="col-md-12 p-md-0 text-right" id="chartToolbar" style="display: none;">
+                            <input class="search searchTable search" placeholder="Search" type="search" data-column="all">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-2" id="topRow">
+                <div class="col-sm-12 px-0 my-2">
+                  <div class="row">
+      
+                    <div class="col-sm-3 pl-0 pr-2">
+                      <select class="inputField selectField" style="width: 100% !important;" name="filter_year" id="filter_year" onchange="filterCandidates()">
+                        <option value="">Select Year</option>
+                        <option value="2021-2022">2021-2022</option>
+                        <option value="2020-2021">2020-2021</option>
+                        <option value="2019-2020">2019-2020</option>
+                        <option value="2018-2019">2018-2019</option>
+                      </select>
+                    </div>
+      
+                    <div class="col-sm-3 pl-0 pr-2">
+                      <select class="inputField selectField" style="width: 100% !important;" name="filter_course" id="filter_course" onchange="filterCandidates()">
+                        <option value="">Select Course</option>
+                        <option value="18">Civil Engineering</option>
+                        <option value="19">Electrical Engineering</option>
+                        <option value="20">Mechanical Engineering (Automobile)</option>
+                        <option value="21">Mechanical Engineering (Production)</option>
+                      </select>
+                    </div>
+      
+                    <div class="col-sm-3 pl-0 pr-2">
+                      <input class="inputField w-100 iconDate" id="filter_date" style="width: 100% !important;" placeholder="Date" value="" type="text" readonly onchange="filterCandidates()">
+                    </div>
+      
+                    <div class="col-sm-3 pl-0 pr-2">
+                      <select class="inputField selectField" style="width: 100% !important;" name="filter_status" id="filter_status" onchange="filterCandidates()">
+                        <option value="">Select Status</option>
+                        <option value="0">Not Appeared</option>
+                        <option value="1">Appeared</option>
+                      </select>
+                    </div>
+      
+                    <!-- <div class="col-sm-1 px-0">
+                      <button class="btn iconBox iconImport" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                    </div>
+                    <div class="col-sm-1 px-1">
+                      <button class="btn iconBox iconExport" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false"></button>
+                    </div> -->
+      
+                  </div>
+                </div>
+              </div>
+        <div class="row" id="tableBox">
+            <div class="col-md-12 primaryContainerBG h-100 p-0 commonTableBg" id="ajax-div" style="">
+                <input type="hidden" name="page" id="page" value="2" />
+                <input type="hidden" name="page_status" id="page_status" value="0" />
+                <input type="hidden" name="total_pages" id="total_pages" value="{{ total_pages }}" />
+                <table id="addOrgTable" class="detail-table table table-borderless table-striped table-hover mt-0"
+                  style="width: 100%;">
+                  <thead>
+                      <tr>
+                          <th class="" id="">
+                            S.No.
+                          </th>
+                          <th class="table_student_name" id="table_student_name">
+                            Student Name
+                          </th>
+                          <th class="table_student_name" id="table_contact">
+                            Contact
+                          </th>
+                          <th class="table_course" id="table_course">
+                            Course
+                          </th>
+                          <th class="table_phone_no" id="table_entrance_status">
+                            Entrance Status
+                          </th>
+                          <th class="table_phone_no" id="table_result">
+                            OTP
+                          </th>
+                          <th>Action</th>
+                      </tr>
+                  </thead>
+                  <tbody id="tablebody">
+                      {% if enrolled %}
+                      {% for student in enrolled %}
+                      <tr  {% if forloop.first %} class="odd selected" {% endif %}>
+                          <td class="table_student_name" onclick="getStudentDetail('{{ student.id }}')">
+                              <div class="row">
+                                  <span class="col-sm-10 col-10 pl-0"> {{ forloop.counter }}</span> 
+                              </div>
+                          </td>
+                          <td class="table_student_name" onclick="getStudentDetail('{{ student.id }}')">
+                              <div class="row">
+                                  <span class="col-sm-10 col-10 pl-0 pr-2"> {{ student.student_name }}</span> 
+                              </div>
+                          </td>
+                          <td class="table_contact" onclick="getStudentDetail('{{ student.id }}')">
+                              {{ student.contact }}
+                          </td>
+
+                          <td class="table_course" onclick="getStudentDetail('{{ student.id }}')">
+                              <span class="mr-2">{{ student.course_name }}</span>
+                          </td>
+
+                          <td class="table_entrance_status" onclick="getStudentDetail('{{ student.id }}')">
+                              <div class="row">
+                                {% if student.entrance_status == 1 %}  
+                                  <span class="col-sm-10 col-10 pl-0 pr-2 text-success">
+                                      {{ student.entrance }}
+                                  </span>
+                                {%else%}
+                                  <span class="col-sm-10 col-10 pl-0 pr-2 text-danger">
+                                    {{ student.entrance }}
+                                  </span>
+                                {% endif %}
+                              </div>
+                          </td>
+                          <td class="table_entrance_status" onclick="getStudentDetail('{{ student.id }}')">
+                            <div class="row">
+                              {% if student.otp_stored %}
+                                <span class="col-sm-10 col-10 pl-0 pr-2">
+                                    {{ student.otp_stored }}
+                                </span>
+                              {%else%}
+                                <span class="col-sm-10 col-10 pl-0 pr-2">
+                                -
+                                </span>
+                              {% endif %}
+                            </div>
+                          </td>
+                          <td>
+                            <div class="row">
+                              <a href="javascript:void(0)" onclick="editRegistration('{{ student.id }}')" data-toggle="modal" data-target="#editRegistration" title="Edit">
+                                  <img src="{% static 'img/svg/editcopy.svg' %}" width="20" />
+                              </a>
+                            </div>
+                          </td>
+                  </tr>
+                  {% endfor %}
+                  <tr id="loading" style="display: none;">
+                      <td class="text-center" colspan="7"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                      </td>
+                  </tr>
+                  {% else %}
+                  <tr>
+                      <td colspan="7" style="text-align: center;">No Record Found...</td>
+                  </tr>
+                  {% endif %}
+              </tbody>
+          </table>
+    </div>
+</div>
+</div>
+</div>
+
+<div class="col-md-4 h-100">
+    <div class="primaryContainerBG h-100" id="detailsBox">
+        {% if student_details %}
+
+        <div class="row" style="height: 85%;">
+            <div class="col-md-12 p-0">
+                <div class="row">
+                    <div class="col-md-2 p-md-0">
+                        {% if student_details.profile_image is not None %}
+                        <img src="{{college_base_url}}{{ student_details.profile_image }}" style="width: 100%;">
+                        {% else %}
+                        <img src="{% static 'img/png/default_icon.png' %}" style="width: 100%;">
+                        {% endif %}
+                    </div>
+                    <div class="col-md-10 p-md-0">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h6><b>{{student_details.first_name}} {% if student_details.middle_name is not None %}{{student_details.middle_name}} {% endif %}{{student_details.last_name}} </b></h6>
+                                <h6 class="smallText"><span style="color: #0052a0;">{{student_details.first_name}}</span></h6>
+                            </div>
+                        </div>
+
+                        <br clear="all">
+                        <div class="row">
+                            <div class="col-md-1 p-md-0">
+                                <img src="{% static 'img/svg/contactNo.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-6 p-md-0">
+                                <h6 class="smallText">Contact No.</h6>
+                                <h6 class="largeText"> {{student_details.primary_contact_no}}</h6>
+                            </div>
+                            <div class="col-md-5 p-md-0">
+                                <h6 class="smallText">Registration Id</h6>
+                                <h6 class="largeText"> {{student_details.reg_no}}</h6>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-12 p-md-0 mt-md-3">
+                        <div class="dropdown-divider"></div>
+                        <div class="row mb-md-2">
+                            <div class="col-md-6 p-md-0">
+                                <div class="row">
+                                    <div class="col-2 p-0">
+                                        <img src="{% static 'img/svg/org.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-10 p-md-0">
+                                        <h6 class="smallText">College</h6>
+                                        <h6 class="largeText">{{student_details.college_name|safe }}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-6 p-md-0">
+                                <div class="row">
+                                    <div class="col-2 p-0">
+                                        <img src="{% static 'img/svg/depart_no.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-10 p-md-0">
+                                        <h6 class="smallText">Course</h6>
+                                        <h6 class="largeText">{{student_details.branch }}</h6>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-md-2">
+
+                            <div class="col-md-6 p-md-0">
+                                <div class="row">
+                                    <div class="col-2 p-0">
+                                        <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-10 p-md-0">
+                                        <h6 class="smallText">Father Name</h6>
+                                        <h6 class="largeText">{{student_details.father_name }}</h6>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 p-md-0">
+                                <div class="row">
+                                    <div class="col-2 p-0">
+                                        <img src="{% static 'img/svg/contactPersonName.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-10 p-md-0">
+                                        <h6 class="smallText">Mother Name</h6>
+                                        <h6 class="largeText">{{student_details.mother_name }}</h6>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-6 p-md-0">
+                                <div class="row">
+                                    <div class="col-2 p-0">
+                                        <img src="{% static 'img/svg/aadhaar.svg' %}" class="profileIconSize" />
+                                    </div>
+                                    <div class="col-md-10 p-md-0">
+                                        <h6 class="smallText">Aadhaar Number</h6>
+                                        <h6 class="largeText">{% if student_details.aadhaar_no is not None %}
+                                            {{student_details.aadhaar_no}}
+                                            {% else %}
+                                            --
+                                            {% endif %}
+                                        </h6>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        No Record Found
+        {% endif %}
+        
+    </div>
+</div>
+</div>
+</div>
+
+
+<!-- *************************************Modal********************************** -->
+<div class="overlayModal" id="addUserModal" data-keyboard="false" data-backdrop="static">  
+</div>
+
+<div class="overlayModal" id="addOrganisationModal" data-keyboard="false" data-backdrop="static">    
+</div>
+
+<!-- *************************************Modal********************************** -->
+{% endblock content %}
+{% block script %}
+<script src="{% static 'js/jquery-confirm.min.js' %}"></script>
+<script src="{% static 'js/Nitgen.js' %}"></script>
+<script type="text/javascript">
+    $(document).ready(function () {
+        var prevTop = 0;
+        
+        $('.commonTableBg').on('scroll', function () {
+            var page = $('#page').val();
+            var totalPages = $('#total_pages').val();
+            
+            var currentTop = $(this).scrollTop();
+            if (prevTop !== currentTop) {
+                prevTop = currentTop;
+                if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+                    if(parseInt($('#page_status').val()) == 0 && parseInt(page)  <= parseInt(totalPages)){
+                        $('#loading').show(); 
+                        $('#page_status').val('1');
+                        $.ajax({
+                            url: "{% url 'src:ajax-student-lists' %}",
+                            method: 'GET',
+                            data: { page:page },
+                            success: function (data) {
+                                setTimeout(() => {
+                                    $('#tablebody').find('tr:last').prev().after(data);
+                                    $('#page').val(parseInt(page)+1);
+                                    $('#loading').hide();
+                                    $('#page_status').val('0');
+                                    $('#addOrgTable').trigger('update');
+                                }, 2000);
+                            },
+                            error: function (err) {
+                                alert(err.message);
+                                window.location.reload();
+                            }
+                        });
+                    }
+                }
+            }
+        })
+        
+    });
+</script>
+<script>
+
+    function editRegistration(id) {
+        $('#addUserModal').html('');
+        showLoader();
+        url = "{% url 'src:entrance/edit-candidate' '0' %}";
+        url = url.replace('0',id)
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+                hideLoader();
+                $("#addUserModal").show();
+                $('#addUserModal').html(data);
+                $('.selectField').select2();
+
+            },
+            error: function (err) {
+                hideLoader();
+            }
+        });
+    }
+
+    function filterStudent(){
+        var loading_html =`<tr id="loading" style="display: none;">
+            <td class="text-center" colspan="8"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+            </td>
+        </tr>`;
+        $('#tablebody').html(loading_html);
+        $('#loading').show();
+        
+        var search = $('#filter_search').val();
+        $.ajax({
+            url: "{% url 'src:filter-student' %}",
+            method: 'POST',
+            data: {
+                search:search, 
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function (data) {
+                hideLoader();
+                $('#ajax-div').html(data);
+                
+                $('#addOrgTable').tablesorter({
+                    widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                    widgetOptions: {
+                        resizable_addLastColumn: true,
+                        resizable: false,
+                        resizable_widths: ["2%", "18%", "13%", "15%", "15%", "15%", "12%", "15%"],
+                        stickyHeaders_attachTo: ".primaryContainerBG",
+                        filter_external: '.search',
+                        filter_columnFilters: false,
+                    }
+                });
+                $("#addOrgTable tbody tr").click(function () {
+                    $(this).addClass("selected").siblings().removeClass("selected");
+                });
+                
+                $(".primaryContainerBG").scroll(function () {
+                    var divTable = $(".primaryContainerBG");
+                    $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                });
+                
+            },
+            error: function (err) {
+                alert(err.message);
+            }
+        });
+    }
+
+    function exports(type){
+        var columns = $('#show_columns').val();
+        if(columns == ''){
+            openToaster("danger", "Please select at-least one column");
+        } else {
+            if(type == 'excel'){
+                var url = "{% url 'src:export-organizations-to-xlsx' 'columns' %}";
+                url = url.replace('columns',columns);
+                window.location.href = url;
+            } else {
+                var url = "{% url 'src:export-organizations-to-pdf' 'columns' %}";
+                url = url.replace('columns',columns);
+                window.location.href = url;
+            }
+        }
+        
+    }
+
+    $(document).ready(function () {
+        $("#filter_date").datepicker({
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+0",
+            maxDate: 0,
+            dateFormat: 'dd/mm/yy' 
+        });
+
+
+        setHeightWidth();
+        
+        $('#addOrgTable').tablesorter({
+            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+            widgetOptions: {
+                resizable_addLastColumn: true,
+                resizable: false,
+                resizable_widths: ["2%", "20%", "20%", "15%", "15%","20%"],
+                stickyHeaders_attachTo: ".primaryContainerBG",
+                filter_external: '.search',
+                filter_columnFilters: false,
+            }
+        });
+        $("#addOrgTable tbody tr").click(function () {
+            $(this).addClass("selected").siblings().removeClass("selected");
+        });
+        
+        $(".primaryContainerBG").scroll(function () {
+            var divTable = $(".primaryContainerBG");
+            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+        });
+    });
+    
+    $(window).resize(function () {
+        setHeightWidth();
+    });
+    
+    $(document).on('click', '.pagination a', function (event) {
+        event.preventDefault();
+        var page = $(this).attr('href').split('page=')[1];
+        
+        $('li').removeClass('active');
+        $(this).parent().addClass('active');
+        ajaxOrganizationList(page);
+    });
+</script>
+
+<script>
+    function filterCandidates() {
+        showLoader();
+        filter_year     = $("#filter_year").val()
+        filter_course   = $("#filter_course").val()
+        filter_date     = $("#filter_date").val()
+        filter_status   = $("#filter_status").val()
+        filter_result   = $("#filter_result").val()
+        filter_search   = $("#filter_search").val()
+
+        $.ajax({
+            url: "{% url 'src:entrance/filter-candidates' %}",
+            method: "POST",
+            data: {
+                filter_year: filter_year,
+                filter_course: filter_course,
+                filter_date: filter_date,
+                filter_status: filter_status,
+                filter_result: filter_result,
+                filter_search: filter_search,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(data) {
+                $('#ajax-div').html(data);
+                $('#total_candidates').text('('+$('#total_filtered_candidates').val()+')');
+                hideLoader();
+            }
+        })
+    }
+</script>
+
+
+<script>
+    function getStudentDetail(id) {
+        $('#detailsBox').html('<div style="margin-top:40px; text-align:center"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+            showLoader();
+            url = "{% url 'src:entrance/candidate-details' '1' %}";
+            url = url.replace('1',id)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    hideLoader();
+                    $('#detailsBox').html(data);
+                    $('#addOrgTable').tablesorter({
+                        widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                        widgetOptions: {
+                            resizable_addLastColumn: true,
+                            resizable: false,
+                            resizable_widths: ["2%", "20%", "20%", "15%", "15%","20%"],
+                            stickyHeaders_attachTo: ".primaryContainerBG",
+                            filter_external: '.search',
+                            filter_columnFilters: false,
+                        }
+                    });
+                    $("#addOrgTable tbody tr").click(function () {
+                        $(this).addClass("selected").siblings().removeClass("selected");
+                    });
+                    $(".deptRow").click(function () {
+                        $(this).addClass("deptSelected").siblings().removeClass("deptSelected");
+                    });
+                    
+                    
+                    $(".primaryContainerBG").scroll(function () {
+                        var divTable = $(".primaryContainerBG");
+                        $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                    });
+                    
+                },
+                error: function (err) {
+                    hideLoader();
+                }
+            });
+        }
+    </script>
+<script>
+    function newEntrance() {
+        $('#addUserModal').html('');
+        showLoader();
+        $.ajax({
+            url: "{% url 'src:entrance/register-candidate' %}",
+            method: 'GET',
+            success: function (data) {
+                hideLoader();
+                $("#addUserModal").show();
+                $('#addUserModal').html(data);
+                
+                var mch = $(".modal-AddUser").height() - (($(".modal-header").outerHeight()) + ($("#modalFooter").outerHeight()));
+                $("#addUserModalBody").height(mch);
+                $(".selectField").select2();
+                
+                $("#date_of_birth").datepicker({  
+                    changeMonth: true,
+                    changeYear: true,  
+                    yearRange: "-100:+0"
+                    ,maxDate: 0,
+                    dateFormat: 'dd/mm/yy' 
+                });
+                
+            },
+            error: function (err) {
+                hideLoader();
+            }
+        });
+    }
+</script>
+
+<script>
+    function exportEnrolled() {
+        filter_year     = $("#filter_year").val()
+        filter_course   = $("#filter_course").val()
+        filter_date     = $("#filter_date").val()
+        filter_status   = $("#filter_status").val()
+
+        var url = "{% url 'src:entrance/export-candidates' 'filter_year' 'filter_course' 'filter_date' 'filter_status' %}";
+
+        if (filter_date != ""){
+            filter_date = filter_date.replace("/", "-")
+            filter_date = filter_date.replace("/", "-")
+            url = url.replace('filter_date', filter_date);
+        } 
+        else {
+            url = url.replace('filter_date', '0');
+        }
+
+        if (filter_status != ""){
+            url = url.replace('filter_status', filter_status);
+        } else {
+            url = url.replace('filter_status', '2');
+        }
+
+        if (filter_course != ""){
+            url = url.replace('filter_course', filter_course);
+        } else {
+            url = url.replace('filter_course', '0');
+        }
+
+        if (filter_year != ""){
+            url = url.replace('filter_year', filter_year);
+        } else {
+            url = url.replace('filter_year', '0');
+        }
+
+        window.location.href = url;
+
+
+
+        
+    }
+</script>
+
+    {% endblock %}

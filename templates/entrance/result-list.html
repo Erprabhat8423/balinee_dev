@@ -1,0 +1,788 @@
+{% extends 'layout/layout.html' %}
+
+{% block title %}
+{{page_title}} 
+{% endblock %}
+
+{% load helper_tags %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} 
+<link rel="stylesheet" href="{% static 'css/jquery-confirm.min.css' %}">
+<style>
+    .header{
+        background-color: #0073e0;
+        color: #ffffff;
+    }
+
+    /* ************* Range Selector ************* */
+        .min-max-slider {
+            position: relative;
+            width: 200px;
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        .min-max-slider > label {
+            display: none;
+        }
+
+        span.value {
+            height: 1.7em;
+            font-weight: bold;
+            display: inline-block;
+        }
+
+        span.value.lower::before {
+            content: "%";
+            display: inline-block;
+        }
+
+        span.value.upper::before {
+            content: "%";
+            display: inline-block;
+            margin-left: 0.4em;
+        }
+
+        .min-max-slider > .legend {
+            display: flex;
+            justify-content: space-between;
+        }
+        .min-max-slider > .legend > * {
+            font-size: small;
+            opacity: 0.25;
+        }
+        .min-max-slider > input {cursor: pointer; position: absolute;}
+
+        /* webkit specific styling */
+        .min-max-slider > input {
+            -webkit-appearance: none;
+            outline: none!important;
+            background: transparent;
+            background-image: linear-gradient(to bottom, transparent 0%, transparent 30%, silver 30%, silver 60%, transparent 60%, transparent 100%);
+        }
+        .min-max-slider > input::-webkit-slider-thumb {
+        -webkit-appearance: none; /* Override default look */
+        appearance: none;
+        width: 14px; /* Set a specific slider handle width */
+        height: 14px; /* Slider handle height */
+        background: #eee; /* Green background */
+        cursor: pointer;
+        border: 1px solid gray;
+        border-radius: 100%;
+        }
+        .min-max-slider > input::-webkit-slider-runnable-track {cursor: pointer;}
+
+    /* ************* Range Selector ************* */
+
+</style>
+{% endblock %}
+
+<div class="row" id="containerHeight">
+    <div class="col-md-8 pr-md-0 h-100">
+        <div class="primaryContainer h-100" id="mainbox">
+            <div class="row mb-2" id="topRow">
+                <div class="col-md-5 p-md-0">
+                    <h6><b>{{page_title}}</b><span id="total_results">({{total_results}})</span><span class="fa fa-star add_to_fav {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')"></span></h6>
+                </div>
+                <div class="col-md-7 p-md-0">
+                    <div class="row mb-2 mt-2" id="secondRow">
+                        <div class="col-md-12 p-md-0 text-right" id="listToolbar" style="display: block;">
+
+                            <button type="button" class="btn border border-primary py-0 pt-1" style="max-height: 50px; color: #007bff;" onclick="exportResult()">Export Result</button>
+                            <!--<button class="btn iconBox" type="button" id="smsButton" onclick="sendSMS()">SMS</button>-->
+                            <button class="btn iconBox p-0" type="button" id="smsButton" onclick="sendSMS()">SMS</button>
+ 
+                            <!-- <div class="dropdown fixed-column" style="display: inline-block;" id="lockColumn">
+                                <button class="btn iconBox" type="button" id="smsButton"></button>
+                            </div> -->
+                        </div>
+                        <div class="col-md-12 p-md-0 text-right" id="chartToolbar" style="display: none;">
+                            <input class="search searchTable search" placeholder="Search" type="search" data-column="all">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="row mb-2" id="topRow">
+                <div class="col-sm-12 px-0 my-2">
+                    <div class="row">
+        
+                        <div class="offset-6 col-sm-3 pl-0 pr-2">
+                            <input class="inputField w-100 iconDate" id="filter_date" style="width: 100% !important;" placeholder="Date" value="" type="text" readonly onchange="filterResults()">
+                        </div>
+
+                        <div class="col-sm-3 pl-0 pr-2">
+                            <select class="inputField selectField" style="width: 100% !important;" name="filter_percentage" id="filter_percentage" onchange="filterResults()">
+                                <option value="">Select Percentage</option>
+                                <option value="0-30">0%-30%</option>
+                                <option value="31-50">31%-50%</option>
+                                <option value="51-80">51%-80%</option>
+                                <option value="81-100">81%-100%</option>
+                            </select>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+            
+        <div class="row" id="tableBox">
+            <div class="col-md-12 primaryContainerBG h-100 p-0 commonTableBg" id="ajax-div">
+                <input type="hidden" name="page" id="page" value="2" />
+                <input type="hidden" name="page_status" id="page_status" value="0" />
+                <input type="hidden" name="total_pages" id="total_pages" value="{{ total_pages }}" />
+                <table id="addOrgTable" class="detail-table table table-borderless table-striped table-hover mt-0"
+                  style="width: 100%;">
+                  <thead>
+                      <tr>
+                          <th class="table_student_name" id="table_student_name">
+                            <input type="checkbox" id="check-all">
+                          </th>
+                          <th class="table_student_name" id="table_student_name">
+                            S.No
+                          </th>
+                          <th class="table_student_name" id="table_student_name">
+                            Student Name
+                          </th>
+                          <th class="table_student_name" id="table_contact">
+                            Contact
+                          </th>
+                          <th class="table_student_name" id="table_date">
+                            Quiz Date
+                          </th>
+                          <th class="table_student_name" id="table_date">
+                            Status
+                          </th>
+                          <th class="table_course" id="table_course">
+                            Total Questions
+                          </th>
+                          <th class="table_phone_no" id="table_entrance_status">
+                            Attempted
+                          </th>
+                          <th class="table_phone_no" id="table_result">
+                            Skipped
+                          </th>
+                          <th class="table_phone_no" id="table_result">
+                            Correct
+                          </th>
+                          <th class="table_phone_no" id="table_result">
+                            Wrong
+                          </th>
+                          <th class="table_phone_no" id="table_result">
+                            Percentage
+                          </th>
+                      </tr>
+                  </thead>
+                  
+                  
+                  <tbody id="tablebody">
+                      {% if enrolled %}
+                      {% for student in enrolled %}
+
+                      <tr  {% if forloop.first %} class="odd selected" id="next" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')" {% endif %} >
+
+                        <th class="table_student_checkbox" id="table_student_checkbox">
+                            <input type="checkbox" class="selected_candidate" value="{{ student.candidate_id }}:{{ student.quiz_start_datetime|date:"Y-m-d" }}">
+                        </th>
+
+                        <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')">
+                            {{ forloop.counter }}
+                        </td>
+
+                        <td class="table_student_name" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')">
+                            <div class="row">
+                                <span class="col-sm-10 col-10 pl-0 pr-2">{{ student.student_name }}</span> 
+                                
+                                <div class="col-sm-2 col-2 px-0" id="is_notified_{{ student.candidate_id }}">
+                                    {% if student.is_notified == 1 %}
+                                    <img src="{% static 'img/svg/Verified.svg' %}" alt="" width="15">
+                                    {% else %}
+                                    <img src="{% static 'img/svg/notVerified.svg' %}" alt="" width="15">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </td>
+
+                        <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')">
+                            {{ student.contact }}
+                        </td>
+                        
+                        <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')">
+                            {{ student.quiz_start_datetime|date:"d/m/Y" }}
+                        </td>
+                        
+                        <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')">
+                            {% if student.quiz_end_datetime %} Completed {% else %} Incompleted {%endif%}
+                        </td>
+                        
+                        <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')">
+                            {{ student.total_questions }}
+                        </td>
+
+                        <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')">
+                            {{ student.total_attempted }}
+                        </td>
+
+                        <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')">
+                            {{ student.total_skipped }}
+                        </td>
+                        
+                        <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')">
+                            {{ student.total_correct }}
+                        </td>
+
+                        <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')">
+                            {{ student.total_wrong }}
+                        </td>
+
+                        <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_start_datetime|date:"Y-m-d" }}')">
+                            {{ student.percentage }}%
+                        </td>
+
+                      {% endfor %}
+                      <tr id="loading" style="display: none;">
+                        <td class="text-center" colspan="6"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+                        </td>
+                      </tr>
+                      {% else %}
+                      <tr>
+                        <td colspan="11" id="next" style="text-align: center;" onclick="getStudentDetail('0', '0')">No Record Found...</td>
+                      </tr>
+                      {% endif %}
+              </tbody>
+              <!--    <tbody id="tablebody">-->
+              <!--        {% if enrolled %}-->
+              <!--        {% for student in enrolled %}-->
+
+              <!--        <tr  {% if forloop.first %} class="odd selected" id="next" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_end_datetime|date:"Y-m-d" }}')" {% endif %} >-->
+
+              <!--          <th class="table_student_checkbox" id="table_student_checkbox">-->
+              <!--              <input type="checkbox" class="selected_candidate" value="{{ student.candidate_id }}:{{ student.quiz_end_datetime|date:"Y-m-d" }}">-->
+              <!--          </th>-->
+
+              <!--          <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_end_datetime|date:"Y-m-d" }}')">-->
+              <!--              {{ forloop.counter }}-->
+              <!--          </td>-->
+
+              <!--          <td class="table_student_name" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_end_datetime|date:"Y-m-d" }}')">-->
+              <!--              <div class="row">-->
+              <!--                  <span class="col-sm-10 col-10 pl-0 pr-2">{{ student.student_name }}</span> -->
+                                
+              <!--                  <div class="col-sm-2 col-2 px-0" id="is_notified_{{ student.candidate_id }}">-->
+              <!--                      {% if student.is_notified == 1 %}-->
+              <!--                      <img src="{% static 'img/svg/Verified.svg' %}" alt="" width="15">-->
+              <!--                      {% else %}-->
+              <!--                      <img src="{% static 'img/svg/notVerified.svg' %}" alt="" width="15">-->
+              <!--                      {% endif %}-->
+              <!--                  </div>-->
+              <!--              </div>-->
+              <!--          </td>-->
+
+              <!--          <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_end_datetime|date:"Y-m-d" }}')">-->
+              <!--              {{ student.contact }}-->
+              <!--          </td>-->
+                        
+              <!--          <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_end_datetime|date:"Y-m-d" }}')">-->
+              <!--              {{ student.quiz_end_datetime|date:"d/m/Y" }}-->
+              <!--          </td>-->
+                        
+              <!--          <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_end_datetime|date:"Y-m-d" }}')">-->
+              <!--              {{ student.total_questions }}-->
+              <!--          </td>-->
+
+              <!--          <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_end_datetime|date:"Y-m-d" }}')">-->
+              <!--              {{ student.total_attempted }}-->
+              <!--          </td>-->
+
+              <!--          <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_end_datetime|date:"Y-m-d" }}')">-->
+              <!--              {{ student.total_skipped }}-->
+              <!--          </td>-->
+                        
+              <!--          <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_end_datetime|date:"Y-m-d" }}')">-->
+              <!--              {{ student.total_correct }}-->
+              <!--          </td>-->
+
+              <!--          <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_end_datetime|date:"Y-m-d" }}')">-->
+              <!--              {{ student.total_wrong }}-->
+              <!--          </td>-->
+
+              <!--          <td class="table_contact" onclick="getStudentDetail('{{ student.candidate_id }}', '{{ student.quiz_end_datetime|date:"Y-m-d" }}')">-->
+              <!--              {{ student.percentage }}%-->
+              <!--          </td>-->
+
+              <!--        {% endfor %}-->
+              <!--        <tr id="loading" style="display: none;">-->
+              <!--          <td class="text-center" colspan="6"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>-->
+              <!--          </td>-->
+              <!--        </tr>-->
+              <!--        {% else %}-->
+              <!--        <tr>-->
+              <!--          <td colspan="11" id="next" style="text-align: center;" onclick="getStudentDetail('0', '0')">No Record Found...</td>-->
+              <!--        </tr>-->
+              <!--        {% endif %}-->
+              <!--</tbody>-->
+          </table>
+    </div>
+</div>
+</div>
+</div>
+
+<div class="col-md-4 h-100">
+    <div class="primaryContainerBG h-100" id="detailsBox">
+        {% if student_details %}
+
+        <div class="row" style="height: 85%;">
+            <div class="col-md-12 p-0">
+                <div class="row">
+                    <div class="col-md-2 p-md-0">
+                        {% if student_details.profile_image is not None %}
+                        <img src="{{college_base_url}}{{ student_details.profile_image }}" style="width: 100%;">
+                        {% else %}
+                        <img src="{% static 'img/png/default_icon.png' %}" style="width: 100%;">
+                        {% endif %}
+                    </div>
+                    <div class="col-md-10 p-md-0">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h6><b>{{student_details.student_name}} {% if student_details.middle_name is not None %}{{student_details.middle_name}} {% endif %}{{student_details.last_name}} </b></h6>
+                                <h6 class="smallText"><span style="color: #0052a0;">{{student_details.first_name}}</span></h6>
+                            </div>
+                        </div>
+
+                        <br clear="all">
+                        <div class="row">
+                            <div class="col-md-1 p-md-0">
+                                <img src="{% static 'img/svg/contactNo.svg' %}" class="profileIconSize" />
+                            </div>
+                            <div class="col-md-6 p-md-0">
+                                <h6 class="smallText">Contact No.</h6>
+                                <h6 class="largeText"> {{student_details.contact}}</h6>
+                            </div>
+                            <div class="col-md-5 p-md-0">
+                                <h6 class="smallText">Email</h6>
+                                <h6 class="largeText"> {{student_details.}}</h6>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-md-12 p-md-0 mt-md-3">
+                        <div class="dropdown-divider">
+        
+                        </div>
+                        <div class="row mb-md-2">
+                            
+                        </div>
+                        </div>
+                </div>
+                <div class="row">
+                    <div class="col-12 p-0 mt-4 col-md-12 p-md-0 mt-md-2">
+                        <table class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th class="header">S.No </th>
+                                    <th class="header">Question </th>
+                                    <th class="header">Options </th>
+                                    <th class="header">Selected Option </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% if student_details.question_answers %}
+                                {% for question_answers in student_details.question_answers %}
+
+                                <tr>
+                                    <td class="small">{{ forloop.counter }}</td>
+                                    <td class="small">{{question_answers.question}}</td>
+                                    <td class="small">
+                                        {{question_answers.option_no}}. <strong>{{question_answers.options}}</strong>
+                                    </td>
+                                    {% if question_answers.answer == 5 or question_answers.answer == 0  %}
+                                    <td class="small text-info">Skipped</td>
+                                    {% elif question_answers.answer == question_answers.option_no %}
+                                    <td class="small text-success ">{{question_answers.ans}}</td>
+                                    {% else %}
+                                        <td class="small text-danger">{{question_answers.ans}} </td>
+                                    {% endif %}
+                                </tr>
+                                {% endfor %}
+                                {% else %}
+                                <tr>
+                                    <td colspan="4" style="text-align: center;">Not Attempted Yet...</td>
+                                </tr>
+                                {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        No Record Found
+        {% endif %}
+        
+    </div>
+</div>
+</div>
+</div>
+
+
+<!-- *************************************Modal********************************** -->
+<div class="overlayModal" id="addUserModal" data-keyboard="false" data-backdrop="static">  
+</div>
+
+<div class="overlayModal" id="addOrganisationModal" data-keyboard="false" data-backdrop="static">    
+</div>
+
+<!-- *************************************Modal********************************** -->
+{% endblock content %}
+{% block script %}
+<script src="{% static 'js/jquery-confirm.min.js' %}"></script>
+<script src="{% static 'js/Nitgen.js' %}"></script>
+
+<script type="text/javascript">
+    $(document).ready(function () {
+        var prevTop = 0;
+        $("#next").click()
+        $('.commonTableBg').on('scroll', function () {
+            var page = $('#page').val();
+            var totalPages = $('#total_pages').val();
+            
+            var currentTop = $(this).scrollTop();
+            if (prevTop !== currentTop) {
+                prevTop = currentTop;
+                if ($(this).scrollTop() + $(this).innerHeight() >= $(this)[0].scrollHeight) {
+                    if(parseInt($('#page_status').val()) == 0 && parseInt(page)  <= parseInt(totalPages)){
+                        $('#loading').show(); 
+                        $('#page_status').val('1');
+                        $.ajax({
+                            url: "{% url 'src:ajax-student-lists' %}",
+                            method: 'GET',
+                            data: { page:page },
+                            success: function (data) {
+                                setTimeout(() => {
+                                    $('#tablebody').find('tr:last').prev().after(data);
+                                    $('#page').val(parseInt(page)+1);
+                                    $('#loading').hide();
+                                    $('#page_status').val('0');
+                                    $('#addOrgTable').trigger('update');
+                                }, 2000);
+                            },
+                            error: function (err) {
+                                alert(err.message);
+                                window.location.reload();
+                            }
+                        });
+                    }
+                }
+            }
+        })
+        
+    });
+</script>
+
+<script>
+
+    $(document).ready(function () {
+        $('#addOrgTable').tablesorter({
+            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+            widgetOptions: {
+                resizable_addLastColumn: true,
+                resizable: false,
+                // resizable_widths: ["5%", "15%", "14%", "12%", "12%", "11%", "10%", "10%", "10%"],
+                stickyHeaders_attachTo: ".primaryContainerBG",
+                filter_external: '.search',
+                filter_columnFilters: false,
+            }
+        });
+        $("#addOrgTable tbody tr").click(function () {
+            $(this).addClass("selected").siblings().removeClass("selected");
+        });
+        
+        $(".primaryContainerBG").scroll(function () {
+            var divTable = $(".primaryContainerBG");
+            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+        });
+    })
+
+    function editRegistration(id) {
+        $('#addUserModal').html('');
+        showLoader();
+        url = "{% url 'src:entrance/edit-candidate' '1' %}";
+        url = url.replace('1',id)
+        $.ajax({
+            url: url,
+            method: 'GET',
+            success: function (data) {
+                hideLoader();
+                $("#addUserModal").show();
+                $('#addUserModal').html(data);
+            },
+            error: function (err) {
+                console.log(err)
+            }
+        });
+    }
+
+    function filterStudent(){
+        var loading_html =`<tr id="loading" style="display: none;">
+            <td class="text-center" colspan="8"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></i>
+            </td>
+        </tr>`;
+        $('#tablebody').html(loading_html);
+        $('#loading').show();
+        
+        var search = $('#filter_search').val();
+        $.ajax({
+            url: "{% url 'src:filter-student' %}",
+            method: 'POST',
+            data: {
+                search:search, 
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function (data) {
+                hideLoader();
+                $('#ajax-div').html(data);
+                
+                $('#addOrgTable').tablesorter({
+                    widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                    widgetOptions: {
+                        resizable_addLastColumn: true,
+                        resizable: false,
+                        // resizable_widths: ["5%", "15%", "14%", "12%", "12%", "11%", "10%", "10%", "10%"],
+                        stickyHeaders_attachTo: ".primaryContainerBG",
+                        filter_external: '.search',
+                        filter_columnFilters: false,
+                    }
+                });
+                $("#addOrgTable tbody tr").click(function () {
+                    $(this).addClass("selected").siblings().removeClass("selected");
+                });
+                
+                $(".primaryContainerBG").scroll(function () {
+                    var divTable = $(".primaryContainerBG");
+                    $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                });
+                
+            },
+            error: function (err) {
+                alert(err.message);
+            }
+        });
+    }
+
+    function exports(type){
+        var columns = $('#show_columns').val();
+        if(columns == ''){
+            openToaster("danger", "Please select at-least one column");
+        } else {
+            if(type == 'excel'){
+                var url = "{% url 'src:export-organizations-to-xlsx' 'columns' %}";
+                url = url.replace('columns',columns);
+                window.location.href = url;
+            } else {
+                var url = "{% url 'src:export-organizations-to-pdf' 'columns' %}";
+                url = url.replace('columns',columns);
+                window.location.href = url;
+            }
+        }
+    }
+
+    $(document).ready(function () {
+        $('#check-all').change( function () {
+            debugger
+            if ($('#check-all').is(':checked')) {
+                $(".selected_candidate").prop('checked', true)
+            }
+            else {
+                $(".selected_candidate").prop('checked', false)
+            }
+        })
+
+        $("#filter_date").datepicker({
+            changeMonth: true,
+            changeYear: true,  
+            yearRange: "-100:+0",
+            maxDate: 0,
+            dateFormat: 'dd/mm/yy' 
+        });
+
+
+        setHeightWidth();
+        
+        $('#addOrgTable').tablesorter({
+            widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+            widgetOptions: {
+                resizable_addLastColumn: true,
+                resizable: false,
+                // resizable_widths: ["5%", "15%", "14%", "12%", "12%", "11%", "10%", "10%", "10%"],
+                stickyHeaders_attachTo: ".primaryContainerBG",
+                filter_external: '.search',
+                filter_columnFilters: false,
+            }
+        });
+        $("#addOrgTable tbody tr").click(function () {
+            $(this).addClass("selected").siblings().removeClass("selected");
+        });
+        
+        $(".primaryContainerBG").scroll(function () {
+            var divTable = $(".primaryContainerBG");
+            $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+        });
+    });
+    
+    $(window).resize(function () {
+        setHeightWidth();
+    });
+    
+    $(document).on('click', '.pagination a', function (event) {
+        event.preventDefault();
+        var page = $(this).attr('href').split('page=')[1];
+        
+        $('li').removeClass('active');
+        $(this).parent().addClass('active');
+        ajaxOrganizationList(page);
+    });
+</script>
+
+<script>
+    function filterResults() {
+        showLoader();
+        filter_date         = $("#filter_date").val()
+        filter_percentage   = $("#filter_percentage").val()
+
+        $.ajax({
+            url: "{% url 'src:entrance/filter-candidate-result' %}",
+            method: "POST",
+            data: {
+                filter_date: filter_date,
+                filter_percentage: filter_percentage,
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+            },
+            success: function(data) {
+                $('#ajax-div').html(data);
+                $('#total_results').text('('+$('#total_filtered_results').val()+')');
+                hideLoader();
+            }
+        })
+    }
+</script>
+
+<script>
+
+    function getStudentDetail(id, formatted_date) {
+        $('#detailsBox').html('<div style="margin-top:40px; text-align:center"><i class="fa fa-spinner fa-spin" style="font-size:2rem"></div>');
+            //showLoader();
+            url = "{% url 'src:entrance/result-details' '1' 'date' %}";
+            console.log("URL: ", url)
+
+            url = url.replace('1', id)
+            if (formatted_date) {
+                url = url.replace('date', formatted_date)
+            }
+            else {
+                url = url.replace('date', '0')
+
+            }
+            console.log("URL: ", url)
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function (data) {
+                    //hideLoader();
+                    $('#detailsBox').html(data);
+                    $('#addOrgTable').tablesorter({
+                        widgets: ["zebra", "filter", "resizable", "stickyHeaders"],
+                        widgetOptions: {
+                            resizable_addLastColumn: true,
+                            resizable: false,
+                            // resizable_widths: ["5%", "15%", "14%", "12%", "12%", "11%", "10%", "10%", "10%"],
+                            stickyHeaders_attachTo: ".primaryContainerBG",
+                            filter_external: '.search',
+                            filter_columnFilters: false,
+                        }
+                    });
+                    $("#addOrgTable tbody tr").click(function () {
+                        $(this).addClass("selected").siblings().removeClass("selected");
+                    });
+                    $(".deptRow").click(function () {
+                        $(this).addClass("deptSelected").siblings().removeClass("deptSelected");
+                    });
+                    $(".primaryContainerBG").scroll(function () {
+                        var divTable = $(".primaryContainerBG");
+                        $(".frezedCell").css("left", 0 + divTable.scrollLeft());
+                    });
+                    
+                },
+                error: function (err) {
+                    console.log(err)
+                }
+            });
+        }
+</script>
+
+<script>
+    function exportResult() {
+        filter_date         = $("#filter_date").val()
+        filter_percentage   = $("#filter_percentage").val()
+
+        var url = "{% url 'src:entrance/export-marksheet' 'filter_date' 'filter_percentage' %}";
+        if (filter_date != ""){
+            filter_date = filter_date.replace("/", "-")
+            filter_date = filter_date.replace("/", "-")
+            url = url.replace('filter_date', filter_date);
+        } 
+        else {
+            url = url.replace('filter_date', '0');
+        }
+
+        if (filter_percentage != ""){
+            url = url.replace('filter_percentage', filter_percentage);
+        } else {
+            url = url.replace('filter_percentage', '0');
+        }
+
+        window.location.href = url;
+    }
+</script>
+
+<script>
+    function sendSMS() {
+        // showLoader();
+        id_list = []
+        $.each($("input[type=checkbox]:checked"), function() {
+            if ($(this).attr("value")) {
+                id_list.push($(this).attr("value"))
+            }
+        });
+
+        $.ajax({
+            url: "{% url 'src:entrance/send-result-sms' %}",
+            method: "POST",
+            data: {
+                candidate_ids: JSON.stringify(id_list),
+                csrfmiddlewaretoken: '{{ csrf_token }}'
+
+            },
+            success: function(data) {
+                for(let i=0; i<id_list.length;i++) {
+                    $("#is_notified_"+id_list[i].split(":")[0]).html("<img src='/static/img/svg/Verified.svg' alt='' width='15'>")
+                    console.log("ID: ", id_list[i].split(":")[0])
+                }
+            },
+            error: function(data) {
+                hideLoader();
+                if (data.responseJSON.message != "") {
+                    openToaster("danger", data.responseJSON.message)
+                }
+                else {
+                    openToaster("danger", "Failed to send the SMS")
+                }
+            }
+        })
+
+    }
+</script>
+
+{% endblock %}

@@ -1,0 +1,153 @@
+.primaryContainerBG{
+    background: rgb(255, 255, 255);
+    overflow: ;
+}
+.camera-scan{
+    background: transparent;
+    position: relative;
+    box-sizing: border-box;
+    text-align: center;
+    opacity: 1;
+}
+.camera-scan-box{
+    background-color: transparent;
+    width: 270px;
+    height: 270px;
+    border: 2px solid #fdca0f;   
+    display: inline-block;
+    vertical-align: middle;
+    margin: 0;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    opacity: 1;
+}
+
+.scan-box-img{
+    height: 290px;
+    display: inline-block;
+    margin: 0;
+    position: absolute;
+    top: 50.5%;
+    left: 50%;
+    -ms-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    opacity: 1;
+}
+
+.border-r-l {
+    border-radius: 0 17px 17px 0 !important;
+}
+.border-r-r{
+   border-radius: 17px 0 0 17px !important;
+}
+.clock-value{
+    font-size: 50px;
+    display: block;
+}
+
+.help_section{
+    height: 100%;
+}
+
+.thumb-scan-box{
+    height: 100px !important;
+}
+.thumb-scan-box img{ height: 100%;}
+.img-circle{
+    border-radius: 50%;
+    width: 90px;
+    height: 90px;
+    background-color: #f1eae1;
+    text-align: center;
+}
+.img-circle img{ width: 100%;}
+.desk-height-stud{
+    height: calc(556px - 10px) !important;
+}
+
+.out-div video{
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    border-radius: 17px;
+
+}
+.out-div{
+    width: 100%;
+    height: 100%;
+}
+
+.largeText {
+    font-size: 12px;
+    word-break: break-word;
+}
+.smallText {
+    font-size: 0.8rem;
+    color: #969696;
+    word-break: break-all;
+}
+.outdivback{
+    opacity: 0.5;
+    border: 5px solid green;
+    width: 100%;
+    height: 100%;
+}
+
+.outdivback video{
+    object-fit: cover;
+    width: 100%;
+    height: 100%;
+    border-radius: 17px;
+
+}
+
+#containerHeight {
+    overflow: ;
+}
+
+.comingSoon{
+    background-image: url(/static/img/png/bg_ComingSoon.png);
+    background-repeat: no-repeat;
+    background-size: cover;
+}
+
+.inputField {
+    background-color: #fff;
+    border: 1px solid lightgrey;
+    font-size: 15px;
+    padding: 6px 14px;
+    /*border-radius: 17px;*/
+    width: 100%;
+    position: relative;
+}
+.bg-img{
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+.bg-img img{
+    width: 100%;
+    height: 100%;
+}
+.scan-student-id-card{
+    display: block;
+    position: absolute;
+    top: 30%;
+    left: 50%;
+    -ms-transform: translate(-50%, -30%);
+    transform: translate(-50%, -30%);
+    text-align: center;
+}
+
+.student-csan-id-icon{
+    position: absolute;
+    top: 6px;
+    right: 14px;
+}
+.inputField:focus {
+    outline: -webkit-focus-ring-color auto 0px;
+    border: 1px solid #0058ff;
+}

@@ -1,0 +1,42 @@
+{% load static %}
+
+<div class="col-md-6 col-12 pl-0 pr-3 mob-border-right-0 mob-pr-0 text-left" style="border-right: 1px solid rgb(226 223 223);">
+    <span class="d-inline-block font-wt-b mb-2 font-13"style="padding-left: 13px; color: #0073e0;">Unmapped</span>
+    <div class="role-map-wraper">
+        <ul class="role-map-ul" id="entity_list">
+            {% for holiday in holidays %}
+            <li id="holiday_{{holiday.id}}" class="role-map-li" onclick="movePolicy('{{holiday.id}}','{{holiday.holiday}}')">
+                <div class="role-map-arrowangle role-map-arrowright">
+                </div>{{holiday.holiday}}
+            </li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+<div class="col-md-6 col-12 pl-3 pr-0 mob-pl-0 mob-pt-8 text-right">
+    <span class="d-inline-block font-wt-b mb-2 font-13" style="padding-right: 17px; color: #0073e0;" >Mapped</span>
+    <form id="mappingForm">
+        {% csrf_token %}
+        <div id="input_section">
+            {% if mapping %}
+            {% for mapping_holiday in mapping %}
+            <input type="hidden" name="holiday_id[]" value="{{mapping_holiday.entity_id}}" >
+            {% endfor %}
+            {% endif %}
+        </div>
+        <input type="hidden" name="role_id" value="{{role.id}}">
+        <input type="hidden" name="entity_type" value="holiday">
+        <div class="role-map-wraper">
+            <ul class="role-map-ul" id="mapped_section">
+                {% if mapping %}
+                {% for mapping_holiday in mapping %}
+                <li id="holiday_{{mapping_holiday.entity_id}}" class="role-map-li" onclick="moveBackPolicy('{{mapping_holiday.entity_id}}','{{mapping_holiday.holiday}}')">{{mapping_holiday.holiday}}
+                    <div class="role-map-arrowangle role-map-arrowleft">
+                    </div>
+                </li>
+                {% endfor %}
+                {% endif %}
+            </ul>
+        </div>
+    </form>
+</div>

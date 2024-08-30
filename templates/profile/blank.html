@@ -1,0 +1,390 @@
+{% extends 'layout/layout.html' %}
+
+{% block content %}
+
+{% load static %}
+
+{% block style %} 
+<style>
+  .select2-container{ min-width: 100%;}
+  .updatsection_tab{
+    padding: 7px;
+    background: #fff;
+    color: #969696;
+    position: relative;
+    font-size: 13px;
+    cursor: pointer;
+    text-align: center;
+    font-weight: 600;
+}
+.updatsection_tab:nth-child(even) {
+    border-left: 1px solid lightgray;
+    border-right: 1px solid lightgray;
+}
+.updatsection_tab:hover{
+    color: #003985;
+    font-weight: 700;
+}
+.activeTab{
+    color: #fff;
+    font-weight: 700;
+    background-color: #ffb400;
+}
+
+input[type=submit] {
+  background-color: #4CAF50;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+
+
+.profile-update , .configuration-setting ,.change-passwrd{
+  border-radius: 5px;
+  background-color: #f2f2f2; 
+}
+.updatsection-height{
+    height: calc(100% - 132px);
+}
+@media screen and (max-width: 767px) {
+    .updatsection-height{
+        height: calc(100% - 116px);
+        overflow: auto;
+    }
+}
+
+</style>
+
+
+{% endblock %}
+<div class="col-sm-12 col-12 p-3 mb-3 updatsection-height" style="">
+
+    <div class="row tabBar ">
+        <div class="col-sm-4 col-4 px-0 updatsection_tab activeTab" onclick="handleTabChange(this,'ChangePassword')">Change Password<i class="fa fa-lock ml-2" style="font-size:20px"></i></div>
+        <div class="col-sm-4 col-4 px-0 updatsection_tab" onclick="handleTabChange(this,'ProfileUpdate')">Update Profile <i class="fa fa-pencil ml-2" style="font-size:20px"></i></div>
+        <div class="col-sm-4 col-4 px-0 updatsection_tab" onclick="handleTabChange(this,'ConfigSetting')">Configuration Setting <i class="fa fa-gear fa-spin ml-2" style="font-size:20px"></i></div>
+    </div>
+
+    <div class="col-sm-12 col-12 px-0 updatsection" id="ChangePassword" style="display: block;">
+        <div class="row change-passwrd mt-3 h-100">
+            <div class="col-md-3 px-0" style="background-repeat: no-repeat;text-align: center;background-color: #0073e0; padding: 16px; position: relative;">
+                <div class="center-fix w-100 chng-pswd-main-img">
+                    <img src="{% static 'img/png/new_Variant.png' %}" / class="chng-passwrd-img">
+                    <h4 class="modalColHead mt-2">Change Password</h4>
+                </div>
+            </div>
+            <div class="col-md-9 col-12 p-5 mob-p-16">
+                <form id="changePasswordForm" method="POST" autocomplete="off" action="" aria-label="Product">
+                    {% csrf_token %}
+                    <div class="row ">
+                        <div class="col-sm-5 col-5 px-0">
+                            <h5 class="font-wt-b">Change Password</h5>
+                        </div> 
+                        <div class="col-sm-7 col-7 px-0">
+                            <button class="btn btn-save float-right" type="button" onclick="updateNewPassword()">Save </button>
+                        </div>
+                    </div>
+                    <div class="row mt-2">
+                        <div class="col-md-12 col-12  mt-2 px-0">
+                            <h6 class="font-wt-b mb-2">Old Password</h6>
+                            <input class="inputField " type="password" placeholder="Old Password*" id="old_password" name="old_password" maxlength="50" />
+                            <label class="error_msg float-right" id=""></label>
+                        </div>
+                        <div class="col-md-12 col-12 mt-2 px-0">
+                            <h6 class="font-wt-b mb-2">New Password</b></h6>
+                            <input class="inputField " type="password" placeholder="New Password*" id="new_password" name="new_password" maxlength="50" />
+                            <label class="error_msg float-right" id=""></label>
+                        </div>
+                        <div class="col-md-12 col-12 mt-2 px-0">
+                            <h6 class="font-wt-b mb-2">Confirm Password</h6>
+                            <input class="inputField " type="password" placeholder="Confirm Password*" id="confirm_password" name="confirm_password" maxlength="50" />
+                            <label class="error_msg float-right" id=""></label>
+                        </div>
+                        <div class="row mt-3" style="margin: 0 auto;">
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="row profile-update mt-3 h-100 py-3  updatsection" id="ProfileUpdate" style="display: none;">
+        <div class="container ">
+            <form id="manage_profile">
+                {% csrf_token %}
+                <div class="row ">
+                    <div class="col-sm-2 col-2 pl-0 pr-1">
+                        <h6 class="font-wt-b mb-2"> First Name</h6>
+                    </div>
+                    <div class="col-sm-10 col-10 pl-2 pr-0">
+                        <input class="inputField " type="text" placeholder="Your name.." id="firstName" name="firstName" maxlength="50" />
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-sm-2 col-2 pl-0 pr-1">
+                        <h6 class="font-wt-b mb-2">Middle Name</h6>
+                    </div>
+                    <div class="col-sm-10 col-10 pl-2 pr-0">
+                        <input class="inputField " type="text" placeholder="Your middle name.." id="middleName" name="middleName" maxlength="50" />
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-sm-2 col-2 pl-0 pr-1">
+                        <h6 class="font-wt-b mb-2">Last Name</h6>
+                    </div>
+                    <div class="col-sm-10 col-10 pl-2 pr-0">
+                        <input class="inputField " type="text" placeholder="Your last name.." id="lastName" name="lastName" maxlength="50" />
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-sm-2 col-2 pl-0 pr-1">
+                        <h6 class="font-wt-b mb-2">Email</h6>
+                    </div>
+                    <div class="col-sm-10 col-10 pl-2 pr-0">
+                        <input class="inputField " type="email" placeholder="Enter Email" name="email" id="email" required>
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                <div class="row mt-2" style="justify-content: center;">
+                    <button class="btn btn-save float-right" type="button" value="" id="manage_profile" name="manage_profile" onclick="manageProfile()"> Save </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div class="row configuration-setting mt-3 h-100 py-3  updatsection" id="ConfigSetting" style="display: none;" >
+        <div class="container ">
+            <form id="manage_configuration" action="{% url 'src:update-configuration' %}" method="POST" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="row ">
+                    <div class="col-sm-2 col-2 pl-0 pr-1">
+                        <h6 class="font-wt-b mb-2"> Page Limit</h6>
+                    </div>
+                    <div class="col-sm-10 col-10 pl-2 pr-0">
+                        <input class="inputField " type="number" placeholder="Your name.." id="pageLimit" name="pageLimit" maxlength="50" />
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-sm-2 col-2 pl-0 pr-1">
+                        <h6 class="font-wt-b mb-2">Institution Name</h6>
+                    </div>
+                    <div class="col-sm-10 col-10 pl-2 pr-0">
+                        <input class="inputField " type="text" placeholder="Your middle name.." id="institutionName" name="institutionName" maxlength="150" />
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-sm-2 col-2 pl-0 pr-1">
+                        <h6 class="font-wt-b mb-2">Institution code</h6>
+                    </div>
+                    <div class="col-sm-10 col-10 pl-2 pr-0">
+                        <input class="inputField " type="text" placeholder="Your last name.." id="institutionCode" name="institutionCode" maxlength="50" />
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+
+                <div class="row mt-2">
+                    <div class="col-sm-2 col-2 pl-0 pr-1">
+                        <h6 class="font-wt-b mb-2">Logo</h6>
+                    </div>
+                    <div class="col-sm-10 col-10 pl-2 pr-0">
+                        <input class="inputField " type="file" placeholder="Select Logo" name="logo" id="logo">
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                <div class="row mt-2">
+                    <div class="col-sm-2 col-2 pl-0 pr-1">
+                        <h6 class="font-wt-b mb-2">Profile Image</h6>
+                    </div>
+                    <div class="col-sm-10 col-10 pl-2 pr-0">
+                        <input class="inputField " type="file" placeholder="Select Profile Image" name="profileImage" id="profileImage">
+                        <label class="error_msg float-right" id=""></label>
+                    </div>
+                </div>
+                
+
+                <div class="row mt-2" style="justify-content: center;">
+                    <button class="btn btn-save float-right" type="submit" value="" id="manage_config" name="manage_config">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+
+    <script>
+
+        $('#manage_configuration').submit(function(e){
+            showLoader();
+            if(validateForm()){
+                hideLoader();
+                return false;
+            }else{
+                showLoader();
+                e.preventDefault();
+                $form = $(this)
+                var formData = new FormData(this);
+                console.log(employee_id)
+                url =  "{% url 'src:edit-employee-basic-detail' 1 %}";
+                url = url.replace(1,parseInt(employee_id));
+                $.ajax({
+                    url: url,
+                    type: 'POST',
+                    data: formData,
+                    success: function (response) {
+                        $('.error').remove();
+                        console.log(response)
+                        if(response.error){
+                            hideLoader();
+                            $(".text-danger").html('');
+                            var data = response.message;
+                            $.each(data, function (index, value) {
+                                console.log(index);
+                                console.log(value);
+                                $('#' + index).html(value);
+                            });
+                        } else {
+                            hideLoader();
+                            editEmployeeOfficialDetail(response.last_user_id) 
+                            $("#date_of_joining").datepicker({
+                                weekStart: 1,
+                                changeMonth: true,
+                                changeYear: true,  
+                                yearRange: "-100:+0",
+                                daysOfWeekHighlighted: "6,0",
+                                autoclose: true,
+                                todayHighlight: true,
+                                dateFormat: 'dd/mm/yy',
+                            });
+                        }
+                    },
+                    cache: false,
+                    contentType: false,
+                    processData: false
+                });
+            }
+        });
+
+        function manageProfile(){
+            showLoader();
+            var firstName = $('#firstName').val();
+            var lastName = $('#lastName').val();
+            var email = $('#email').val();
+            var email_regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/i;
+
+            if(firstName!='' & lastName!='' & email!=''){
+                $.ajax({
+                    url: "{% url 'src:update-profile' %}",
+                    method: 'POST',
+                    data: $('#manage_profile').serialize(),
+                    success: function (data) {
+                        hideLoader();
+                        console.log(data);
+                        if(data.flag){
+                            openToaster("success", data.message);
+                        }
+                        else{
+                            openToaster("danger", data.message);
+                        }
+                    },
+                    error: function (err) {
+                        hideLoader();
+                        console.log(err)
+                    }
+                }).always(function()
+                 {
+                        // hideLoader();
+                    });
+            }else{
+                alert('Please Fill Form');
+                hideLoader();
+            }
+            
+        } 
+
+        function updateNewPassword() {
+            showLoader();
+            if(validateProductForm()){
+                hideLoader();
+                return false;
+            }else{
+                $.ajax({
+                    url: "{% url 'src:change-password' %}",
+                    method: 'POST',
+                    data: $('#changePasswordForm').serialize(),
+                    success: function (data) {
+                        hideLoader();
+                        if(data.flag){
+                            $("#changePasswordModal").html('');
+
+                            openToaster("success", data.message);
+                        }
+                        else{
+                            openToaster("danger", data.message);
+                        }
+                    },
+                    error: function (err) {
+                        hideLoader();
+                        console.log(err)
+                    }
+                }).always(function() {
+                    // hideLoader();
+                });
+            } 
+        }
+
+
+        function validateProductForm(){
+            error = 0;
+            $('.error_msg ').text('');
+            $('.inputField').css("border", "");
+            if($('[name="old_password"]').val() == ""){
+                $('[name="old_password"]').parent().find('.error_msg').text('Please enter old password');
+                $('[name="old_password"]').css("border", "1px solid #db8305");
+                error = error + 1;
+            }
+            if($('[name="new_password"]').val() == ""){
+                $('[name="new_password"]').parent().find('.error_msg').text('Please enter new password');
+                $('[name="new_password"]').css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                error = error + 1;
+            }
+
+            if($('[name="confirm_password"]').val() == ""){
+                $('[name="confirm_password"]').parent().find('.error_msg').text('Please re-type new password');
+                $('[name="confirm_password"]').css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                error = error + 1;
+            }
+
+
+            if($('[name="confirm_password"]').val() !== $('[name="new_password"]').val()){
+                $('[name="confirm_password"]').parent().find('.error_msg').text('Confirm password & New password did not matched');
+                $('[name="confirm_password"]').css("border", "1px solid #db8305").css("border-radius", "0.6rem");
+                error = error + 1;
+            }
+
+            if(error > 0){
+                return true;
+            }else{
+                return false;
+            }
+        }
+        function hideModal(id){
+            $('#'+id).hide();
+        }
+
+    </script>
+
+
+    <script>
+     function handleTabChange(element,target){
+        $('.updatsection_tab').removeClass('activeTab');
+        $(element).addClass('activeTab');
+
+        $('.updatsection').hide();
+        $('#'+target).show();
+    }
+</script>
+{% endblock %}

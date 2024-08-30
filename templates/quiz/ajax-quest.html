@@ -1,0 +1,302 @@
+{% load static %}
+	<h2 class="hilight" id="hilight"></h2>
+		<ul class="anslist mb-20" id="selected_answer">
+			<h3> {{ first_question.question }}</h3>
+			<li> <label for='answer-1' class='btn'> <input type='radio' name='choices' id='answer-1' value=1> <span class='mx-2'>{{ first_question.option_1}}</span> </label> </li>
+			<li> <label for='answer-2' class='btn'> <input type='radio' name='choices' id='answer-2' value=2> <span class='mx-2'>{{ first_question.option_2}}</span> </label> </li>
+			<li> <label for='answer-3' class='btn'> <input type='radio' name='choices' id='answer-3' value=3> <span class='mx-2'>{{ first_question.option_3}}</span> </label> </li>
+			<li> <label for='answer-4' class='btn'> <input type='radio' name='choices' id='answer-4' value=4> <span class='mx-2'>{{ first_question.option_4}}</span> </label> </li>
+		</ul>
+
+		<div class="col-md-12" style="bottom: 100px;">
+			<div class="row mt-5 navfooter pt-10">
+
+				<div class='col-md-6 col-6' align='left'>
+					<a style='opacity: 1; cursor: pointer;' id="previous">
+						<img src="{% static 'entrance-assets/img/arrow l.svg' %}"/>&nbsp;Previous
+					</a>
+				</div>
+
+				<!-- <div class='col-md-6' align='left'>
+					<a style='cursor: cursor;' id="previous">
+						<img src="{% static 'entrance-assets/img/arrow l.svg' %}"/>&nbsp;Previous
+					</a>
+				</div> -->
+				{% if pos >= 30 %}
+					<div class='col-md-6 col-6' align='right'>
+						<button onclick='quizSubmission()' style='cursor:pointer;' type='button' class='btn btn-lg p-3 btn-primary submitfinal col-md-5 fw-500 me-sm-3 mb-3 mb-sm-0 btnshow'>Submit &nbsp;<img src='{% static 'entrance-assets/img/submit.svg' %}'></button>
+					</div>
+				{%else%}
+					<div class='col-md-6 col-6' align='right'>
+						<a style='cursor:pointer;' id="next">Next &nbsp;<img src="{% static 'entrance-assets/img/arrow r.svg' %}"/></a>
+					</div>
+				{%endif%}
+
+			</div>
+			</div>
+	
+
+{% block script %}
+<script>
+	valid_options = [1,2,3,4]
+
+	raw_attemped_data = "{{ candidate_quest.question_answers | safe }}"
+	asd_attemped_data = raw_attemped_data.replaceAll("'", "\"")
+	attemped_data = JSON.parse(asd_attemped_data)
+
+	$(document).ready(function() {
+		q = {{ attempts | safe }}
+		$("#answer-"+String(q['answer'])).attr('checked', true)
+
+		$("#hilight").html("<h1 class='hilight text-weight-bold'>Ques. No. " + {{ pos }} +"</h1>");
+
+		$('#num-'+parseInt({{ pos }})).removeClass('skipped')
+		$('#num-'+parseInt({{ pos }})).addClass('attended')
+
+		$(".attended-checkbox").removeClass("attended-checkbox")
+		$('#checkbox-'+parseInt({{ pos }})).removeAttr('checked')
+		$('#checkbox-'+parseInt({{ pos }})+' ~ .checkmark').removeClass('skipped-checkbox')
+		$('#checkbox-'+parseInt({{ pos }})+' ~ .checkmark').addClass('attended-checkbox')
+
+	});
+</script>
+<script>
+	$("#next").on("click", function() {
+		showLoader()
+
+		ans = $("input[name='choices']:checked").val()
+		if (ans === undefined) {
+			ans = 5
+		}
+		ans = parseInt(ans)
+		if (valid_options.includes(ans)) {
+			$('#num-{{ pos }}').removeClass('skipped')
+			$('#num-{{ pos }}').addClass('attended')
+			$('#checkbox-{{ pos }}').attr('checked', true)
+			$('#checkbox-{{ pos }} ~ .checkmark').removeClass('skipped-checkbox')
+			$('#checkbox-{{ pos }} ~ .checkmark').addClass('attended-checkbox')
+		}
+		else {
+			$('#num-'+parseInt({{ pos }})).removeClass('attended')
+			$('#num-'+parseInt({{ pos }})).addClass('skipped')
+
+			$('#checkbox-'+parseInt({{ pos }})+' ~ .checkmark').removeClass('attended-checkbox')
+			$('#checkbox-'+parseInt({{ pos }})+' ~ .checkmark').addClass('skipped-checkbox')
+		}
+		_pos = parseInt({{ pos }}) + 1
+		_pre = parseInt({{ pos }}) - 1
+		candidate_id = {{ candidate_id }}
+
+		ajaxQuest(_pos, candidate_id, 1)
+		saveQuiz(candidate_id, {{ pos }}, 1)
+		hideLoader();
+	});
+</script>
+
+<script>
+	$("#previous").on("click", function() {
+		showLoader()
+		debugger
+		_pos = parseInt({{ pos }}) - 1
+		_pre = parseInt({{ pos }}) + 1
+		candidate_id = {{ candidate_id }}
+		ans = $("input[name='choices']:checked").val()
+		if (ans === undefined) {
+			ans = 5
+		}
+		ans = parseInt(ans)
+		if (valid_options.includes(ans)) {
+			$('#num-'+parseInt({{ pos }})).removeClass('skipped')
+			$('#num-'+parseInt({{ pos }})).addClass('attended')
+			$('#checkbox-'+parseInt({{ pos }})).attr('checked', true)
+
+			$('#checkbox-'+parseInt({{ pos }})+' ~ .checkmark').removeClass('skipped-checkbox')
+		}
+		else {
+			$('#num-'+parseInt({{ pos }})).removeClass('attended')
+			$('#num-'+parseInt({{ pos }})).addClass('skipped')
+
+			$('#checkbox-'+parseInt({{ pos }})+' ~ .checkmark').removeClass('attended-checkbox')
+			$('#checkbox-'+parseInt({{ pos }})+' ~ .checkmark').addClass('skipped-checkbox')
+		}
+		if ( _pos > 0) {
+			ajaxQuest(_pos, candidate_id, 1)
+			saveQuiz(candidate_id, {{ pos }}, -1)
+		}
+		else {
+			$("#previous").css({'opacity': '0.4', 'cursor': 'no-drop'})
+		}
+		hideLoader();
+
+	});
+</script>
+
+<script>
+	function ajaxQuest(position, candidate_id, navigation_render) {
+		showLoader()
+		ans = $("input[name='choices']:checked").val()
+		if (ans === undefined || ans == 'undefined' || ans == '' ) {
+			ans = 5
+		}
+		ans = parseInt(ans)
+		for (let key in attemped_data){
+			if (attemped_data[key]['question_id'] == {{ first_question.id }}) {
+				attemped_data[key]['answer'] = ans
+			}
+		}
+
+		if (navigation_render != 1) {
+			saveQuiz(candidate_id, {{ pos }}, position - {{ pos }})
+		}
+
+		// if (navigation_render != 1) {
+		// 	debugger
+		// 	if (position < {{ pos }}) {
+		// 		saveQuiz(candidate_id, {{ pos }}, {{ pos }} - position)
+		// 	}
+		// 	else{
+		// 		saveQuiz(candidate_id, {{ pos }}, position - {{ pos }} )
+		// 	}
+		// }
+
+
+		$.ajax({
+			url: '/ajax-quest',
+			method: "POST",
+			data: {
+				position: parseInt(position),
+				candidate_id: parseInt({{ candidate_id }}),
+				id: parseInt({{ first_question.id }}),
+				answer: parseInt(ans)
+			},
+			success: function(data) {
+				$('#_selected_answer').html('')
+				$('#_selected_answer').html(data)
+				ans = parseInt(ans)
+				if (valid_options.includes(ans)) {
+					$('#num-'+{{ pos }}).removeClass('skipped')
+					$('#num-'+{{ pos }}).addClass('attended')
+					$('#checkbox-'+{{ pos }}).attr('checked', true)
+					$('#checkbox-'+{{ pos }}+' ~ .checkmark').removeClass('skipped-checkbox')
+				}
+				else {
+					$('#num-'+{{ pos }}).removeClass('attended')
+					$('#num-'+{{ pos }}).addClass('skipped')
+					$('#checkbox-'+{{ pos }}+' ~ .checkmark').removeClass('attended-checkbox')
+					$('#checkbox-'+{{ pos }}+' ~ .checkmark').addClass('skipped-checkbox')
+				}
+				hideLoader();
+
+			}
+		});
+	}
+
+</script>
+
+<script>
+	function saveQuiz(candidate_id, position, navigator) {
+		// debugger
+		showLoader()
+		ans = $("input[name='choices']:checked").val()
+		if (ans === undefined) {
+			ans = 5
+		}
+		for (let key in attemped_data){
+			if (attemped_data[key]['question_id'] == {{ first_question.id }}) {
+				attemped_data[key]['answer'] = parseInt(ans)
+				updated_key = attemped_data[key]
+			}
+		}
+		time_left = $("#showtime").html()
+		$.ajax({
+			url: '/quiz-save',
+			method: "POST",
+			data: {
+				position: parseInt(position),
+				candidate_id: parseInt({{ candidate_id }}),
+				id: parseInt({{ first_question.id }}),
+				time_left: time_left,
+				updated_key: JSON.stringify(updated_key),
+				all_answers: JSON.stringify(attemped_data),
+				navigator: navigator
+			},
+			success: function(data) {
+				console.log("Success")
+				hideLoader();
+
+			}
+		});
+	}
+
+</script>
+<script>
+		function quizSubmission() {
+		debugger
+		ans = $("input[name='choices']:checked").val()
+		// all_selections.push({"question_id": questions[questions.length -1]['id'], "selected_option": ans})
+		saveQuiz({{candidate_id}}, {{ pos }}, 0)
+
+		attempted = 0
+		skipped = 0
+		visited_id = []
+		for (let final_count in attemped_data) {
+			if (parseInt(attemped_data[final_count]['answer']) > 0) {
+				if (parseInt(attemped_data[final_count]['answer']) != 5 && parseInt(attemped_data[final_count]['answer']) != 0) {
+					attempted++
+				}
+				else if ( parseInt(attemped_data[final_count]['answer']) == 5) {
+					skipped++
+				}
+			}
+			visited_id.push(attemped_data[final_count]['id'])
+		}
+
+		$('#tot_ques').html(attemped_data.length)
+		$('#tot_attempt').html(attempted)
+		$('#tot_skipped').html(skipped)
+
+		$('#_otpbox').show()
+	}
+
+	function deniedSubmission() {
+		$('#_otpbox').hide()
+	}
+
+	function confirmSubmission() {
+		time_left = document.getElementById("showtime").innerHTML
+		_all_selections = JSON.stringify(all_selections)
+		$.ajax({
+			url: "/quiz-submit",
+			method: "POST",
+			data: {
+				candidate_id: {{candidate_id}},
+				selections : _all_selections,
+				time_left: time_left
+			},
+			success: function(data) {
+				document.cookie = 'id=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;';
+				window.onbeforeunload = null
+				location.reload(true);
+			}
+		})
+	}
+</script>
+
+<script>
+function showLoader() {
+                console.log("Show Loader")
+                $("#loader").show();
+                $("#bodyContainer").addClass('isBlurred');
+            }
+
+            function hideLoader() {
+                console.log("Hide Loader")
+                $("#loader").hide();
+                $("#bodyContainer").removeClass('isBlurred');
+            }
+</script>
+{% endblock %}
+
+
+
+

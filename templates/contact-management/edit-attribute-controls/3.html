@@ -1,0 +1,141 @@
+{% load static %}
+<div class="row ">
+	<div class="col-md-12">
+		<div class="row mt-3 wrapper">
+			
+
+			{% if 'student_location' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/address.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Institution : {% if 'student_location' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<select class="inputField selectField student_locations" style="width: 100% !important;" name="student_location" id="student_location" onchange="getCourseOption(this.value)" >
+						<option value="">Select Institution</option>
+						{% if organizations %}
+						{% for organization in organizations %}
+						<option value="{{organization.id}}" {% if organization.id == academic_detail.location_id %} selected {% endif %}>{{organization.organization_name}}</option>
+						{% endfor %}
+						{% endif %}
+					</select>
+					<label class="error_msg float-right" id="student_location_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'branch' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/course.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Branch : {% if 'branch' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input type="hidden" id="hidden_branch" value="{% if academic_detail.branch_id is not None %}{{academic_detail.branch_id}}{% endif %}">
+					<select name="branch" class="form-control select2" id="branch" >
+						<option value="">Choose Branch/Course</option>
+						
+					</select>
+					<label class="error_msg float-right" id="branch_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'year' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/calander-blue.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Year / Semester : {% if 'year' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input type="hidden" id="hidden_year" value="{% if academic_detail.year_id is not None %}{{academic_detail.year_id}}{% endif %}">
+					<select class="inputField selectField year" style="width: 100% !important;" name="year" id="year"  >
+						<option value="">Choose Year/Semester</option>
+								<optgroup label="Year">
+									<option value="year_1">1st Year</option>
+									<option value="year_2">2nd Year</option>
+									<option value="year_3">3rd Year</option>
+								</optgroup>
+								<optgroup label="Semester">
+									<option value="sem_1">1st Semester</option>
+									<option value="sem_2">2nd Semester</option>
+									<option value="sem_3">3rd Semester</option>
+									<option value="sem_4">4th Semester</option>
+									<option value="sem_5">5th Semester</option>
+									<option value="sem_6">6th Semester</option>
+								</optgroup>
+					</select>
+					<label class="error_msg float-right" id="year_error"></label>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+
+	<div class="col-md-12">
+		<div class="row mt-3 wrapper">
+
+			
+
+			{% if 'date_of_admission' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/calander-blue.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Date Of Admission : {% if 'date_of_admission' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField numeric date_of_admissions" type="text" placeholder="Date Of Admission" name="date_of_admission" id="date_of_admission"  value="{% if academic_detail.date_of_admission is not None %}{{academic_detail.date_of_admission|date:'d/m/Y'}}{% else %}{% now 'm/d/Y' %}{% endif %}">
+					<label class="error_msg float-right" id="date_of_admission_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'registration' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/calander-blue.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Registration No : {% if 'registration' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input class="inputField numeric registrations" type="text" placeholder="Registration Number" name="registration" id="registration" maxlength="50" value="{% if academic_detail.registration_no is not None %}{{academic_detail.registration_no}}{% endif %}">
+					<label class="error_msg float-right" id="registration_error"></label>
+				</div>
+			</div>
+			{% endif %}
+
+			{% if 'teacher_gaurdian_name' not in attribute.hidden_fields %}
+			<div class="col-md-3">
+				<div class="col-md-12 p-0">
+					<img src="{% static 'img/svg/course.svg' %}" class="profileIconSize">&nbsp;&nbsp;
+					<h6 class="mt-2 mb-0" style="display: inline-block;">
+						Teacher Gaurdian Name : {% if 'teacher_gaurdian_name' not in attribute.fields %}*{% endif %}
+					</h6>
+				</div>
+				<div class="col-md-12 p-0 mt-2">
+					<input type="hidden" id="hidden_teacher_gaurdian_id" value="{% if academic_detail.teacher_guardian_id is not None %}{{academic_detail.teacher_guardian_id}}{% endif %}">
+					<select name="teacher_gaurdian_name" class="form-control selectField" id="teacher_gaurdian_name">
+						<option value="">Choose Teacher Gaurdian</option>
+						{% if teachers %}
+						{% for teacher in teachers %}
+						<option value="{{teacher.id}}">{{teacher.salutation}} {{teacher.first_name}}{% if teacher.middle_name %} {{teacher.middle_name}} {% else%} {% endif %}{{teacher.last_name}}</option>
+						{% endfor %}
+						{% endif %}
+					</select>
+					<label class="error_msg float-right" id="teacher_gaurdian_name_error"></label>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+	</div>
+
+</div>

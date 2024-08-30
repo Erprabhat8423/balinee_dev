@@ -1,0 +1,554 @@
+{% extends 'layout/layout.html' %}
+
+{% load helper_tags %}
+
+{% block content %}
+{% load static %}
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/manage-holidays.css' %}">
+{% endblock %}
+
+<div class="row px-3" id="containerHeight">
+    <div class="col-md-8 col-12 pr-3 pl-0 h-100 mob-pr-0">
+        <div class="row border-redius-17 h-100" id="">
+            <div class="col-md-12 col-12 primaryContainer h-100 px-0  " id="mainbox">
+                <div class="row mb-2" id="topRow">
+                    <div class="col-sm-5 col-12 px-0 mob-mt-8  mob-mb-8">
+                        <h6 class="font-wt-b">{{page_title}} 
+                            <i class="fa fa-star add_to_fav ml-2 {% checkedFavorite page_title request.get_full_path %}" onclick="updateFavorite(this,'{{page_title}}','{{ request.get_full_path }}')">
+                            </i>
+                        </h6>
+                    </div>
+                    
+                </div>
+                <div class="primaryContainerBG h-100 commonTableBg" id="">
+                    <form action="" id="">
+                        <div class="row">
+                            <div class="col-md-6 px-0">
+                                <div class="row">
+                                    <span class="slider-icon-box" onclick="getVacationCalender('284','2','2021')">
+                                    <img src="/static/img/svg/arrow_left.svg" alt="">
+                                    </span>
+                                    <span class="calendar-title">{{ currentMonth }}
+                                    <b style="color: #000;">{{ currentYear }}</b>
+                                    </span>
+                                    <span class="slider-icon-box mr-3" onclick="getVacationCalender('284','4','2021')">
+                                    <img src="/static/img/svg/arrow_right.svg" alt="">
+                                    </span>
+                                
+                                </div>
+                            </div>
+                    
+                        
+                        <div class="col-md-12 px-0 calendar-table">
+                        <table class="">
+                            <thead>
+                            <tr>
+                            <th>Monday</th>
+                            <th>Tuesday</th>
+                            <th>Wednesday</th>
+                            <th>Thursday</th>
+                            <th>Friday</th>
+                            <th>Saturday</th>
+                            <th>Sunday</th>
+                            </tr>
+                            </thead>
+                        <tbody>
+                        <tr>
+                            {% for day in firstWeek %}
+                            <td class=" ">
+                                <input type="checkbox" name="" id="date-2021-03-01" value="2021-03-01" onclick="" class="calendar__input" disabled="">
+                                <label for="date-2021-03-01" class="calendar__label disabled_date">
+                                <div class="calendar__label__date">
+                                    {{ day }}
+                                   
+                                </div>
+
+                                </label>
+                            </td>
+                            {% endfor %}                            
+                        </tr>
+                        
+                        <tr>                        
+                            {% for day in secondWeek %}                            
+                            <td class=" ">
+                                <input type="checkbox" name="" id="date-2021-03-08" value="2021-03-08" onclick="" class="calendar__input" disabled="">
+                                <label for="date-2021-03-08" class="calendar__label disabled_date">
+                                <div class="calendar__label__date">{{ day }}</div>
+                                </label>
+                            </td>
+                            {% endfor %}
+                            </tr> 
+
+                            <tr>                            
+                            {% for day in thirdWeek %}
+                            <td class=" ">
+                            <input type="checkbox" name="" id="date-2021-03-15" value="2021-03-15" onclick="" class="calendar__input" disabled="">
+                            <label for="date-2021-03-15" class="calendar__label disabled_date">
+                            <div class="calendar__label__date">{{ day }}</div>
+                            </label>
+                            </td>
+                            {% endfor %}
+                            </tr>
+                            
+                            <tr>
+                            {% for day in fourthWeek %}                            
+                            <td class=" ">
+                            <input type="checkbox" name="" id="date-2021-03-22" value="2021-03-22" onclick="" class="calendar__input" disabled="">
+                            <label for="date-2021-03-22" class="calendar__label disabled_date">
+                            <div class="calendar__label__date">{{ day }}</div>
+                            </label>
+                            </td>
+                            {% endfor %}
+                            </tr>
+                            
+                            <tr>
+                            {% for day in fifthWeek %}
+                            
+                            <td class=" ">
+                            <input type="checkbox" name="" id="date-2021-03-29" value="2021-03-29" onclick="" class="calendar__input" disabled="">
+                            <label for="date-2021-03-29" class="calendar__label disabled_date">
+                            <div class="calendar__label__date">{{ day }}</div>
+                            </label>
+                            </td>
+                            {% endfor %}
+                                                        
+                            <td class="grey">
+                            <input type="checkbox" name="" id="" value="2021-04-01" class="calendar__input" disabled="">
+                            <label for="" class="calendar__label ">
+                            <div class="calendar__label__date">1</div>
+                            </label>
+                            </td> 
+                            
+                            <td class="grey">
+                            <input type="checkbox" name="" id="" value="2021-04-02" class="calendar__input" disabled="">
+                            <label for="" class="calendar__label ">
+                            <div class="calendar__label__date">2</div>
+                            </label>
+                            </td>
+                            
+                            <td class="grey">
+                            <input type="checkbox" name="" id="" value="2021-04-03" class="calendar__input" disabled="">
+                            <label for="" class="calendar__label ">
+                            <div class="calendar__label__date">3</div>
+                            </label>
+                            </td>
+                            <td class="grey">
+                            <input type="checkbox" name="" id="" value="2021-04-04" class="calendar__input" disabled="">
+                            <label for="" class="calendar__label ">
+                            <div class="calendar__label__date">4</div>
+                            </label>
+                            </td>
+                            </tr>
+                            </tbody>
+                            </table>
+                            </div>
+                        </div>
+                    </form>
+                </div>                        
+                
+            </div>
+        </div>
+
+    </div>
+    
+    <div class="col-md-4 col-12 px-0 mob-h-100 h-100 mob-mt-8 mob-mb-8 ">
+        <div class="primaryContainerBG h-100" id="">
+            <div class="col-sm-12 col-12 px-0 border-bottom">
+                <div class="row">
+                    <div class="col-sm-6 col-6 px-0">
+                        <div class="font-13 dark-blue-color font-wt-b mt-2">Holiday List<span>(06)</span></div>
+                    </div>
+                    <div class="col-sm-6 col-6 px-0">
+                        <button type="button" class="btn-2blue font-13 float-right" id="AddnewHolidayModal">Add New
+                        </button>
+                    </div>
+                </div>
+                <div class="row my-2">
+                    <div class="col-sm-4 col-6 px-0">
+                        <select class="inputField selectField w-100 All"  name="salutation" id="salutation">
+                            <option value="All">All</option>
+                            <option value="Select">Select</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-8 col-6 px-0">
+                        <div class="dropdown float-right" >
+                            <button class="btn iconBox iconExport" type="button" id="dropdownMenuButton"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            </button>
+
+                            <div class="dropdown-menu dropdown-menu-right logoutContainer"
+                            aria-labelledby="dropdownMenuButton">
+                                <input type="hidden" name="show_columns" id="show_columns" value="" >
+                                <a class="dropdown-item  " onclick="exports('excel')" href="javascript:void(0)">Export to excel
+                                    <img src="{% static 'img/svg/XLS.svg' %}" class="logoutIcons ml-1" /> 
+                                </a>
+                                <a class="dropdown-item " onclick="exports('pdf')" href="javascript:void(0)">Export to Pdf 
+                                    <img src="{% static 'img/svg/PDF.svg' %}" class="logoutIcons ml-1" />
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+                <div class="row h-100 mt-2 holiday-selcetion-row mob-h-100" id="tableBox">
+                    <div class="col-md-12 primaryContainerBG h-100 p-0 commonTableBg">
+                        <table id="rolesTable" class="table table-borderless  table-hover mt-0"
+                        style="width: 100%;">
+                            <thead> <tr> </tr> </thead>
+                            <tbody id="tablebody">
+                                <tr>
+                                    <td>
+                                        <div class="accent-color font-wt-b font-12" style="margin-left: 11px;">
+                                            January
+                                        </div>
+                                        <ul>
+                                            <li class="holidays_row">
+                                                <div class="col-sm-4 col-4 px-0 holidays_name">Republic Day</div>
+                                                <div class="col-sm-4 col-4 px-0 holidays_date"> 
+                                                    <span class="d-inline-block ml-1">26 jan ,</span>
+                                                    <span class="d-inline-block ml-1">2021 ,</span>
+                                                    <span class="d-inline-block ml-1">Tuesday</span>
+                                                </div>
+                                                <div class="col-sm-4 col-4 px-0 ">
+                                                    <div class="row float-right">
+                                                        <a href="#" onclick="deleteHolidays('')">
+                                                            <img class="tableRowIcon tableRowIcon-product-icon" src="/static/img/svg/delete.svg" style="width: 11px;">
+                                                        </a>
+                                                        <a href="#" class="ml-2" onclick="editHolidays('')">
+                                                            <img class="tableRowIcon tableRowIcon-product-icon mr-0" src="/static/img/svg/editcopy.svg" style="width: 16px;" >
+                                                        </a> 
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="accent-color font-wt-b font-12" style="margin-left: 11px;">
+                                            January
+                                        </div>
+                                        <ul>
+                                            <li class="holidays_row">
+                                                <div class="col-sm-4 col-4 px-0 holidays_name">Republic Day</div>
+                                                <div class="col-sm-4 col-4 px-0 holidays_date"> 
+                                                    <span class="d-inline-block ml-1">26 jan ,</span>
+                                                    <span class="d-inline-block ml-1">2021 ,</span>
+                                                    <span class="d-inline-block ml-1">Tuesday</span>
+                                                </div>
+                                                <div class="col-sm-4 col-4 px-0 ">
+                                                    <div class="row float-right">
+                                                        <a href="#" onclick="deleteHolidays('')">
+                                                            <img class="tableRowIcon tableRowIcon-product-icon" src="/static/img/svg/delete.svg" style="width: 11px;">
+                                                        </a>
+                                                        <a href="#" class="ml-2" onclick="editHolidays('')">
+                                                            <img class="tableRowIcon tableRowIcon-product-icon mr-0" src="/static/img/svg/editcopy.svg" style="width: 16px;" >
+                                                        </a> 
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="accent-color font-wt-b font-12" style="margin-left: 11px;">
+                                            January
+                                        </div>
+                                        <ul>
+                                            <li class="holidays_row">
+                                                <div class="col-sm-4 col-4 px-0 holidays_name">Republic Day</div>
+                                                <div class="col-sm-4 col-4 px-0 holidays_date"> 
+                                                    <span class="d-inline-block ml-1">26 jan ,</span>
+                                                    <span class="d-inline-block ml-1">2021 ,</span>
+                                                    <span class="d-inline-block ml-1">Tuesday</span>
+                                                </div>
+                                                <div class="col-sm-4 col-4 px-0 ">
+                                                    <div class="row float-right">
+                                                        <a href="#" onclick="deleteHolidays('')">
+                                                            <img class="tableRowIcon tableRowIcon-product-icon" src="/static/img/svg/delete.svg" style="width: 11px;">
+                                                        </a>
+                                                        <a href="#" class="ml-2" onclick="editHolidays('')">
+                                                            <img class="tableRowIcon tableRowIcon-product-icon mr-0" src="/static/img/svg/editcopy.svg" style="width: 16px;" >
+                                                        </a> 
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="accent-color font-wt-b font-12" style="margin-left: 11px;">
+                                            January
+                                        </div>
+                                        <ul>
+                                            <li class="holidays_row">
+                                                <div class="col-sm-4 col-4 px-0 holidays_name">Republic Day</div>
+                                                <div class="col-sm-4 col-4 px-0 holidays_date"> 
+                                                    <span class="d-inline-block ml-1">26 jan ,</span>
+                                                    <span class="d-inline-block ml-1">2021 ,</span>
+                                                    <span class="d-inline-block ml-1">Tuesday</span>
+                                                </div>
+                                                <div class="col-sm-4 col-4 px-0 ">
+                                                    <div class="row float-right">
+                                                        <a href="#" onclick="deleteHolidays('')">
+                                                            <img class="tableRowIcon tableRowIcon-product-icon" src="/static/img/svg/delete.svg" style="width: 11px;">
+                                                        </a>
+                                                        <a href="#" class="ml-2" onclick="editHolidays('')">
+                                                            <img class="tableRowIcon tableRowIcon-product-icon mr-0" src="/static/img/svg/editcopy.svg" style="width: 16px;" >
+                                                        </a> 
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="accent-color font-wt-b font-12" style="margin-left: 11px;">
+                                            January
+                                        </div>
+                                        <ul>
+                                            <li class="holidays_row">
+                                                <div class="col-sm-4 col-4 px-0 holidays_name">Republic Day</div>
+                                                <div class="col-sm-4 col-4 px-0 holidays_date"> 
+                                                    <span class="d-inline-block ml-1">26 jan ,</span>
+                                                    <span class="d-inline-block ml-1">2021 ,</span>
+                                                    <span class="d-inline-block ml-1">Tuesday</span>
+                                                </div>
+                                                <div class="col-sm-4 col-4 px-0 ">
+                                                    <div class="row float-right">
+                                                        <a href="#" onclick="deleteHolidays('')">
+                                                            <img class="tableRowIcon tableRowIcon-product-icon" src="/static/img/svg/delete.svg" style="width: 11px;">
+                                                        </a>
+                                                        <a href="#" class="ml-2" onclick="editHolidays('')">
+                                                            <img class="tableRowIcon tableRowIcon-product-icon mr-0" src="/static/img/svg/editcopy.svg" style="width: 16px;" >
+                                                        </a> 
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="accent-color font-wt-b font-12" style="margin-left: 11px;">
+                                            January
+                                        </div>
+                                        <ul>
+                                            <li class="holidays_row">
+                                                <div class="col-sm-4 col-4 px-0 holidays_name">Republic Day</div>
+                                                <div class="col-sm-4 col-4 px-0 holidays_date"> 
+                                                    <span class="d-inline-block ml-1">26 jan ,</span>
+                                                    <span class="d-inline-block ml-1">2021 ,</span>
+                                                    <span class="d-inline-block ml-1">Tuesday</span>
+                                                </div>
+                                                <div class="col-sm-4 col-4 px-0 ">
+                                                    <div class="row float-right">
+                                                        <a href="#" onclick="deleteHolidays('')">
+                                                            <img class="tableRowIcon tableRowIcon-product-icon" src="/static/img/svg/delete.svg" style="width: 11px;">
+                                                        </a>
+                                                        <a href="#" class="ml-2" onclick="editHolidays('')">
+                                                            <img class="tableRowIcon tableRowIcon-product-icon mr-0" src="/static/img/svg/editcopy.svg" style="width: 16px;" >
+                                                        </a> 
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="accent-color font-wt-b font-12" style="margin-left: 11px;">
+                                            January
+                                        </div>
+                                        <ul>
+                                            <li class="holidays_row">
+                                                <div class="col-sm-4 col-4 px-0 holidays_name">Republic Day</div>
+                                                <div class="col-sm-4 col-4 px-0 holidays_date"> 
+                                                    <span class="d-inline-block ml-1">26 jan ,</span>
+                                                    <span class="d-inline-block ml-1">2021 ,</span>
+                                                    <span class="d-inline-block ml-1">Tuesday</span>
+                                                </div>
+                                                <div class="col-sm-4 col-4 px-0 ">
+                                                    <div class="row float-right">
+                                                        <a href="#" onclick="deleteHolidays('')">
+                                                            <img class="tableRowIcon tableRowIcon-product-icon" src="/static/img/svg/delete.svg" style="width: 11px;">
+                                                        </a>
+                                                        <a href="#" class="ml-2" onclick="editHolidays('')">
+                                                            <img class="tableRowIcon tableRowIcon-product-icon mr-0" src="/static/img/svg/editcopy.svg" style="width: 16px;" >
+                                                        </a> 
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="accent-color font-wt-b font-12" style="margin-left: 11px;">
+                                            January
+                                        </div>
+                                        <ul>
+                                            <li class="holidays_row">
+                                                <div class="col-sm-4 col-4 px-0 holidays_name">Republic Day</div>
+                                                <div class="col-sm-4 col-4 px-0 holidays_date"> 
+                                                    <span class="d-inline-block ml-1">26 jan ,</span>
+                                                    <span class="d-inline-block ml-1">2021 ,</span>
+                                                    <span class="d-inline-block ml-1">Tuesday</span>
+                                                </div>
+                                                <div class="col-sm-4 col-4 px-0 ">
+                                                    <div class="row float-right">
+                                                        <a href="#" onclick="deleteHolidays('')">
+                                                            <img class="tableRowIcon tableRowIcon-product-icon" src="/static/img/svg/delete.svg" style="width: 11px;">
+                                                        </a>
+                                                        <a href="#" class="ml-2" onclick="editHolidays('')">
+                                                            <img class="tableRowIcon tableRowIcon-product-icon mr-0" src="/static/img/svg/editcopy.svg" style="width: 16px;" >
+                                                        </a> 
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="accent-color font-wt-b font-12" style="margin-left: 11px;">
+                                            January
+                                        </div>
+                                        <ul>
+                                            <li class="holidays_row">
+                                                <div class="col-sm-4 col-4 px-0 holidays_name">Republic Day</div>
+                                                <div class="col-sm-4 col-4 px-0 holidays_date"> 
+                                                    <span class="d-inline-block ml-1">26 jan ,</span>
+                                                    <span class="d-inline-block ml-1">2021 ,</span>
+                                                    <span class="d-inline-block ml-1">Tuesday</span>
+                                                </div>
+                                                <div class="col-sm-4 col-4 px-0 ">
+                                                    <div class="row float-right">
+                                                        <a href="#" onclick="deleteHolidays('')">
+                                                            <img class="tableRowIcon tableRowIcon-product-icon" src="/static/img/svg/delete.svg" style="width: 11px;">
+                                                        </a>
+                                                        <a href="#" class="ml-2" onclick="editHolidays('')">
+                                                            <img class="tableRowIcon tableRowIcon-product-icon mr-0" src="/static/img/svg/editcopy.svg" style="width: 16px;" >
+                                                        </a> 
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="accent-color font-wt-b font-12" style="margin-left: 11px;">
+                                            January
+                                        </div>
+                                        <ul>
+                                            <li class="holidays_row">
+                                                <div class="col-sm-4 col-4 px-0 holidays_name">Republic Day</div>
+                                                <div class="col-sm-4 col-4 px-0 holidays_date"> 
+                                                    <span class="d-inline-block ml-1">26 jan ,</span>
+                                                    <span class="d-inline-block ml-1">2021 ,</span>
+                                                    <span class="d-inline-block ml-1">Tuesday</span>
+                                                </div>
+                                                <div class="col-sm-4 col-4 px-0 ">
+                                                    <div class="row float-right">
+                                                        <a href="#" onclick="deleteHolidays('')">
+                                                            <img class="tableRowIcon tableRowIcon-product-icon" src="/static/img/svg/delete.svg" style="width: 11px;">
+                                                        </a>
+                                                        <a href="#" class="ml-2" onclick="editHolidays('')">
+                                                            <img class="tableRowIcon tableRowIcon-product-icon mr-0" src="/static/img/svg/editcopy.svg" style="width: 16px;" >
+                                                        </a> 
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+        </div>
+    </div>
+</div>
+            
+    <!-- *************************************Modal********************************** -->
+    
+    <div class="overlayModal" id="AddnewHolidayModal" data-keyboard="false" data-backdrop="static" style="display: none;">
+        {% load static %}
+        <div class="modal-AddOrganisation centered" >
+            <div class="modal-body p-0">
+                <div class="row">
+                    <div class="col-sm-3 col-12 px-0 ">
+                       <div class="row modalHoliday">
+                           <div class="text-center">
+                                <img src="{% static 'img/svg/calander-vications.svg' %}"  />
+                                <h4 class="text-white mt-2">Add New <span class="modal-heading d-block"> Holiday </span></h4>
+                           </div>
+                       </div>
+                    </div>
+                    <div class="col-sm-9 col-12 add-details-popup">
+                        <form name="" method="POST" autocomplete="off" action=""  >
+                            {% csrf_token %}
+                            <div class="row add-form-row-mrng" style="justify-content: flex-end;">
+                                <button class="btn btn-close " type="button"  onclick="manipulateModal('addOrganisationModal','close')">
+                                    <span class="mob-d-none">Close</span>
+                                    <i class="far fa-times-circle mob-d-block desk-d-none"></i>
+                                </button>
+                                <button class="btn btn-save mob-ml-16" type="button" onclick="saveOrganization()">
+                                    Save
+                                </button>
+                            </div>
+                            <div class="row add-form-row-mrng">
+                                <div class="col-sm-12 col-12  pr-0 mt-2">
+                                    <img src="{% static 'img/svg/vication-holiday.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="font-wt-b d-inline-block"">
+                                        Organisation Name
+                                    </h6>
+                                </div>
+                                   
+                                <div class="col-sm-12 col-12 px-0 mt-2">
+                                    <input class="inputField" type="text" placeholder="Organisation Name*"
+                                        id="" name="organization_name" maxlength="50" />
+                                    <label class="error_msg float-right" id="organization_name_error"></label>
+                                    
+                                </div>
+                            </div>
+                            <div class="row add-form-row-mrng mt-2">
+                                <div class="col-sm-12 col-12  pr-0">
+                                    <img src="{% static 'img/svg/calander-blue.svg' %}" class="profileIconSize" />&nbsp;&nbsp;
+                                    <h6 class="font-wt-b d-inline-block">Select Date Range</h6>
+                                </div>
+        
+                                <div class="col-sm-12 col-12 px-0 mt-2">
+                                    <div class="row ">
+                                        <div class="col-sm-6 col-6 pl-0 pr-2">
+                                            <input class="inputField position-relative" type="text" placeholder="Date From*" id="" name="dateFrom" />
+                                            <img src="{% static 'img/svg/claender-grey.svg' %}" class="profileIconSize calender-icon-input" style="right: 16px;" />
+                                            <label class="error_msg float-right" id="address_error"></label>
+                                        </div>
+                                        <div class="col-sm-6 col-6  pl-1 pr-0 ">
+                                            <input class="inputField position-relative" type="text" placeholder="Date To*" id="" name="dateTo"  />
+                                            <img src="{% static 'img/svg/claender-grey.svg' %}" class="profileIconSize calender-icon-input" />
+                                            <label class="error_msg float-right" id="pincode_error"></label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    
+    <!-- *************************************Modal********************************** -->
+{% endblock content %}
+
+{% block script %}
+   
+{% endblock %}
